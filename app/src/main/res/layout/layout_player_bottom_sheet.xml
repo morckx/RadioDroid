@@ -7,13 +7,13 @@
     android:orientation="vertical"
     android:translationZ="10dp"
     app:behavior_hideable="false"
-    app:behavior_peekHeight="?android:attr/actionBarSize"
+    app:behavior_peekHeight="128dp"
     app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
     <FrameLayout
         android:id="@+id/fragment_player_small"
         android:layout_width="match_parent"
-        android:layout_height="?android:attr/actionBarSize"
+        android:layout_height="128dp"
         android:tag="1" />
 
     <FrameLayout

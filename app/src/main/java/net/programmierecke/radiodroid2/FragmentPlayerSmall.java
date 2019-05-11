@@ -24,6 +24,8 @@ import net.programmierecke.radiodroid2.station.DataRadioStation;
 import net.programmierecke.radiodroid2.station.StationActions;
 import net.programmierecke.radiodroid2.station.live.StreamLiveInfo;
 
+import java.io.IOException;
+
 public class FragmentPlayerSmall extends Fragment {
     private TrackHistoryRepository trackHistoryRepository;
 
@@ -52,6 +54,7 @@ public class FragmentPlayerSmall extends Fragment {
     private ImageView imageViewIcon;
 
     private ImageButton buttonPlay;
+    private ImageButton buttonPower;
     private ImageButton buttonMore;
 
     private boolean firstPlayAttempted = false;
@@ -91,6 +94,25 @@ public class FragmentPlayerSmall extends Fragment {
         textViewLiveInfo = view.findViewById(R.id.textViewLiveInfo);
         textViewLiveInfoBig = view.findViewById(R.id.textViewLiveInfoBig);
         imageViewIcon = view.findViewById(R.id.playerRadioImage);
+        buttonPower = view.findViewById(R.id.buttonPower);
+        if (buttonPower != null) {
+            buttonPower.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (PlayerServiceUtil.isPlaying()) {
+                        if (PlayerServiceUtil.isPlaying())
+                            PlayerServiceUtil.stop();
+                        // Don't stop MPD playback when a user is listening in the app
+                    }
+                    try {
+                        Runtime.getRuntime().exec("su -c input keyevent 26");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+
 
         buttonPlay = view.findViewById(R.id.buttonPlay);
         buttonMore = view.findViewById(R.id.buttonMore);
