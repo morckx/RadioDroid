@@ -241,4 +241,5 @@
     <string name="settings_retry_timeout">Zeitüberschreitung für Wiederverbindungsversuche</string>
     <string name="settings_seconds_format">%d Sekunden</string>
     <string name="settings_view_mpd_servers">Ihre Server</string>
+    <string name="action_off">Ausschalten</string>
 </resources>

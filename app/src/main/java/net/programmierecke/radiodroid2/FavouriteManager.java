@@ -60,11 +60,13 @@ public class FavouriteManager extends StationSaveManager {
 
     public void updateShortcuts() {
         if (Build.VERSION.SDK_INT >= 25) {
-            int number = min(listStations.size(), ActivityMain.MAX_DYNAMIC_LAUNCHER_SHORTCUTS);
+            int number = min(listStations.size() + 1, ActivityMain.MAX_DYNAMIC_LAUNCHER_SHORTCUTS);
             SetDynamicAppLauncherShortcuts setDynamicAppLauncherShortcuts = new SetDynamicAppLauncherShortcuts(number);
-            for (int i = 0; i < number; i++) {
+            for (int i = 0; i < number - 1; i++) {
                 listStations.get(i).prepareShortcut(context, setDynamicAppLauncherShortcuts);
             }
+
+            new DataRadioStation().prepareOffShortcut(context, setDynamicAppLauncherShortcuts);
         }
     }
 

@@ -47,7 +47,6 @@ import com.google.android.material.navigation.NavigationView;
 
 import com.google.android.material.tabs.TabLayout;
 import com.mikepenz.iconics.Iconics;
-import com.mikepenz.iconics.context.IconicsLayoutInflater2;
 import com.rustamg.filedialogs.FileDialog;
 import com.rustamg.filedialogs.OpenFileDialog;
 import com.rustamg.filedialogs.SaveFileDialog;
@@ -62,17 +61,26 @@ import net.programmierecke.radiodroid2.players.mpd.MPDServersRepository;
 import net.programmierecke.radiodroid2.players.PlayStationTask;
 import net.programmierecke.radiodroid2.players.selector.PlayerType;
 import net.programmierecke.radiodroid2.service.MediaSessionCallback;
+import net.programmierecke.radiodroid2.service.PauseReason;
 import net.programmierecke.radiodroid2.service.PlayerService;
 import net.programmierecke.radiodroid2.service.PlayerServiceUtil;
 import net.programmierecke.radiodroid2.station.DataRadioStation;
 import net.programmierecke.radiodroid2.station.StationsFilter;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.lang.ref.WeakReference;
+import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Date;
 
 import okhttp3.OkHttpClient;
 
 import static net.programmierecke.radiodroid2.service.MediaSessionCallback.EXTRA_STATION_UUID;
+import static net.programmierecke.radiodroid2.service.MediaSessionCallback.EXTRA_STATION_UUID;
+import static net.programmierecke.radiodroid2.service.MediaSessionCallback.EXTRA_STOP;
+import static net.programmierecke.radiodroid2.service.MediaSessionCallback.EXTRA_TURN_OFF;
 
 public class ActivityMain extends AppCompatActivity implements SearchView.OnQueryTextListener, NavigationView.OnNavigationItemSelectedListener, BottomNavigationView.OnNavigationItemSelectedListener, FileDialog.OnFileSelectedListener, TimePickerDialog.OnTimeSetListener, SearchPreferenceResultListener {
 
@@ -495,6 +503,19 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
             intent.removeExtra(EXTRA_STATION_UUID); // mark intent as consumed
             RadioDroidApp radioDroidApp = (RadioDroidApp) getApplication();
             final OkHttpClient httpClient = radioDroidApp.getHttpClient();
+
+            if (stationUUID.equals(EXTRA_STOP) || stationUUID.equals(EXTRA_TURN_OFF)) {
+                if (PlayerServiceUtil.isPlaying())
+                    PlayerServiceUtil.pause(PauseReason.USER);
+                if (stationUUID.equals(EXTRA_TURN_OFF)) {
+                    try {
+                        Process p = Runtime.getRuntime().exec("su -c input keyevent 26");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                return;
+            }
 
             new AsyncTask<Void, Void, DataRadioStation>() {
                 @Override

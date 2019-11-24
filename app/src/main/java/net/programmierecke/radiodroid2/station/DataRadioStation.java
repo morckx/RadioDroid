@@ -34,6 +34,7 @@ import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
 import okhttp3.OkHttpClient;
 
 import static net.programmierecke.radiodroid2.Utils.resourceToUri;
+import static net.programmierecke.radiodroid2.service.MediaSessionCallback.EXTRA_TURN_OFF;
 
 public class DataRadioStation implements Parcelable {
 	static final String TAG = "DATAStation";
@@ -444,4 +445,18 @@ public class DataRadioStation implements Parcelable {
 
         }
     }
+
+	public void prepareOffShortcut(Context ctx, ShortcutReadyListener cb) {
+		if (Build.VERSION.SDK_INT >= 25) {
+			Intent playByUUUIDintent = new Intent(MediaSessionCallback.ACTION_PLAY_STATION_BY_UUID, null, ctx, ActivityMain.class)
+					.putExtra(MediaSessionCallback.EXTRA_STATION_UUID, EXTRA_TURN_OFF);
+			ShortcutInfo shortcut = new ShortcutInfo.Builder(ctx.getApplicationContext(), ctx.getPackageName() + "/" + EXTRA_TURN_OFF)
+					.setShortLabel(ctx.getString(R.string.action_off))
+					.setIcon(Icon.createWithResource(ctx, R.drawable.power_off_24dp))
+					.setIntent(playByUUUIDintent)
+					.build();
+			cb.onShortcutReadyListener(shortcut);
+		}
+	}
+
 }
