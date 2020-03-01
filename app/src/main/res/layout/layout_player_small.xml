@@ -64,7 +64,7 @@
         android:ellipsize="end"
         android:gravity="top"
         android:singleLine="true"
-        android:textColor="@color/textColorSecondary"
+        android:textColor="?android:textColorSecondary"
         android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
