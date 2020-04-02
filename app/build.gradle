@@ -104,6 +104,7 @@ dependencies {
     implementation 'com.github.rustamg:file-dialogs:1.0'
     implementation 'info.debatty:java-string-similarity:1.2.1'
     implementation 'me.xdrop:fuzzywuzzy:1.2.0'
+    implementation 'eu.chainfire:libsuperuser:1.1.0.+'
 
     implementation "androidx.room:room-runtime:2.2.4"
     annotationProcessor "androidx.room:room-compiler:2.2.4"

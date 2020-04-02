@@ -25,6 +25,7 @@ import net.programmierecke.radiodroid2.station.StationActions;
 import net.programmierecke.radiodroid2.station.live.StreamLiveInfo;
 
 import java.io.IOException;
+import eu.chainfire.libsuperuser.Shell;
 
 public class FragmentPlayerSmall extends Fragment {
     private TrackHistoryRepository trackHistoryRepository;
@@ -105,8 +106,8 @@ public class FragmentPlayerSmall extends Fragment {
                         // Don't stop MPD playback when a user is listening in the app
                     }
                     try {
-                        Runtime.getRuntime().exec("su -c input keyevent 26");
-                    } catch (IOException e) {
+                        Shell.Pool.SU.run("input keyevent 26");
+                    } catch (Shell.ShellDiedException e) {
                         e.printStackTrace();
                     }
                 }

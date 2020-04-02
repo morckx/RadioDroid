@@ -75,6 +75,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 
+import eu.chainfire.libsuperuser.Shell;
 import okhttp3.OkHttpClient;
 
 import static net.programmierecke.radiodroid2.service.MediaSessionCallback.EXTRA_STATION_UUID;
@@ -509,8 +510,8 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
                     PlayerServiceUtil.pause(PauseReason.USER);
                 if (stationUUID.equals(EXTRA_TURN_OFF)) {
                     try {
-                        Process p = Runtime.getRuntime().exec("su -c input keyevent 26");
-                    } catch (IOException e) {
+                        Shell.Pool.SU.run("input keyevent 26");
+                    } catch (Shell.ShellDiedException e) {
                         e.printStackTrace();
                     }
                 }
