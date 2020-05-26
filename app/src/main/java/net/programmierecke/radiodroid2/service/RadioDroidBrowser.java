@@ -49,6 +49,7 @@ public class RadioDroidBrowser {
     private static final String MEDIA_ID_ROOT = "__ROOT__";
     private static final String MEDIA_ID_MUSICS_FAVORITE = "__FAVORITE__";
     private static final String MEDIA_ID_MUSICS_HISTORY = "__HISTORY__";
+    private static final String MEDIA_ID_MUSICS_SEARCH_RESULTS = "__SEARCH_RESULTS__";
     private static final String MEDIA_ID_MUSICS_TOP = "__TOP__";
     private static final String MEDIA_ID_MUSICS_TOP_TAGS = "__TOP_TAGS__";
 
@@ -225,8 +226,8 @@ public class RadioDroidBrowser {
                 stations = radioDroidApp.getHistoryManager().getList();
                 break;
             }
-            case MEDIA_ID_MUSICS_TOP: {
-
+            case MEDIA_ID_MUSICS_SEARCH_RESULTS: {
+                stations = radioDroidApp.getSearchResultsManager().getList();
                 break;
             }
         }
@@ -262,6 +263,13 @@ public class RadioDroidBrowser {
                 .setMediaId(MEDIA_ID_MUSICS_HISTORY)
                 .setTitle(resources.getString(R.string.nav_item_history))
                 .setIconUri(resourceToUri(resources, R.drawable.ic_restore_black_24dp))
+                .build(),
+                MediaBrowserCompat.MediaItem.FLAG_BROWSABLE));
+
+        mediaItems.add(new MediaBrowserCompat.MediaItem(new MediaDescriptionCompat.Builder()
+                .setMediaId(MEDIA_ID_MUSICS_SEARCH_RESULTS)
+                .setTitle(resources.getString(R.string.search_results))
+                .setIconUri(resourceToUri(resources, R.drawable.searchpreference_ic_search))
                 .build(),
                 MediaBrowserCompat.MediaItem.FLAG_BROWSABLE));
 

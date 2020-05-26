@@ -168,6 +168,10 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
             PlayerService.this.setStation(station);
         }
 
+        public void setPlaybackState(int playbackState) {
+            PlayerService.this.setMediaPlaybackState(playbackState);
+        }
+
         public void SkipToNext() throws RemoteException {
             PlayerService.this.next();
         }
@@ -750,7 +754,7 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
         //sendBroadCast(PLAYER_SERVICE_STATE_CHANGE);
     }
 
-    private void setMediaPlaybackState(int state) {
+    public void setMediaPlaybackState(int state) {
         if (mediaSession == null) {
             return;
         }

@@ -77,6 +77,11 @@ android {
         }
         unitTests.returnDefaultValues = true
     }
+
+    packagingOptions {
+        exclude "META-INF/LICENSE*"
+        exclude "META-INF/NOTICE*"
+    }
 }
 
 def getLastFMApiKey() {
@@ -131,6 +136,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.2'
     implementation 'com.github.zawadz88.materialpopupmenu:material-popup-menu:3.4.0'
+    implementation ('de.sfuhrm:radiobrowser4j:2.0.2'){ exclude group: 'javax.activation' }
 }
 
 

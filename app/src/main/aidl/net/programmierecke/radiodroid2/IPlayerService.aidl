@@ -11,6 +11,7 @@ import android.support.v4.media.session.MediaSessionCompat;
 interface IPlayerService
 {
 void SetStation(in DataRadioStation station);
+void setPlaybackState(in int state);
 void Play(boolean isAlarm);
 void Pause(in PauseReason pauseReason);
 void Resume();

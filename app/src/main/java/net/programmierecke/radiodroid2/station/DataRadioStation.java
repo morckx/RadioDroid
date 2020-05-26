@@ -28,6 +28,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import de.sfuhrm.radiobrowser4j.Station;
 import jp.wasabeef.picasso.transformations.CropCircleTransformation;
 import jp.wasabeef.picasso.transformations.CropSquareTransformation;
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
@@ -64,6 +65,7 @@ public class DataRadioStation implements Parcelable {
 	public String Codec;
 	public boolean Working = true;
 	public boolean Hls = false;
+	public double distanceFromQuery = Double.MAX_VALUE;
 
 	public String playableUrl;
 
@@ -251,6 +253,35 @@ public class DataRadioStation implements Parcelable {
 					Log.e(TAG, "DecodeJsonSingle() "+e);
 				}
 			}
+		}
+		return null;
+	}
+
+	public static DataRadioStation DataRadioStationFromStation(Station s) {
+		if (s != null) {
+			DataRadioStation aStation = new DataRadioStation();
+			aStation.Name = s.getName();
+			aStation.StreamUrl = s.getUrlResolved();
+			aStation.StreamUrl = s.getUrl();
+			aStation.StationUuid = s.getStationUUID().toString();
+			aStation.ChangeUuid = s.getChangeUUID().toString();
+			aStation.Votes = s.getVotes();
+			aStation.RefreshRetryCount = 0;
+			aStation.HomePageUrl = s.getHomepage();
+			aStation.TagsAll = s.getTags();
+			aStation.Country = s.getCountry();
+			aStation.CountryCode = s.getCountryCode();
+			aStation.State = s.getState();
+			aStation.IconUrl = s.getFavicon();
+			aStation.Language = s.getLanguage();
+			aStation.ClickCount = s.getClickcount();
+			aStation.ClickTrend = s.getClicktrend();
+			aStation.Bitrate = s.getBitrate();
+			aStation.Codec = s.getCodec();
+			aStation.Working = s.getLastcheckok() != 0;
+			aStation.fixStationFields();
+
+			return aStation;
 		}
 		return null;
 	}

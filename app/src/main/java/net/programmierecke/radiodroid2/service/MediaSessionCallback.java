@@ -2,15 +2,21 @@ package net.programmierecke.radiodroid2.service;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
+import android.util.Log;
 import android.view.KeyEvent;
 
+import androidx.annotation.RequiresApi;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import net.programmierecke.radiodroid2.IPlayerService;
 import net.programmierecke.radiodroid2.RadioDroidApp;
+import net.programmierecke.radiodroid2.SearchResultsManager;
 import net.programmierecke.radiodroid2.station.DataRadioStation;
 import net.programmierecke.radiodroid2.utils.GetRealLinkAndPlayTask;
 
@@ -19,6 +25,7 @@ public class MediaSessionCallback extends MediaSessionCompat.Callback {
     public static final String EXTRA_STATION_ID = "STATION_ID";
     public static final String ACTION_PLAY_STATION_BY_UUID = "PLAY_STATION_BY_UUID";
     public static final String EXTRA_STATION_UUID = "STATION_UUID";
+    private static final String TAG = "MediaSessionCallback";
 
     private Context context;
     private IPlayerService playerService;
@@ -112,13 +119,21 @@ public class MediaSessionCallback extends MediaSessionCompat.Callback {
     public void onPlayFromSearch(String query, Bundle extras) {
         // remove voice search residues like " with radiodroid"
         query = query.replaceAll("(?i) \\w+ radio\\s*droid.*", "");
-
-        DataRadioStation station = ((RadioDroidApp) context.getApplicationContext()).getFavouriteManager().getBestNameMatch(query);
-        if (station == null)
-           station = ((RadioDroidApp) context.getApplicationContext()).getHistoryManager().getBestNameMatch(query);
-        if (station == null)
-            station = ((RadioDroidApp) context.getApplicationContext()).getFallbackStationsManager().getBestNameMatch(query);
-        GetRealLinkAndPlayTask playTask = new GetRealLinkAndPlayTask(context, station, playerService);
-        playTask.execute();
+        SearchResultsManager searchResultsManager = ((RadioDroidApp) context.getApplicationContext()).getSearchResultsManager();
+        try {
+            playerService.setPlaybackState(PlaybackStateCompat.STATE_CONNECTING);
+        } catch (RemoteException e) {}
+        new SearchResultsManager.AsyncStationSearchTask(searchResultsManager, query, bestMatchStation -> {
+            try {
+                if (bestMatchStation != null) {
+                    playerService.SetStation(bestMatchStation);
+                    playerService.Play(false);
+                } else {
+                    playerService.setPlaybackState(PlaybackStateCompat.STATE_ERROR);
+                }
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }).execute();
     }
 }

@@ -67,6 +67,12 @@ public class StationSaveManager extends Observable {
         }
     }
 
+    public void addUniqe(DataRadioStation station) {
+        if (getById(station.StationUuid) == null)
+            add(station);
+    }
+
+
     public void addFront(DataRadioStation station) {
         listStations.add(0, station);
         Save();
