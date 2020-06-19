@@ -86,7 +86,7 @@ def getLastFMApiKey() {
 
 ext {
     exoplayerVersion = '2.11.4'
-    iconicsVersion = '4.0.2'
+    iconicsVersion = '5.0.3'
 }
 
 dependencies {
