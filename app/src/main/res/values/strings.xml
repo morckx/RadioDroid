@@ -236,7 +236,7 @@
     <string name="error_caching_stream">Stream caching problem</string>
     <string name="error_play_stream">Unable to play stream</string>
     <string name="error_stream_reconnect_timeout">Unable to reconnect to the stream: timeout</string>
-    <string name="warning_no_network_trying_resume">No network connection. Trying to resume when connection is back.</string>
+    <string name="warning_network_lost_trying_resume">Network connection lost. Trying to resume when connection is back.</string>
     <string name="giving_up_resume">Giving up attempt to resume playback</string>
 
     <string name="error_record_needs_write">Need write permission for recording</string>
@@ -344,4 +344,5 @@
     <string name="settings_grid_layout_hud_icon_display">Grid layout for station icons</string>
     <string name="settings_grid_layout_hud_icon_display_desc_off">Stations are displayed in list layout</string>
     <string name="settings_grid_style_layout_icon_display_desc_on">Station icons are displayed in grid layout</string>
+    <string name="error_no_network_connection">No network connection.</string>
 </resources>
