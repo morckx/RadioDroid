@@ -150,7 +150,7 @@ dependencies {
     implementation 'androidx.paging:paging-runtime:2.1.2'
 
     playImplementation 'com.google.android.gms:play-services-cast:18.1.0'
-    playImplementation 'com.google.android.gms:play-services-cast-framework:18.1.0'
+    playImplementation 'com.google.android.gms:play-services-cast-framework:19.0.0'
     playImplementation 'com.google.android.gms:play-services-safetynet:17.0.0'
 
     testImplementation 'junit:junit:4.13'
