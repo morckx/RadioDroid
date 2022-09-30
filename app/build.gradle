@@ -28,9 +28,6 @@ android {
 
     compileSdkVersion 33
 
-    lintOptions {
-        abortOnError true
-    }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
@@ -108,6 +105,10 @@ android {
             dimension "one"
         }
     }
+    lint {
+        abortOnError true
+    }
+    namespace 'net.programmierecke.radiodroid2'
 
     testOptions {
         unitTests.all {
