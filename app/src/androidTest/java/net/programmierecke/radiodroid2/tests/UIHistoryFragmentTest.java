@@ -28,7 +28,9 @@ import java.util.Arrays;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.hasDescendant;
+import static androidx.test.espresso.matcher.ViewMatchers.isDescendantOfA;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static net.programmierecke.radiodroid2.tests.utils.RecyclerDragAndDropAction.recyclerDragAndDrop;
@@ -38,6 +40,7 @@ import static net.programmierecke.radiodroid2.tests.utils.ScrollToRecyclerItemAc
 import static net.programmierecke.radiodroid2.tests.utils.TestUtils.getFakeRadioStationName;
 import static net.programmierecke.radiodroid2.tests.utils.conditionwatcher.ViewMatchWaiter.waitForView;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 
 @LargeTest
@@ -104,19 +107,19 @@ public class UIHistoryFragmentTest {
     public void stationInHistory_ShouldBeDeleted_WithSwipeRight() {
         onView(withId(R.id.nav_item_history)).perform(ViewActions.click());
 
-        onView(withId(R.id.recyclerViewStations)).perform(scrollToRecyclerItem(0));
+        onView(allOf((withId(R.id.recyclerViewStations)), not(isDescendantOfA(withId(R.id.recyclerViewStations))))).perform(scrollToRecyclerItem(0));
         onView(withRecyclerView(R.id.recyclerViewStations).atPosition(0)).perform(ViewActions.swipeRight());
         onView(withRecyclerView(R.id.recyclerViewStations).atPosition(0))
                 .check(matches(hasDescendant(withText(getFakeRadioStationName(STATIONS_COUNT - 2)))));
         assertEquals(STATIONS_COUNT - 1, historyManager.getList().size());
 
-        onView(withId(R.id.recyclerViewStations)).perform(scrollToRecyclerItem(1));
+        onView(allOf((withId(R.id.recyclerViewStations)), not(isDescendantOfA(withId(R.id.recyclerViewStations))))).perform(scrollToRecyclerItem(1));
         onView(withRecyclerView(R.id.recyclerViewStations).atPosition(1)).perform(ViewActions.swipeRight());
         onView(withRecyclerView(R.id.recyclerViewStations).atPosition(1))
                 .check(matches(hasDescendant(withText(getFakeRadioStationName(STATIONS_COUNT - 4)))));
         assertEquals(STATIONS_COUNT - 2, historyManager.getList().size());
 
-        onView(withId(R.id.recyclerViewStations)).perform(scrollToRecyclerItem(2));
+        onView(allOf((withId(R.id.recyclerViewStations)), not(isDescendantOfA(withId(R.id.recyclerViewStations))))).perform(scrollToRecyclerItem(2));
         onView(withRecyclerView(R.id.recyclerViewStations).atPosition(2)).perform(ViewActions.swipeRight());
         onView(withRecyclerView(R.id.recyclerViewStations).atPosition(2))
                 .check(matches(hasDescendant(withText(getFakeRadioStationName(STATIONS_COUNT - 6)))));
