@@ -163,7 +163,7 @@ dependencies {
     implementation 'com.github.rustamg:file-dialogs:1.0'
     implementation 'info.debatty:java-string-similarity:2.0.0'
     implementation 'me.xdrop:fuzzywuzzy:1.2.0'
-    implementation 'com.github.zawadz88.materialpopupmenu:material-popup-menu:3.4.0'
+    implementation 'com.github.zawadz88.materialpopupmenu:material-popup-menu:4.1.0'
     implementation 'com.github.ByteHamster:SearchPreference:v2.0.0'
 
     implementation 'androidx.room:room-runtime:2.4.3'
