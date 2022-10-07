@@ -37,6 +37,7 @@ public class RadioDroidApp extends MultiDexApplication {
     private HistoryManager historyManager;
     private FavouriteManager favouriteManager;
     private RecordingsManager recordingsManager;
+    private FallbackStationsManager fallbackStationsManager;
     private RadioAlarmManager alarmManager;
     private TvChannelManager tvChannelManager;
 
@@ -95,6 +96,7 @@ public class RadioDroidApp extends MultiDexApplication {
 
         historyManager = new HistoryManager(this);
         favouriteManager = new FavouriteManager(this);
+        fallbackStationsManager = new FallbackStationsManager(this);
         recordingsManager = new RecordingsManager();
         alarmManager = new RadioAlarmManager(this);
 
@@ -127,6 +129,10 @@ public class RadioDroidApp extends MultiDexApplication {
                 .addInterceptor(new UserAgentInterceptor("RadioDroid2/" + BuildConfig.VERSION_NAME));
 
         httpClient = builder.build();
+    }
+
+    public FallbackStationsManager getFallbackStationsManager() {
+        return fallbackStationsManager;
     }
 
     public HistoryManager getHistoryManager() {
