@@ -345,4 +345,11 @@
     <string name="settings_ignore_battery_optimization_summary_on">Battery optimization is ignored, RadioDroid should always be able to re-gain focus after focus loss.</string>
     <string name="settings_ignore_battery_optimization_summary_off">Battery optimization is activated, RadioDroid will not be able to re-gain focus after focus loss, if in background.</string>
     <string name="key_ignore_battery_optimization">ignore_battery_optimization</string>
+    <string name="settings_android_auto">Android Auto</string>
+    <string name="settings_show_bitmap_station_icons_in_hud_browser">Use bitmap icons</string>
+    <string name="settings_show_bitmap_station_icons_in_hud_browser_desc_on">Bitmap icons are used in Android Auto. ⚠Note: This is not officially supported and may cause incompatibilities.</string>
+    <string name="settings_show_bitmap_station_icons_in_hud_browser_desc_off">No bitmap icons are used in Android Auto. This is the default and supported behaviour.</string>
+    <string name="settings_grid_layout_hud_icon_display">Grid layout for station icons</string>
+    <string name="settings_grid_layout_hud_icon_display_desc_off">Stations are displayed in list layout</string>
+    <string name="settings_grid_style_layout_icon_display_desc_on">Station icons are displayed in grid layout</string>
 </resources>
