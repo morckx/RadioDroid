@@ -1,3 +1,6 @@
+plugins {
+    id 'de.undercouch.download'
+}
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
@@ -127,6 +130,15 @@ android {
         }
         animationsDisabled = true
         unitTests.returnDefaultValues = true
+    }
+
+    task renewFallbackStations(type: Download) {
+        group 'Build Setup'
+        description 'Renews the list of some popular and recently checked fallback stations'
+        src 'https://de1.api.radio-browser.info/json/stations/search?limit=10&bitrateMax=128&hidebroken=true&has_extended_info=true&order=lastchecktime&reverse=true&bitrateMax=128'
+        dest new File("app/src/main/res/raw", "fallback_stations.json")
+        overwrite true
+        tempAndMove true
     }
 }
 
