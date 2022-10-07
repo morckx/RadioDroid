@@ -134,7 +134,7 @@ public class RadioDroidApp extends MultiDexApplication {
     public FallbackStationsManager getFallbackStationsManager() {
         return fallbackStationsManager;
     }
-   
+
     public HistoryManager getHistoryManager() {
         return historyManager;
     }

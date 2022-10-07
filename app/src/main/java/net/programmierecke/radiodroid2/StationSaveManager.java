@@ -108,7 +108,7 @@ public class StationSaveManager extends Observable {
         }
     }
 
-        public void addAll(List<DataRadioStation> stations) {
+    public void addAll(List<DataRadioStation> stations) {
         if (stations == null)
             return;
         for (DataRadioStation station : stations) {
@@ -540,7 +540,6 @@ public class StationSaveManager extends Observable {
                         DataRadioStation station = Utils.getStationByUuid(httpClient, context, uuid);
                         if (station != null) {
                             station.queue = this;
-                            loadedItems.add(station);
                         }
                     } catch (Exception e) {
                         Log.e("LOAD", e.toString());

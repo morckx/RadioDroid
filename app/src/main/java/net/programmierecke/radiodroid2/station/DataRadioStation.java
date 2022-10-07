@@ -70,7 +70,7 @@ public class DataRadioStation implements Parcelable {
 	public String playableUrl;
 
 	public StationSaveManager queue;
-	
+
 	@Deprecated
 	public String StationId = "";
 

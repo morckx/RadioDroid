@@ -466,7 +466,6 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
         mediaSession.setSessionActivity(PendingIntent.getActivity(itsContext.getApplicationContext(), 0, startActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT | pendingIntentFlag));
 
         setMediaPlaybackState(PlaybackStateCompat.STATE_NONE);
-
         RadioDroidApp radioDroidApp = (RadioDroidApp) getApplication();
         trackHistoryRepository = radioDroidApp.getTrackHistoryRepository();
 
@@ -806,7 +805,6 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
 
             mediaSession.setActive(true);
 
-        setMediaPlaybackState(PlaybackStateCompat.STATE_NONE);
             setMediaPlaybackState(PlaybackStateCompat.STATE_NONE);
         }
     }

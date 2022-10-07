@@ -147,11 +147,11 @@ public class RadioDroidBrowser {
 
             List<MediaBrowserCompat.MediaItem> mediaItems = new ArrayList<>();
             SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-            
+
             for (DataRadioStation station : stations) {
-                
+
                 Bitmap stationIcon = stationIdToIcon.get(station.StationUuid);
-                
+
                 if (stationIcon == null)
                     stationIcon = BitmapFactory.decodeResource(Resources.getSystem(), R.drawable.ic_launcher);
                 Bundle extras = new Bundle();
