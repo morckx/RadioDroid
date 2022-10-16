@@ -3,7 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
+
+## Development snapshot [0.86.900-morckx] - 2025-01-05
+### Added
+- Android Auto support
+  - (you need to allow *Unknown Sources* in the Android Auto development settings as described [here](https://developer.android.com/training/cars/testing#step1))
+- Option to call battery optimization settings
 
 ## [0.86] - 2023-09-28
 ### Added
