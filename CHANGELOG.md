@@ -5,6 +5,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## Development snapshot [0.84.900-morckx] - 2022-10-16
+### Added
+- Android Auto support
+  - (you need to allow *Unknown Sources* in the Android Auto development settings as described [here](https://developer.android.com/training/cars/testing#step1))
+- Option to call battery optimization settings
+
+### Updated
+- All dependencies and build tools
+
 ## [0.84] - 2020-12-28
 ### Added
 - Refreshable favorites and history lists
