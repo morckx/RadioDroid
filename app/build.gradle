@@ -183,7 +183,7 @@ dependencies {
     implementation 'com.github.ByteHamster:SearchPreference:v2.3.0'
 
     implementation 'androidx.room:room-runtime:2.4.3'
-    androidTestImplementation("androidx.test.espresso:espresso-contrib:3.4.0") {
+    androidTestImplementation("androidx.test.espresso:espresso-contrib:3.5.0") {
         exclude group: 'org.checkerframework', module: 'checker'
     }
     annotationProcessor 'androidx.room:room-compiler:2.4.3'
