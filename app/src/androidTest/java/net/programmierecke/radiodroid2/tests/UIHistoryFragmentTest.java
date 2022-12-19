@@ -102,7 +102,7 @@ public class UIHistoryFragmentTest {
         }
     }
 
-    @SdkSuppress(maxSdkVersion = 32)
+    @Ignore("Too many false positives")
     @Test
     public void stationInHistory_ShouldBeDeleted_WithSwipeRight() {
         onView(withId(R.id.nav_item_history)).perform(ViewActions.click());
