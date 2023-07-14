@@ -1,8 +1,17 @@
-plugins {
-    id 'de.undercouch.download'
-}
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: "de.undercouch.download"
+
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "de.undercouch:gradle-download-task:5.4.0"
+    }
+}
 
 def getAvailableLocales() {
     def tree = fileTree(dir: 'src/main/res', include: '**/strings.xml')
