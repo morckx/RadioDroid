@@ -3,8 +3,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-
 ## Development snapshot [0.86.900-morckx] - 2025-01-05
+
+- Fixed radio-browser server fallback
+- ExoPlayer library updated to 2.18.7
+- All dependencies updated
+- Target SDK updated to 34
+  - but still tested and working on API level 16 (Jelly Bean)
+- Norwegian Bokmål translation added
+- Galician translation added
+- Esperanto translation added
+- Brazilian Portuguese translation updated
+
 ### Added
 - Android Auto support
   - (you need to allow *Unknown Sources* in the Android Auto development settings as described [here](https://developer.android.com/training/cars/testing#step1))
