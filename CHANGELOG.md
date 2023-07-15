@@ -5,6 +5,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## Development snapshot [0.84.901-morckx] - 2023-07-15
+
+- Fixed radio-browser server fallback
+- ExoPlayer library updated to 2.18.7
+- All dependencies updated
+- Target SDK updated to 34
+  - but still tested and working on API level 16 (Jelly Bean)
+- Norwegian Bokmål translation added
+- Galician translation added
+- Esperanto translation added
+- Brazilian Portuguese translation updated
+
 ## Development snapshot [0.84.900-morckx] - 2022-10-16
 ### Added
 - Android Auto support
