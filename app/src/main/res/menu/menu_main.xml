@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
+     app:itemIconTint="#ff0000"
+    app:itemTextColor="#00ff00"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
 
     <item
         android:id="@+id/action_search"
         android:title="@string/action_search"
         android:icon="@drawable/ic_search_24dp"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
+        android:nextFocusDown="@+id/action_set_sleep_timer"
         app:showAsAction="always" />
 
     <item
@@ -36,8 +40,9 @@
     <item
         android:id="@+id/action_set_sleep_timer"
         android:icon="@drawable/ic_hourglass_empty_black_24dp"
+        android:nextFocusUp="@+id/action_search"
         android:title="@string/nav_item_add_sleep"
-        app:showAsAction="always"/>
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/action_save"

@@ -590,7 +590,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
         menuItemIconsView = menu.findItem(R.id.action_icons_view);
         menuItemAddAlarm = menu.findItem(R.id.action_add_alarm);
         menuItemMpd = menu.findItem(R.id.action_mpd);
-        mSearchView = (SearchView) MenuItemCompat.getActionView(menuItemSearch);
+        mSearchView = (SearchView) menuItemSearch.getActionView();
         mSearchView.setOnQueryTextListener(this);
         mSearchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
             private int prevTabsVisibility = View.GONE;
@@ -635,6 +635,10 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
             case R.id.nav_item_stations: {
                 menuItemSleepTimer.setVisible(true);
                 menuItemSearch.setVisible(true);
+                menuItemSearch.getActionView().setActivated(true);
+                menuItemSearch.getActionView().setFocusable(true);
+                ((SearchView) menuItemSearch.getActionView()).setIconifiedByDefault(false);
+//                ((SearchView) menuItemSearch.getActionView()).setIconified(false);
                 myToolbar.setTitle(R.string.nav_item_stations);
                 break;
             }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_checked="true" android:color="?attr/menuTextColorSelected" />
+    <item android:state_checked="true" android:color="#00ff00" />
     <!-- Default State -->
-    <item android:color="?attr/menuTextColorDefault" />
+    <item android:color="#ff0000" />
 </selector>

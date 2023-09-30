@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_checked="true" android:color="?attr/menuBottomTextColorSelected" />
+    <item android:state_checked="true" android:color="#00ff00" />
     <!-- Default State -->
-    <item android:color="?attr/menuBottomTextColorDefault" />
+    <item android:color="#ff0000" />
+      <item android:state_pressed="true" android:color="#fff000"  android:drawable="@color/colorAccentDark"/>
+    <item android:state_activated="true" android:color="#00aaff" android:drawable="@color/colorAccentDark"/>
+    <item android:state_focused="true"
+        android:color="#000000" android:drawable="@color/colorAccent"/> <!-- focused -->
 </selector>
