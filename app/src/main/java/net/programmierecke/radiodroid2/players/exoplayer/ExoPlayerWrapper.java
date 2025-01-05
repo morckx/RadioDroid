@@ -60,7 +60,7 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
 
     private String streamUrl;
 
-    private final DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+    //private DefaultBandwidthMeter bandwidthMeter;
 
     private RecordableListener recordableListener;
 
@@ -130,7 +130,7 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
         final int retryTimeout = prefs.getInt("settings_retry_timeout", 10);
         final int retryDelay = prefs.getInt("settings_retry_delay", 100);
 
-        DataSource.Factory dataSourceFactory = new RadioDataSourceFactory(httpClient, bandwidthMeter, this, retryTimeout, retryDelay);
+        DataSource.Factory dataSourceFactory = new RadioDataSourceFactory(httpClient, new DefaultBandwidthMeter.Builder(context).build(), this, retryTimeout, retryDelay);
         // Produces Extractor instances for parsing the media data.
         if (!isHls) {
             audioSource = new ProgressiveMediaSource.Factory(dataSourceFactory)

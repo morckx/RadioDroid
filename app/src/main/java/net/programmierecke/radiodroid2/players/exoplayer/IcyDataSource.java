@@ -114,10 +114,14 @@ public class IcyDataSource implements HttpDataSource {
 
         request = builder.build();
 
-        return connect();
+        try {
+            return connect();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    private long connect() throws HttpDataSourceException {
+    private long connect() throws IOException {
         Response response;
         try {
             response = httpClient.newCall(request).execute();
@@ -130,7 +134,8 @@ public class IcyDataSource implements HttpDataSource {
 
         if (!response.isSuccessful()) {
             final Map<String, List<String>> headers = request.headers().toMultimap();
-            throw new InvalidResponseCodeException(responseCode, headers, dataSpec);
+            assert response.body() != null;
+            throw new InvalidResponseCodeException(responseCode, response.message(), null, headers, dataSpec, response.body().bytes());
         }
 
         responseBody = response.body();
