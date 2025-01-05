@@ -37,7 +37,7 @@ def getAvailableLocales() {
 
 android {
     flavorDimensions "one"
-    compileSdkVersion 34
+    compileSdkVersion 35
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
@@ -159,20 +159,21 @@ ext {
 dependencies {
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'androidx.recyclerview:recyclerview:1.3.0'
-    implementation 'com.google.android.material:material:1.11.0-alpha01'
-    implementation 'androidx.preference:preference:1.2.0'
-    implementation 'androidx.mediarouter:mediarouter:1.4.0'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.recyclerview:recyclerview:1.3.2'
+    implementation 'com.google.android.material:material:1.12.0'
+    implementation 'androidx.preference:preference-ktx:1.2.1'
+    implementation 'androidx.mediarouter:mediarouter:1.7.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.recyclerview:recyclerview:1.3.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.recyclerview:recyclerview:1.3.2'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.0'
     implementation 'androidx.tvprovider:tvprovider:1.0.0'
 
     // Keep OkHttp 3.12.X to support Android 4.X, see https://developer.squareup.com/blog/okhttp-3-13-requires-android-5
     //noinspection GradleDependency
     implementation 'com.squareup.okhttp3:okhttp:3.12.13'
 
+    //noinspection GradleDependency
     implementation 'com.google.code.gson:gson:2.9.1'
     //noinspection GradleDependency 2.8 is newer than 2.71828'
     implementation 'com.squareup.picasso:picasso:2.8'
@@ -189,21 +190,21 @@ dependencies {
     implementation 'com.github.zawadz88:MaterialPopupMenu:3.4.0'
     implementation 'com.github.ByteHamster:SearchPreference:v2.3.0'
 
-    implementation 'androidx.room:room-runtime:2.5.2'
+    implementation 'androidx.room:room-runtime:2.6.1'
     androidTestImplementation("androidx.test.espresso:espresso-contrib:3.4.0") {
         exclude group: 'org.checkerframework', module: 'checker'
     }
-    annotationProcessor 'androidx.room:room-compiler:2.5.2'
+    annotationProcessor 'androidx.room:room-compiler:2.6.1'
 
     implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
-    implementation "androidx.lifecycle:lifecycle-common-java8:2.6.1"
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1"
+    implementation "androidx.lifecycle:lifecycle-common-java8:2.8.7"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7"
 
-    implementation 'androidx.paging:paging-runtime:3.1.1'
+    implementation 'androidx.paging:paging-runtime:3.3.5'
 
-    playImplementation 'com.google.android.gms:play-services-cast:21.3.0'
-    playImplementation 'com.google.android.gms:play-services-cast-framework:21.3.0'
-    playImplementation 'com.google.android.gms:play-services-safetynet:18.0.1'
+    playImplementation 'com.google.android.gms:play-services-cast:22.0.0'
+    playImplementation 'com.google.android.gms:play-services-cast-framework:22.0.0'
+    playImplementation 'com.google.android.gms:play-services-safetynet:18.1.0'
 
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.1'
