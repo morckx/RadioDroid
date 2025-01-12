@@ -1,11 +1,8 @@
 package net.programmierecke.radiodroid2.tests;
 
-import androidx.test.core.app.ActivityScenario;
-import androidx.test.core.app.ActivityScenario$$ExternalSyntheticLambda0;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.espresso.action.ViewActions;
-import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
 import androidx.test.filters.SdkSuppress;

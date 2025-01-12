@@ -18,8 +18,8 @@ import org.hamcrest.Matcher;
 import java.util.ArrayList;
 import java.util.List;
 
-import static androidx.test.espresso.core.internal.deps.guava.base.Preconditions.checkElementIndex;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayingAtLeast;
+import static com.google.common.base.Preconditions.checkElementIndex;
 
 public class GeneralDragAndDropAction implements ViewAction {
 
