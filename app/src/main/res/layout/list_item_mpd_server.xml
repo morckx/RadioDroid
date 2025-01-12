@@ -92,7 +92,7 @@
             app:layout_constraintTop_toTopOf="@id/buttonMPDIncreaseVolume"
             tools:text="100%" />
 
-        <ImageButton
+        <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/buttonMPDDecreaseVolume"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -105,7 +105,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:srcCompat="@drawable/ic_volume_down_24dp" />
 
-        <ImageButton
+        <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/buttonMPDIncreaseVolume"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
