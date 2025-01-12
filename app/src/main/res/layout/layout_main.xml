@@ -110,6 +110,7 @@
         app:itemBackground="?attr/selectableItemBackgroundBorderless"
         app:itemHorizontalTranslationEnabled="true"
         app:itemTextColor="@color/menu_bottom_text_color"
+        app:itemIconTint="@color/menu_bottom_item_color"
         app:menu="@menu/menu_bottom_navigation" />
 
 </LinearLayout>
