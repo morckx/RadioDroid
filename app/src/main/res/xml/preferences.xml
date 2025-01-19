@@ -98,7 +98,7 @@
             android:title="@string/settings_icon_click_toggles_favorite" />
 
         <CheckBoxPreference
-            android:defaultValue="false"
+            android:defaultValue="true"
             android:key="auto_favorite"
             android:summaryOff="@string/settings_auto_favorite_off"
             android:summaryOn="@string/settings_auto_favorite_on"
