@@ -13,13 +13,15 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
-import android.provider.DocumentsContract;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowInsets;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -33,7 +35,6 @@ import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.view.GravityCompat;
-import androidx.core.view.MenuItemCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
@@ -69,8 +70,6 @@ import net.programmierecke.radiodroid2.service.PlayerServiceUtil;
 import net.programmierecke.radiodroid2.station.DataRadioStation;
 import net.programmierecke.radiodroid2.station.StationsFilter;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -332,6 +331,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
 
         if (mSearchView != null) {
             mSearchView.clearFocus();
+            mSearchView.setFocusableInTouchMode(true);
         }
 
         mDrawerLayout.closeDrawers();
@@ -604,6 +604,8 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
         menuItemMpd = menu.findItem(R.id.action_mpd);
         mSearchView = (SearchView) menuItemSearch.getActionView();
         mSearchView.setOnQueryTextListener(this);
+        mSearchView.setFocusableInTouchMode(true);
+        showSoftKeyboard(mSearchView);
         mSearchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
             private int prevTabsVisibility = View.GONE;
 
@@ -614,8 +616,12 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
                 }
 
                 if (hasFocus) {
+                    Log.d(TAG, "SearchView has focus");
                     prevTabsVisibility = tabsView.getVisibility();
                     tabsView.setVisibility(View.GONE);
+                    if (isRunningOnTV())  {
+                        showSoftKeyboard(mSearchView);
+                    }
                 } else {
                     tabsView.setVisibility(prevTabsVisibility);
                 }
@@ -703,6 +709,17 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
 
         return true;
     }
+
+    public void showSoftKeyboard(View view) {
+        view.requestFocus();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && view.getWindowInsetsController() != null) {
+            view.getWindowInsetsController().show(WindowInsets.Type.ime());
+        } else {
+           InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+           imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+        }
+    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent resultData) {
