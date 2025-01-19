@@ -1,8 +1,10 @@
 package net.programmierecke.radiodroid2;
 
+import android.app.UiModeManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.media.audiofx.AudioEffect;
 import android.os.Build;
 import android.os.Bundle;
@@ -164,6 +166,11 @@ public class FragmentSettings extends PreferenceFragmentCompat implements Shared
 //                    return false;
 //                }
 //            });
+        } else if (s.equals("pref_category_ui")) {
+          if (isRunningOnTV()) {
+              // findPreference("theme_name").setVisible(false);
+              findPreference("bottom_navigation").setVisible(false);
+          }
         }
 
         Preference batPref = getPreferenceScreen().findPreference(getString(R.string.key_ignore_battery_optimization));
@@ -180,6 +187,15 @@ public class FragmentSettings extends PreferenceFragmentCompat implements Shared
                 batPref.getParent().removePreference(batPref);
             }
         }
+    }
+
+    private boolean isRunningOnTV() {
+        UiModeManager uiModeManager = (UiModeManager) getSystemService();
+        return uiModeManager.getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION;
+    }
+
+    private Object getSystemService() {
+        return  getActivity().getSystemService(Context.UI_MODE_SERVICE);
     }
 
     /*

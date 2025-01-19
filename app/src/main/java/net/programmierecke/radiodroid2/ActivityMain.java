@@ -1,6 +1,7 @@
 package net.programmierecke.radiodroid2;
 
 import android.app.TimePickerDialog;
+import android.app.UiModeManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -8,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -196,7 +198,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
         mNavigationView = findViewById(R.id.my_navigation_view);
         mBottomNavigationView = findViewById(R.id.bottom_navigation);
 
-        if (Utils.bottomNavigationEnabled(this)) {
+        if (useBottomNavigation() ) {
             mBottomNavigationView.setOnNavigationItemSelectedListener(this);
             mNavigationView.setVisibility(View.GONE);
             mNavigationView.getLayoutParams().width = 0;
@@ -359,7 +361,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
         // I'm not sure why.
         mFragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
-        if (Utils.bottomNavigationEnabled(this))
+        if (useBottomNavigation())
             fragmentTransaction.replace(R.id.containerView, f).commit();
         else
             fragmentTransaction.replace(R.id.containerView, f).addToBackStack(backStackTag).commit();
@@ -400,7 +402,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
         }
 
         // Don't support backstack with BottomNavigationView
-        if (Utils.bottomNavigationEnabled(this)) {
+        if (useBottomNavigation()) {
             // I'm giving 3 seconds on making a choice
             if (lastExitTry != null && new Date().getTime() < lastExitTry.getTime() + 3 * 1000) {
                 PlayerServiceUtil.shutdownService();
@@ -417,7 +419,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
 
             selectedMenuItem = Integer.parseInt(backStackEntry.getName());
 
-            if (!Utils.bottomNavigationEnabled(this)) {
+            if (!useBottomNavigation()) {
                 mNavigationView.setCheckedItem(selectedMenuItem);
             }
             invalidateOptionsMenu();
@@ -428,6 +430,16 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
         }
         super.onBackPressed();
     }
+
+    public boolean isRunningOnTV() {
+        UiModeManager uiModeManager = (UiModeManager) getSystemService(UI_MODE_SERVICE);
+        return uiModeManager.getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION;
+    }
+
+    private boolean useBottomNavigation() {
+        return !isRunningOnTV() && sharedPref.getBoolean("use_bottom_navigation", false);
+    }
+
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -597,7 +609,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
 
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                if (Utils.bottomNavigationEnabled(ActivityMain.this)) {
+                if (useBottomNavigation()) {
                     mBottomNavigationView.setVisibility(hasFocus ? View.GONE : View.VISIBLE);
                 }
 
@@ -937,7 +949,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
 
     private void selectMenuItem(int itemId) {
         MenuItem item;
-        if (Utils.bottomNavigationEnabled(this))
+        if (useBottomNavigation())
             item = mBottomNavigationView.getMenu().findItem(itemId);
         else
             item = mNavigationView.getMenu().findItem(itemId);
@@ -967,7 +979,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
             String backStackTag = String.valueOf(R.id.nav_item_stations);
             FragmentTabs f = new FragmentTabs();
             FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
-            if (Utils.bottomNavigationEnabled(this)) {
+            if (useBottomNavigation()) {
                 fragmentTransaction.replace(R.id.containerView, f).commit();
                 mBottomNavigationView.getMenu().findItem(R.id.nav_item_stations).setChecked(true);
             } else {
