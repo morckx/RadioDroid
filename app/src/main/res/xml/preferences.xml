@@ -11,7 +11,7 @@
         android:key="pref_category_ui">
 
         <ListPreference
-            android:defaultValue="@string/theme_light"
+            android:defaultValue="@string/theme_dark"
             android:entries="@array/theme_entries"
             android:entryValues="@array/theme_values"
             android:key="theme_name"
