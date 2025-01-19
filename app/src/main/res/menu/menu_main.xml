@@ -17,32 +17,32 @@
         android:id="@+id/action_icons_view"
         android:title="@string/action_toggle_view"
         android:icon="@drawable/ic_view_icons_24dp"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/action_list_view"
         android:title="@string/action_toggle_view"
         android:icon="@drawable/ic_view_list_24dp"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/action_mpd"
         android:title="@string/settings_mpd"
         android:icon="@drawable/mpd"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/media_route_menu_item"
         android:title="@string/media_route_menu_title"
         app:actionProviderClass="androidx.mediarouter.app.MediaRouteActionProvider"
-        app:showAsAction="always"/>
+        app:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/action_set_sleep_timer"
         android:icon="@drawable/ic_hourglass_empty_black_24dp"
         android:nextFocusUp="@+id/action_search"
         android:title="@string/nav_item_add_sleep"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/action_save"
@@ -60,7 +60,7 @@
         android:id="@+id/action_add_alarm"
         android:title="@string/nav_item_alarm"
         android:icon="@drawable/ic_add_alarm_black_24dp"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/action_delete"
