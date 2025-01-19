@@ -437,7 +437,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
     }
 
     private boolean useBottomNavigation() {
-        return !isRunningOnTV() && sharedPref.getBoolean("use_bottom_navigation", false);
+        return !isRunningOnTV() && Utils.bottomNavigationEnabled(this);
     }
 
 
