@@ -143,6 +143,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
 
     private int selectedMenuItem;
 
+    private boolean isRunningOnTV;
     private boolean instanceStateWasSaved;
 
     private Date lastExitTry;
@@ -154,6 +155,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
         Iconics.init(this);
 
         super.onCreate(savedInstanceState);
+        checkIsRunningOnTV();
 
         if (sharedPref == null) {
             PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
@@ -431,13 +433,13 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
         super.onBackPressed();
     }
 
-    public boolean isRunningOnTV() {
+    public void checkIsRunningOnTV() {
         UiModeManager uiModeManager = (UiModeManager) getSystemService(UI_MODE_SERVICE);
-        return uiModeManager.getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION;
+        isRunningOnTV = uiModeManager.getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION;
     }
 
     private boolean useBottomNavigation() {
-        return !isRunningOnTV() && Utils.bottomNavigationEnabled(this);
+        return !isRunningOnTV && Utils.bottomNavigationEnabled(this);
     }
 
 
@@ -619,7 +621,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
                     Log.d(TAG, "SearchView has focus");
                     prevTabsVisibility = tabsView.getVisibility();
                     tabsView.setVisibility(View.GONE);
-                    if (isRunningOnTV())  {
+                    if (isRunningOnTV)  {
                         showSoftKeyboard(mSearchView);
                     }
                 } else {
