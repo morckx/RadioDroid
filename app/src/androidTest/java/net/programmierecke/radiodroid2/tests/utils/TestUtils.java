@@ -24,10 +24,6 @@ import javax.annotation.Nonnull;
 
 public class TestUtils {
 
-    static {
-        BuildConfig.IS_TESTING.set(true);
-    }
-
     public static String getFakeRadioStationName(int idx) {
         return String.format("Test Station %d", idx);
     }

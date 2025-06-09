@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <resources>
     <string name="detail_name">Name</string>
     <string name="detail_tags">Tags</string>
@@ -80,9 +79,15 @@
     <string name="error_invalid_file_name">Invalid file name</string>
     <string name="label_button_cancel">Cancel</string>
     <string name="label_button_overwrite">Overwrite</string>
-    <string name="notify_load_playlist_nok">Could not import from %1$s&#47;%2$s</string>
-    <string name="notify_load_playlist_now">Importing from %1$s&#47;%2$s, please wait.</string>
-    <string name="notify_load_playlist_ok">Imported %1$d stations from %2$s&#47;%3$s</string>
+    <string name="notify_load_playlist_now">Importing from %1$s/%2$s, please wait.</string>
+    <string name="notify_load_playlist_now_saf">Importing from %1$s, please wait.</string>
+    <string name="notify_load_playlist_ok">Imported %1$d stations from %2$s/%3$s.</string>
+    <string name="notify_load_playlist_ok_saf">Imported %1$d stations from %2$s.</string>
+    <string name="notify_load_playlist_ok_nf">Imported %1$d stations.</string>
+    <string name="notify_load_playlist_nok">Failed to import from %1$s/%2$s.</string>
+    <string name="notify_load_playlist_nok_saf">Failed to import from %1$s.</string>
+
+
     <string name="notify_save_playlist_nok">Could not export to %1$s&#47;%2$s</string>
     <string name="notify_save_playlist_now">Exporting to %1$s&#47;%2$s, please wait.</string>
     <string name="notify_save_playlist_ok">Exported to %1$s&#47;%2$s successfully</string>
@@ -350,4 +355,6 @@
     <string name="context_menu_add_alarm">@string/action_alarm</string>
     <string name="context_menu_create_shortcut">@string/detail_create_shortcut</string>
     <string name="context_menu_delete">@string/action_delete</string>
+
 </resources>
+

@@ -11,6 +11,8 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.database.Cursor;
+import android.provider.OpenableColumns;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -757,7 +759,21 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
                 try{
                     InputStream is = getContentResolver().openInputStream(uri);
                     InputStreamReader reader = new InputStreamReader(is);
-                    favouriteManager.LoadM3USimple(reader);
+                    // Extract display name from SAF Uri
+                    String displayName = "";
+                    if (uri != null) {
+                        try (Cursor cursor = getContentResolver().query(uri, null, null, null, null)) {
+                            if (cursor != null && cursor.moveToFirst()) {
+                                int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                                if (nameIndex >= 0) {
+                                    displayName = cursor.getString(nameIndex);
+                                }
+                            }
+                        } catch (Exception e) {
+                            Log.e(TAG, "Unable to get display name from SAF Uri", e);
+                        }
+                    }
+                    favouriteManager.LoadM3USimple(reader, displayName);
                 }
                 catch (Exception e){
                     Log.e(TAG, "Unable to load to file " + e);
@@ -798,6 +814,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
     }
 
     void SaveFavouritesSimple() {
+        // Use Storage Access Framework to let the user choose where to save the playlist
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("audio/x-mpegurl");
@@ -806,15 +823,12 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
     }
 
     void LoadFavourites() {
-        OpenFileDialog dialogOpen = new OpenFileDialog();
-        dialogOpen.setStyle(DialogFragment.STYLE_NO_TITLE, Utils.getThemeResId(this));
-        Bundle argsOpen = new Bundle();
-        argsOpen.putString(FileDialog.EXTENSION, ".m3u"); // file extension is optional
-        dialogOpen.setArguments(argsOpen);
-        dialogOpen.show(getSupportFragmentManager(), OpenFileDialog.class.getName());
+        // Use Storage Access Framework to let the user pick any .m3u playlist file
+        LoadFavouritesSimple();
     }
 
     void LoadFavouritesSimple() {
+        // Use Storage Access Framework to open a playlist file
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("audio/x-mpegurl");
