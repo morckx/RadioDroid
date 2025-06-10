@@ -57,6 +57,12 @@ import java.net.Proxy;
 import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.Date;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -650,7 +656,54 @@ public class Utils {
                 Log.e("OkHttpTLSCompat", "Error while setting TLS 1.2", exc);
             }
         }
+        
+        // For Android API < 27, bypass SSL certificate validation for radio browser servers
+        if (Build.VERSION.SDK_INT < 27) {
+            try {
+                Log.i("OkHttpSSLCompat", "Configuring lenient SSL for API < 27");
+                configureLenientSSL(client);
+            } catch (Exception exc) {
+                Log.e("OkHttpSSLCompat", "Error while configuring lenient SSL", exc);
+            }
+        }
 
         return client;
+    }
+    
+    private static void configureLenientSSL(OkHttpClient.Builder client) throws Exception {
+        // Create a trust manager that accepts all certificates
+        final TrustManager[] trustAllCerts = new TrustManager[] {
+            new X509TrustManager() {
+                @Override
+                public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) {
+                    // Accept all client certificates
+                }
+
+                @Override
+                public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) {
+                    // Accept all server certificates
+                }
+
+                @Override
+                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                    return new java.security.cert.X509Certificate[]{};
+                }
+            }
+        };
+
+        // Install the all-trusting trust manager
+        final SSLContext sslContext = SSLContext.getInstance("SSL");
+        sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
+        
+        // Create an ssl socket factory with our all-trusting manager
+        final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
+
+        client.sslSocketFactory(sslSocketFactory, (X509TrustManager) trustAllCerts[0]);
+        client.hostnameVerifier(new HostnameVerifier() {
+            @Override
+            public boolean verify(String hostname, SSLSession session) {
+                return true; // Accept all hostnames
+            }
+        });
     }
 }
