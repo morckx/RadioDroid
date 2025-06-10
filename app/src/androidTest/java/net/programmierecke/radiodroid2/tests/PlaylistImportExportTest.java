@@ -29,7 +29,13 @@ public class PlaylistImportExportTest {
         manager.clear();
 
         // Use app-specific storage for tests to avoid permission issues
-        testFilePath = context.getExternalFilesDir(null).getAbsolutePath();
+        File externalDir = context.getExternalFilesDir(null);
+        if (externalDir != null) {
+            testFilePath = externalDir.getAbsolutePath();
+        } else {
+            // Fallback to internal storage if external is not available (e.g., on API 21 emulator)
+            testFilePath = context.getFilesDir().getAbsolutePath();
+        }
     }
 
     @After
