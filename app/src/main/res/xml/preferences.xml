@@ -10,7 +10,7 @@
         search:ignore="true"
         android:key="pref_category_ui">
 
-        <ListPreference
+        <androidx.preference.ListPreference
             android:defaultValue="@string/theme_dark"
             android:entries="@array/theme_entries"
             android:entryValues="@array/theme_values"
@@ -42,7 +42,7 @@
         search:ignore="true"
         android:key="pref_category_startup">
 
-        <ListPreference
+        <androidx.preference.ListPreference
             android:defaultValue="@string/startup_show_history"
             android:entries="@array/startup_action_entries"
             android:entryValues="@array/startup_action_entryvalues"
@@ -66,7 +66,7 @@
             android:summaryOn="@string/settings_auto_off_on_startup_on"
             android:title="@string/settings_auto_off_on_startup" />
 
-        <ListPreference
+        <androidx.preference.ListPreference
             android:defaultValue="10"
             android:dependency="auto_off_on_startup"
             android:entries="@array/timeout_minutes"
@@ -185,7 +185,7 @@
             android:key="shareapp_package"
             android:title="@string/settings_alarm_audio_player" />
 
-        <ListPreference
+        <androidx.preference.ListPreference
             android:defaultValue="10"
             android:dependency="alarm_external"
             android:entries="@array/timeout_minutes"
@@ -200,7 +200,7 @@
     <PreferenceScreen android:title="@string/settings_recordings"
         search:ignore="true"
         android:key="pref_category_recordings">
-        <ListPreference
+        <androidx.preference.ListPreference
             android:defaultValue="@string/settings_record_name_formatting_default"
             android:entries="@array/settings_record_name_formatting_list_display"
             android:entryValues="@array/settings_record_name_formatting_list"
@@ -267,7 +267,7 @@
         search:ignore="true"
         android:key="pref_category_other">
 
-        <EditTextPreference
+        <androidx.preference.EditTextPreference
             android:key="last_fm_api_key"
             android:title="@string/settings_lastfm_api_key"
             android:summary="@string/settings_lastfm_api_key_desc"/>
