@@ -519,7 +519,13 @@ public class StationSaveManager extends Observable {
             values.put(MediaStore.Downloads.MIME_TYPE, "audio/x-mpegurl");
             values.put(MediaStore.Downloads.IS_PENDING, 1);
 
-            Uri contentUri = MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
+            Uri contentUri;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                contentUri = MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
+            } else {
+                // Fallback for older versions - this shouldn't be reached since we check Q earlier
+                return false;
+            }
             Uri fileUri = context.getContentResolver().insert(contentUri, values);
 
             if (fileUri != null) {

@@ -300,7 +300,7 @@ public class ItemAdapterStation
             }
         }
 
-        final boolean isExpanded = position == expandedPosition;
+        final boolean isExpanded = holder.getAdapterPosition() == expandedPosition;
         holder.textViewTags.setVisibility(isExpanded ? View.GONE : View.VISIBLE);
 
         holder.buttonMore.setImageResource(isExpanded ? R.drawable.ic_expand_less_black_24dp : R.drawable.ic_expand_more_black_24dp);
@@ -324,7 +324,7 @@ public class ItemAdapterStation
         });
 
         TypedValue tv = new TypedValue();
-        if (playingStationPosition == position) {
+        if (playingStationPosition == holder.getAdapterPosition()) {
             getContext().getTheme().resolveAttribute(R.attr.colorAccentMy, tv, true);
             holder.textViewTitle.setTextColor(tv.data);
             holder.textViewTitle.setTypeface(null, Typeface.BOLD);
