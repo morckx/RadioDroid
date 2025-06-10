@@ -439,7 +439,12 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
     }
 
     private boolean useBottomNavigation() {
-        return !isRunningOnTV() && Utils.bottomNavigationEnabled(this);
+        // Always use bottom navigation on Android TV, regardless of configuration
+        if (isRunningOnTV()) {
+            return true;
+        }
+        // For non-TV devices, use the configured preference
+        return Utils.bottomNavigationEnabled(this);
     }
 
 
