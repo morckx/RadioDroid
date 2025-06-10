@@ -19,6 +19,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -1220,5 +1221,30 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
     @Override
     public void invalidateOptionsMenuForCast() {
         invalidateOptionsMenu();
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        // Handle TV remote control keys
+        if (isRunningOnTV()) {
+            switch (keyCode) {
+                case KeyEvent.KEYCODE_MENU:
+                case KeyEvent.KEYCODE_DPAD_LEFT:
+                    // Open navigation drawer when menu button or left D-pad is pressed on TV
+                    if (!mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+                        mDrawerLayout.openDrawer(GravityCompat.START);
+                        return true;
+                    }
+                    break;
+                case KeyEvent.KEYCODE_BACK:
+                    // Close drawer first if it's open
+                    if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+                        mDrawerLayout.closeDrawer(GravityCompat.START);
+                        return true;
+                    }
+                    break;
+            }
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }
