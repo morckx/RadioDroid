@@ -109,6 +109,7 @@ public class FragmentPlayerFull extends Fragment {
     private RecordingsAdapter recordingsAdapter;
 
     private boolean storagePermissionsDenied = false;
+    private boolean forceAlbumArtRefresh = false;
 
     private RecyclerAwareNestedScrollView scrollViewContent;
 
@@ -300,6 +301,26 @@ public class FragmentPlayerFull extends Fragment {
         }
     }
 
+    /**
+     * Public method to refresh the view when it becomes visible
+     * Call this when the expanded player view is shown
+     */
+    public void refreshOnVisible() {
+        if (isVisible() && initialized) {
+            // Force refresh of all content
+            lastLiveInfoForTrackMetadata = null;
+            trackMetadataLastFailureType = null;
+            forceAlbumArtRefresh = true;
+            
+            // Clear current album art to show loading state
+            if (artAndInfoPagerAdapter != null && artAndInfoPagerAdapter.imageViewArt != null) {
+                artAndInfoPagerAdapter.imageViewArt.setImageDrawable(null);
+            }
+            
+            fullUpdate();
+        }
+    }
+
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -318,12 +339,26 @@ public class FragmentPlayerFull extends Fragment {
                     playLastFromHistory();
                 }
 
+                // Update button state immediately and again after delay to catch service state change
                 updatePlaybackButtons(PlayerServiceUtil.isPlaying(), PlayerServiceUtil.isRecording());
+                new Handler().postDelayed(() -> {
+                    updatePlaybackButtons(PlayerServiceUtil.isPlaying(), PlayerServiceUtil.isRecording());
+                    // Also update all station info and album art in case station changed
+                    fullUpdate();
+                }, 100);
             }
         });
 
-        btnPrev.setOnClickListener(view -> PlayerServiceUtil.skipToPrevious());
-        btnNext.setOnClickListener(view -> PlayerServiceUtil.skipToNext());
+        btnPrev.setOnClickListener(view -> {
+            PlayerServiceUtil.skipToPrevious();
+            // Force UI update after station change
+            new Handler().postDelayed(this::fullUpdate, 100);
+        });
+        btnNext.setOnClickListener(view -> {
+            PlayerServiceUtil.skipToNext();
+            // Force UI update after station change
+            new Handler().postDelayed(this::fullUpdate, 100);
+        });
 
         btnRecord.setOnClickListener(view -> {
             if (PlayerServiceUtil.isPlaying()) {
@@ -374,6 +409,7 @@ public class FragmentPlayerFull extends Fragment {
             stopUpdating();
         } else {
             startUpdating();
+            new Handler().postDelayed(this::fullUpdate, 100);
         }
 
         if (touchInterceptListener != null) {
@@ -382,10 +418,20 @@ public class FragmentPlayerFull extends Fragment {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        // Ensure we update when fragment starts
+        if (isVisible() && initialized) {
+            refreshOnVisible();
+        }
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
 
         startUpdating();
+        new Handler().postDelayed(this::fullUpdate, 100);
     }
 
     @Override
@@ -401,6 +447,16 @@ public class FragmentPlayerFull extends Fragment {
     private void startUpdating() {
         if (!isVisible()) {
             return;
+        }
+
+        // Force album art refresh when view becomes visible
+        lastLiveInfoForTrackMetadata = null;
+        trackMetadataLastFailureType = null;
+        forceAlbumArtRefresh = true;
+        
+        // Clear the current album art to force reload
+        if (artAndInfoPagerAdapter != null && artAndInfoPagerAdapter.imageViewArt != null) {
+            artAndInfoPagerAdapter.imageViewArt.setImageDrawable(null);
         }
 
         fullUpdate();
@@ -584,8 +640,13 @@ public class FragmentPlayerFull extends Fragment {
         if (TextUtils.isEmpty(liveInfo.getArtist()) || TextUtils.isEmpty(liveInfo.getTrack()) ||
                 LastFMApiKey.isEmpty()) {
             if (station.hasIcon()) {
-                // TODO: Check if we already have this station's icon loaded into image view
-                ImageLoader.loadImage(requireContext(), station.IconUrl, artAndInfoPagerAdapter.imageViewArt);
+                // Use fresh loading if forced refresh is needed
+                if (forceAlbumArtRefresh) {
+                    ImageLoader.loadImageFresh(requireContext(), station.IconUrl, artAndInfoPagerAdapter.imageViewArt);
+                    forceAlbumArtRefresh = false;
+                } else {
+                    ImageLoader.loadImage(requireContext(), station.IconUrl, artAndInfoPagerAdapter.imageViewArt);
+                }
             } else {
                 artAndInfoPagerAdapter.imageViewArt.setImageResource(R.drawable.ic_launcher);
             }
@@ -672,7 +733,13 @@ public class FragmentPlayerFull extends Fragment {
                     DataRadioStation station = Utils.getCurrentOrLastStation(fragment.requireContext());
 
                     if (station != null && station.hasIcon()) {
-                        ImageLoader.loadImage(fragment.requireContext(), station.IconUrl, fragment.artAndInfoPagerAdapter.imageViewArt);
+                        // Use fresh loading if forced refresh is needed
+                        if (fragment.forceAlbumArtRefresh) {
+                            ImageLoader.loadImageFresh(fragment.requireContext(), station.IconUrl, fragment.artAndInfoPagerAdapter.imageViewArt);
+                            fragment.forceAlbumArtRefresh = false;
+                        } else {
+                            ImageLoader.loadImage(fragment.requireContext(), station.IconUrl, fragment.artAndInfoPagerAdapter.imageViewArt);
+                        }
                     } else {
                         fragment.artAndInfoPagerAdapter.imageViewArt.setImageResource(R.drawable.ic_launcher);
                     }
@@ -696,7 +763,13 @@ public class FragmentPlayerFull extends Fragment {
                         final String albumArtUrl = albumArts.get(0).url;
 
                         if (!TextUtils.isEmpty(albumArtUrl)) {
-                            ImageLoader.loadImage(fragment.requireContext(), albumArtUrl, fragment.artAndInfoPagerAdapter.imageViewArt);
+                            // Use fresh loading if forced refresh is needed
+                            if (fragment.forceAlbumArtRefresh) {
+                                ImageLoader.loadImageFresh(fragment.requireContext(), albumArtUrl, fragment.artAndInfoPagerAdapter.imageViewArt);
+                                fragment.forceAlbumArtRefresh = false;
+                            } else {
+                                ImageLoader.loadImage(fragment.requireContext(), albumArtUrl, fragment.artAndInfoPagerAdapter.imageViewArt);
+                            }
 
                             if (!albumArtUrl.equals(trackHistoryEntry.stationIconUrl)) {
                                 fragment.trackHistoryRepository.setTrackArtUrl(trackHistoryEntry.uid, albumArtUrl);
@@ -854,6 +927,9 @@ public class FragmentPlayerFull extends Fragment {
 
                 fragmentPlayerFull.updateRunningRecording();
             }
+            
+            // Update play/pause button state to ensure it stays in sync
+            fragmentPlayerFull.updatePlaybackButtons(PlayerServiceUtil.isPlaying(), PlayerServiceUtil.isRecording());
         }
     }
 

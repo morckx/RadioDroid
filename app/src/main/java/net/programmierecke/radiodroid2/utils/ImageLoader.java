@@ -48,6 +48,20 @@ public class ImageLoader {
     }
 
     /**
+     * Load image into ImageView bypassing cache (for forced refresh)
+     */
+    public static void loadImageFresh(Context context, String url, ImageView imageView) {
+        Glide.with(context)
+                .load(url)
+                .apply(new RequestOptions()
+                        .error(R.drawable.ic_launcher)
+                        .transform(new CenterCrop())
+                        .diskCacheStrategy(DiskCacheStrategy.NONE)
+                        .skipMemoryCache(true))
+                .into(imageView);
+    }
+
+    /**
      * Load image into ImageView with transformations for radio station icons
      */
     public static void loadStationIcon(Context context, String url, ImageView imageView) {
