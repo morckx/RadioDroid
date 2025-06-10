@@ -23,6 +23,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.PermissionChecker;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.preference.PreferenceManager;
@@ -91,6 +92,16 @@ public class Utils {
     public static boolean isRunningOnTV(Context context) {
         UiModeManager uiModeManager = (UiModeManager) context.getSystemService(Context.UI_MODE_SERVICE);
         return uiModeManager.getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION;
+    }
+
+    /**
+     * Check if the app has a specific permission
+     * @param context The application context
+     * @param permission The permission to check
+     * @return true if permission is granted, false otherwise
+     */
+    public static boolean hasPermission(Context context, String permission) {
+        return ContextCompat.checkSelfPermission(context, permission) == PermissionChecker.PERMISSION_GRANTED;
     }
 
     public static int parseIntWithDefault(String number, int defaultVal) {

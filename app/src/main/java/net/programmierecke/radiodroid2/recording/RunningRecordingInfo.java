@@ -1,13 +1,16 @@
 package net.programmierecke.radiodroid2.recording;
 
-import java.io.FileOutputStream;
+import android.net.Uri;
+
+import java.io.OutputStream;
 
 public class RunningRecordingInfo {
     private Recordable recordable;
     private String title;
     private String fileName;
-    private FileOutputStream outputStream;
+    private OutputStream outputStream;
     private long bytesWritten;
+    private Uri mediaStoreUri;
 
     public Recordable getRecordable() {
         return recordable;
@@ -33,11 +36,11 @@ public class RunningRecordingInfo {
         this.fileName = fileName;
     }
 
-    public FileOutputStream getOutputStream() {
+    public OutputStream getOutputStream() {
         return outputStream;
     }
 
-    protected void setOutputStream(FileOutputStream outputStream) {
+    protected void setOutputStream(OutputStream outputStream) {
         this.outputStream = outputStream;
     }
 
@@ -47,5 +50,13 @@ public class RunningRecordingInfo {
 
     protected void setBytesWritten(long bytesWritten) {
         this.bytesWritten = bytesWritten;
+    }
+
+    public Uri getMediaStoreUri() {
+        return mediaStoreUri;
+    }
+
+    protected void setMediaStoreUri(Uri mediaStoreUri) {
+        this.mediaStoreUri = mediaStoreUri;
     }
 }

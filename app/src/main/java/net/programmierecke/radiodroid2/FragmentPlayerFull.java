@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -329,12 +330,22 @@ public class FragmentPlayerFull extends Fragment {
                 if (PlayerServiceUtil.isRecording()) {
                     PlayerServiceUtil.stopRecording();
                 } else {
-                    if (Utils.verifyStoragePermissions(FragmentPlayerFull.this, PERM_REQ_STORAGE_RECORD)) {
+                    if (recordingsManager.hasRecordingPermission()) {
                         PlayerServiceUtil.startRecording();
+                    } else {
+                        requestPermissions(recordingsManager.getRequiredPermissions(), PERM_REQ_STORAGE_RECORD);
                     }
                 }
 
+                // Update UI immediately and schedule another update after brief delay
+                updatePlaybackButtons(PlayerServiceUtil.isPlaying(), PlayerServiceUtil.isRecording());
                 updateRunningRecording();
+                
+                // Schedule another update after 500ms to catch async state changes
+                new Handler().postDelayed(() -> {
+                    updatePlaybackButtons(PlayerServiceUtil.isPlaying(), PlayerServiceUtil.isRecording());
+                    updateRunningRecording();
+                }, 500);
 
                 pagerHistoryAndRecordings.setCurrentItem(1, true);
             }
@@ -851,7 +862,7 @@ public class FragmentPlayerFull extends Fragment {
                                            @NonNull String[] permissions, @NonNull int[] grantResults) {
         // If request is cancelled, the result arrays are empty.
         if (requestCode == PERM_REQ_STORAGE_RECORD) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (recordingsManager.hasRecordingPermission()) {
                 storagePermissionsDenied = false;
                 PlayerServiceUtil.startRecording();
             } else {

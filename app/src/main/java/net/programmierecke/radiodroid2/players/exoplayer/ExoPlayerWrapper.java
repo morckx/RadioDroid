@@ -328,7 +328,10 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
         currentPlaybackTransferredBytes += length;
 
         if (recordableListener != null) {
-            recordableListener.onBytesAvailable(buffer, offset, length);
+            // Create a copy of the buffer to avoid race conditions with buffer reuse
+            byte[] recordingBuffer = new byte[length];
+            System.arraycopy(buffer, offset, recordingBuffer, 0, length);
+            recordableListener.onBytesAvailable(recordingBuffer, 0, length);
         }
     }
 

@@ -100,7 +100,10 @@ public class StreamProxy implements Recordable {
                 outStream.write(readBuffer, 0, readBytes);
 
                 if (recordableListener != null) {
-                    recordableListener.onBytesAvailable(readBuffer, 0, readBytes);
+                    // Create a copy of the buffer to avoid race conditions with buffer reuse
+                    byte[] recordingBuffer = new byte[readBytes];
+                    System.arraycopy(readBuffer, 0, recordingBuffer, 0, readBytes);
+                    recordableListener.onBytesAvailable(recordingBuffer, 0, readBytes);
                 }
 
                 callback.onBytesRead(readBuffer, 0, readBytes);
