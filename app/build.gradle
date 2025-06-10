@@ -155,7 +155,7 @@ android {
 }
 
 ext {
-    media3Version = '1.4.1'
+    media3Version = '1.7.1'
     iconicsVersion = '4.0.2'
 }
 
