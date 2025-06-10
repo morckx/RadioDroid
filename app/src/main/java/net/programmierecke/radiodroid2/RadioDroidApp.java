@@ -10,8 +10,9 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.multidex.MultiDexApplication;
 import androidx.preference.PreferenceManager;
 
-import com.squareup.picasso.OkHttp3Downloader;
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.integration.okhttp3.OkHttpUrlLoader;
+import com.bumptech.glide.load.model.GlideUrl;
 
 import net.programmierecke.radiodroid2.alarm.RadioAlarmManager;
 import net.programmierecke.radiodroid2.history.TrackHistoryRepository;
@@ -86,10 +87,8 @@ public class RadioDroidApp extends MultiDexApplication {
 
         rebuildHttpClient();
 
-        Picasso.Builder builder = new Picasso.Builder(this);
-        builder.downloader(new OkHttp3Downloader(newHttpClientForPicasso()));
-        Picasso picassoInstance = builder.build();
-        Picasso.setSingletonInstance(picassoInstance);
+        // Configure Glide with custom OkHttp client
+        Glide.get(this).getRegistry().replace(GlideUrl.class, java.io.InputStream.class, new OkHttpUrlLoader.Factory(newHttpClientForGlide()));
 
         CountryCodeDictionary.getInstance().load(this);
         CountryFlagsLoader.getInstance();
@@ -207,16 +206,9 @@ public class RadioDroidApp extends MultiDexApplication {
         return true;
     }
 
-    private OkHttpClient newHttpClientForPicasso() {
-        File cache = new File(getCacheDir(), "picasso-cache");
-        if (!cache.exists()) {
-            //noinspection ResultOfMethodCallIgnored
-            cache.mkdirs();
-        }
-
+    private OkHttpClient newHttpClientForGlide() {
         OkHttpClient.Builder builder = new OkHttpClient.Builder()
-                .addInterceptor(new UserAgentInterceptor("RadioDroid2/" + BuildConfig.VERSION_NAME))
-                .cache(new Cache(cache, Integer.MAX_VALUE));
+                .addInterceptor(new UserAgentInterceptor("RadioDroid2/" + BuildConfig.VERSION_NAME));
 
         if (testsInterceptor != null) {
             builder.addInterceptor(testsInterceptor);

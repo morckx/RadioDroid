@@ -16,8 +16,7 @@ import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
+import net.programmierecke.radiodroid2.utils.ImageLoader;
 
 import net.programmierecke.radiodroid2.ActivityMain;
 import net.programmierecke.radiodroid2.R;
@@ -29,9 +28,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import jp.wasabeef.picasso.transformations.CropCircleTransformation;
-import jp.wasabeef.picasso.transformations.CropSquareTransformation;
-import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
 import okhttp3.OkHttpClient;
 
 import static net.programmierecke.radiodroid2.Utils.resourceToUri;
@@ -417,15 +413,11 @@ public class DataRadioStation implements Parcelable {
 	}
 
     public void prepareShortcut(Context ctx, ShortcutReadyListener cb) {
-        Picasso.get()
-                .load((!hasIcon() ? resourceToUri(ctx.getResources(), R.drawable.ic_launcher).toString() : IconUrl))
-                .error(R.drawable.ic_launcher)
-                .transform(Utils.useCircularIcons(ctx) ? new CropCircleTransformation() : new CropSquareTransformation())
-                .transform(new RoundedCornersTransformation(12, 2, RoundedCornersTransformation.CornerType.ALL))
-                .into(new RadioIconTarget(ctx, this, cb));
+        String iconUrl = hasIcon() ? IconUrl : resourceToUri(ctx.getResources(), R.drawable.ic_launcher).toString();
+        ImageLoader.loadStationIconForBrowser(ctx, iconUrl, 128, Utils.useCircularIcons(ctx), new RadioIconTarget(ctx, this, cb));
     }
 
-    class RadioIconTarget implements Target {
+    class RadioIconTarget implements ImageLoader.BitmapTarget {
         DataRadioStation station;
         Context ctx;
         ShortcutReadyListener cb;
@@ -438,7 +430,7 @@ public class DataRadioStation implements Parcelable {
         }
 
         @Override
-        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+        public void onBitmapLoaded(Bitmap bitmap) {
             if (Build.VERSION.SDK_INT >= 25) {
                 Intent playByUUIDintent = new Intent(MediaSessionCallback.ACTION_PLAY_STATION_BY_UUID, null, ctx, ActivityMain.class)
                         .putExtra(MediaSessionCallback.EXTRA_STATION_UUID, station.StationUuid);
@@ -452,13 +444,15 @@ public class DataRadioStation implements Parcelable {
         }
 
         @Override
-        public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-            onBitmapLoaded(((BitmapDrawable) errorDrawable).getBitmap(), null);
+        public void onBitmapFailed(Drawable errorDrawable) {
+            if (errorDrawable instanceof BitmapDrawable) {
+                onBitmapLoaded(((BitmapDrawable) errorDrawable).getBitmap());
+            }
         }
 
         @Override
         public void onPrepareLoad(Drawable placeHolderDrawable) {
-
+            // No action needed
         }
     }
 }

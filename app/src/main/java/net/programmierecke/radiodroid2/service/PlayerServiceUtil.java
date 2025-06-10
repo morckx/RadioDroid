@@ -17,9 +17,7 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.NetworkPolicy;
-import com.squareup.picasso.Picasso;
+import net.programmierecke.radiodroid2.utils.ImageLoader;
 
 import net.programmierecke.radiodroid2.BuildConfig;
 import net.programmierecke.radiodroid2.IPlayerService;
@@ -274,37 +272,14 @@ public class PlayerServiceUtil {
     }
 
     public static void getStationIcon(final ImageView holder, final String fromUrl) {
-        if (fromUrl == null) {
+        if (fromUrl == null || fromUrl.trim().equals("")) {
             return;
         }
 
-        if (fromUrl.trim().equals("")) return;
-        Resources r = mainContext.getResources();
-        final float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 70, r.getDisplayMetrics());
         final Drawable stationImagePlaceholder = AppCompatResources.getDrawable(holder.getContext(), R.drawable.ic_photo_24dp);
-
-        Callback imageLoadCallback = new Callback() {
-            @Override
-            public void onSuccess() {
-            }
-
-            @Override
-            public void onError(Exception e) {
-                Picasso.get()
-                        .load(fromUrl)
-                        .placeholder(stationImagePlaceholder)
-                        .resize((int) px, 0)
-                        .networkPolicy(NetworkPolicy.NO_CACHE)
-                        .into(holder);
-            }
-        };
-
-        Picasso.get()
-                .load(fromUrl)
-                .placeholder(stationImagePlaceholder)
-                .resize((int) px, 0)
-                .networkPolicy(NetworkPolicy.OFFLINE)
-                .into(holder, imageLoadCallback);
+        
+        // Use the new offline-first image loading method
+        ImageLoader.loadStationIconOfflineFirst(holder.getContext(), fromUrl, holder, stationImagePlaceholder);
     }
 
     public static ShoutcastInfo getShoutcastInfo() {

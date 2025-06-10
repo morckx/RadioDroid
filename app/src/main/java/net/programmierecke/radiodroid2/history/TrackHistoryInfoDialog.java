@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.format.DateUtils;
@@ -25,7 +26,8 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatImageView;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 
 import net.programmierecke.radiodroid2.R;
 
@@ -57,10 +59,15 @@ public class TrackHistoryInfoDialog extends BottomSheetDialogFragment {
 
         Resources resource = requireContext().getResources();
         final float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 200, resource.getDisplayMetrics());
-        Picasso.get()
+        
+        Drawable placeholder = AppCompatResources.getDrawable(getContext(), R.drawable.ic_photo_24dp);
+        RequestOptions options = new RequestOptions()
+                .placeholder(placeholder)
+                .override((int) px, 0);
+                
+        Glide.with(this)
                 .load(historyEntry.artUrl)
-                .placeholder(AppCompatResources.getDrawable(getContext(), R.drawable.ic_photo_24dp))
-                .resize((int) px, 0)
+                .apply(options)
                 .into(imageViewTrackArt);
 
         // TODO: Icons for date and duration

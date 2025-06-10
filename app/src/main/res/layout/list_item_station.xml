@@ -18,7 +18,7 @@
                 android:layout_width="90dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:background="@android:color/white"
+                android:background="@android:color/transparent"
                 android:measureAllChildren="true">
 
             <ImageView

@@ -38,7 +38,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
-import com.squareup.picasso.Picasso;
+import net.programmierecke.radiodroid2.utils.ImageLoader;
 
 import net.programmierecke.radiodroid2.history.TrackHistoryAdapter;
 import net.programmierecke.radiodroid2.history.TrackHistoryEntry;
@@ -574,10 +574,7 @@ public class FragmentPlayerFull extends Fragment {
                 LastFMApiKey.isEmpty()) {
             if (station.hasIcon()) {
                 // TODO: Check if we already have this station's icon loaded into image view
-                Picasso.get()
-                        .load(station.IconUrl)
-                        .error(R.drawable.ic_launcher)
-                        .into(artAndInfoPagerAdapter.imageViewArt);
+                ImageLoader.loadImage(requireContext(), station.IconUrl, artAndInfoPagerAdapter.imageViewArt);
             } else {
                 artAndInfoPagerAdapter.imageViewArt.setImageResource(R.drawable.ic_launcher);
             }
@@ -664,10 +661,7 @@ public class FragmentPlayerFull extends Fragment {
                     DataRadioStation station = Utils.getCurrentOrLastStation(fragment.requireContext());
 
                     if (station != null && station.hasIcon()) {
-                        Picasso.get()
-                                .load(station.IconUrl)
-                                .error(R.drawable.ic_launcher)
-                                .into(fragment.artAndInfoPagerAdapter.imageViewArt);
+                        ImageLoader.loadImage(fragment.requireContext(), station.IconUrl, fragment.artAndInfoPagerAdapter.imageViewArt);
                     } else {
                         fragment.artAndInfoPagerAdapter.imageViewArt.setImageResource(R.drawable.ic_launcher);
                     }
@@ -691,9 +685,7 @@ public class FragmentPlayerFull extends Fragment {
                         final String albumArtUrl = albumArts.get(0).url;
 
                         if (!TextUtils.isEmpty(albumArtUrl)) {
-                            Picasso.get()
-                                    .load(albumArtUrl)
-                                    .into(fragment.artAndInfoPagerAdapter.imageViewArt);
+                            ImageLoader.loadImage(fragment.requireContext(), albumArtUrl, fragment.artAndInfoPagerAdapter.imageViewArt);
 
                             if (!albumArtUrl.equals(trackHistoryEntry.stationIconUrl)) {
                                 fragment.trackHistoryRepository.setTrackArtUrl(trackHistoryEntry.uid, albumArtUrl);

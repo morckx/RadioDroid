@@ -25,8 +25,8 @@ import androidx.annotation.Nullable;
 import androidx.media.MediaBrowserServiceCompat;
 import androidx.preference.PreferenceManager;
 
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
+import com.bumptech.glide.request.target.CustomTarget;
+import net.programmierecke.radiodroid2.utils.ImageLoader;
 
 import net.programmierecke.radiodroid2.R;
 import net.programmierecke.radiodroid2.RadioDroidApp;
@@ -41,9 +41,6 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import jp.wasabeef.picasso.transformations.CropCircleTransformation;
-import jp.wasabeef.picasso.transformations.CropSquareTransformation;
-import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
 
 import static net.programmierecke.radiodroid2.Utils.resourceToUri;
 
@@ -72,8 +69,8 @@ public class RadioDroidBrowser {
         private Map<String, Bitmap> stationIdToIcon = new HashMap<>();
         private CountDownLatch countDownLatch;
         private  Resources resources;
-        // Picasso stores weak references to targets
-        List<Target> imageLoadTargets = new ArrayList<>();
+        // Glide custom targets for image loading
+        List<ImageLoader.BitmapTarget> imageLoadTargets = new ArrayList<>();
 
         RetrieveStationsIconAndSendResult(MediaBrowserServiceCompat.Result<List<MediaBrowserCompat.MediaItem>> result, List<DataRadioStation> stations, Context context) {
             this.result = result;
@@ -92,33 +89,31 @@ public class RadioDroidBrowser {
                     break;
                 }
 
-                Target imageLoadTarget = new Target() {
+                ImageLoader.BitmapTarget imageLoadTarget = new ImageLoader.BitmapTarget() {
                     @Override
-                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                    public void onBitmapLoaded(Bitmap bitmap) {
                         stationIdToIcon.put(station.StationUuid, bitmap);
                         countDownLatch.countDown();
                     }
 
                     @Override
-                    public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-                        onBitmapLoaded(((BitmapDrawable) errorDrawable).getBitmap(), null);
-                        countDownLatch.countDown();
+                    public void onBitmapFailed(Drawable errorDrawable) {
+                        if (errorDrawable instanceof BitmapDrawable) {
+                            onBitmapLoaded(((BitmapDrawable) errorDrawable).getBitmap());
+                        } else {
+                            countDownLatch.countDown();
+                        }
                     }
 
                     @Override
                     public void onPrepareLoad(Drawable placeHolderDrawable) {
-
+                        // No action needed
                     }
                 };
                 imageLoadTargets.add(imageLoadTarget);
-
-                Picasso.get().load((!station.hasIcon() ? resourceToUri(resources, R.drawable.ic_launcher).toString() : station.IconUrl))
-                        .transform(new CropSquareTransformation())
-                        .error(R.drawable.ic_launcher)
-                        .transform(Utils.useCircularIcons(context) ? new CropCircleTransformation() : new CropSquareTransformation())
-                        .transform(new RoundedCornersTransformation(12, 2, RoundedCornersTransformation.CornerType.ALL))
-                        .resize(128, 128)
-                        .into(imageLoadTarget);
+                
+                String iconUrl = station.hasIcon() ? station.IconUrl : resourceToUri(resources, R.drawable.ic_launcher).toString();
+                ImageLoader.loadStationIconForBrowser(context, iconUrl, 128, Utils.useCircularIcons(context), imageLoadTarget);
             }
 
             super.onPreExecute();
@@ -140,9 +135,8 @@ public class RadioDroidBrowser {
         protected void onPostExecute(Void aVoid) {
             Context context = contextRef.get();
             if (context != null) {
-                for (Target target : imageLoadTargets) {
-                    Picasso.get().cancelRequest(target);
-                }
+                // Note: Glide BitmapTarget doesn't require explicit cancellation like Picasso
+                // The request will be automatically cancelled when the target is no longer referenced
             }
 
             List<MediaBrowserCompat.MediaItem> mediaItems = new ArrayList<>();
