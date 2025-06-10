@@ -439,7 +439,11 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
     }
 
     private boolean useBottomNavigation() {
-        return !isRunningOnTV() && Utils.bottomNavigationEnabled(this);
+        // Always use drawer navigation on Android TV for better remote control navigation
+        if (isRunningOnTV()) {
+            return false;
+        }
+        return Utils.bottomNavigationEnabled(this);
     }
 
 
