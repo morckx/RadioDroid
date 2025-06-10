@@ -16,6 +16,7 @@ import net.programmierecke.radiodroid2.tests.utils.http.HttpToMockInterceptor;
 import net.programmierecke.radiodroid2.tests.utils.http.MockHttpDispatcher;
 
 import java.io.IOException;
+import java.net.InetAddress;
 
 import javax.annotation.Nullable;
 
@@ -69,7 +70,8 @@ public class CustomTestRunner extends AndroidJUnitRunner {
         mockWebServer.setDispatcher(mockHttpDispatcher);
 
         try {
-            mockWebServer.start();
+            // Starte mit expliziter IP-Adresse anstatt localhost, um UnknownHostException zu vermeiden
+            mockWebServer.start(InetAddress.getByName("127.0.0.1"), 0);
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
