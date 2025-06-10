@@ -3,7 +3,8 @@ package net.programmierecke.radiodroid2.station.live;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.google.android.exoplayer2.metadata.icy.IcyHeaders;
+import androidx.media3.extractor.metadata.icy.IcyHeaders;
+import androidx.media3.common.util.UnstableApi;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -12,6 +13,7 @@ import okhttp3.Response;
 
 import static net.programmierecke.radiodroid2.Utils.parseIntWithDefault;
 
+@UnstableApi
 public class ShoutcastInfo implements Parcelable {
     public int metadataOffset;
     public int bitrate;

@@ -47,6 +47,7 @@ import android.widget.Toast;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.media3.common.util.UnstableApi;
 import androidx.core.graphics.drawable.RoundedBitmapDrawable;
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -75,6 +76,7 @@ import net.programmierecke.radiodroid2.recording.RunningRecordingInfo;
 
 import static android.content.Intent.ACTION_MEDIA_BUTTON;
 
+@UnstableApi
 public class PlayerService extends JobIntentService implements RadioPlayer.PlayerListener {
     protected static final int NOTIFY_ID = 1;
     private static final String NOTIFICATION_CHANNEL_ID = "default";

@@ -10,6 +10,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.preference.PreferenceManager;
+import androidx.media3.common.util.UnstableApi;
 
 import net.programmierecke.radiodroid2.BuildConfig;
 import net.programmierecke.radiodroid2.R;
@@ -29,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
 
+@UnstableApi
 public class RadioPlayer implements PlayerWrapper.PlayListener, Recordable {
 
     final private String TAG = "RadioPlayer";
