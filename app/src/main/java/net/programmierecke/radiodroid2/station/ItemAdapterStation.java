@@ -328,11 +328,22 @@ public class ItemAdapterStation
             getContext().getTheme().resolveAttribute(R.attr.colorAccentMy, tv, true);
             holder.textViewTitle.setTextColor(tv.data);
             holder.textViewTitle.setTypeface(null, Typeface.BOLD);
+                    
+            // Add background highlight for Android TV
+            if (Utils.isRunningOnTV(getContext())) {
+                holder.itemView.setBackground(AppCompatResources.getDrawable(getContext(), R.drawable.selected_state));
+            }
         } else {
             getContext().getTheme().resolveAttribute(R.attr.boxBackgroundColor, tv, true);
             holder.textViewTitle.setTypeface(holder.textViewShortDescription.getTypeface());
             getContext().getTheme().resolveAttribute(R.attr.iconsInItemBackgroundColor, tv, true);
             holder.textViewTitle.setTextColor(tv.data);
+            
+            // Reset background for Android TV
+            if (Utils.isRunningOnTV(getContext())) {
+                getContext().getTheme().resolveAttribute(R.attr.selectableItemBackground, tv, true);
+                holder.itemView.setBackgroundResource(tv.resourceId);
+            }
         }
 
         holder.textViewTitle.setText(station.Name);
@@ -514,6 +525,7 @@ public class ItemAdapterStation
     Context getContext() {
         return activity;
     }
+
 
     void setupIcon(boolean useCircularIcons, ImageView imageView, ImageView transparentImageView) {
         if (useCircularIcons) {

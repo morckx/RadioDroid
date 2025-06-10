@@ -2,10 +2,12 @@ package net.programmierecke.radiodroid2;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.UiModeManager;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
@@ -80,6 +82,16 @@ import okhttp3.TlsVersion;
 
 public class Utils {
     private static int loadIcons = -1;
+
+    /**
+     * Check if the app is running on Android TV
+     * @param context The application context
+     * @return true if running on Android TV, false otherwise
+     */
+    public static boolean isRunningOnTV(Context context) {
+        UiModeManager uiModeManager = (UiModeManager) context.getSystemService(Context.UI_MODE_SERVICE);
+        return uiModeManager.getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION;
+    }
 
     public static int parseIntWithDefault(String number, int defaultVal) {
         try {
