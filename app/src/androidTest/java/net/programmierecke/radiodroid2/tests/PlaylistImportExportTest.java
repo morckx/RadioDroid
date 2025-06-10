@@ -5,6 +5,7 @@ import static net.programmierecke.radiodroid2.tests.utils.TestUtils.generateFake
 import android.content.Context;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.filters.SdkSuppress;
 import net.programmierecke.radiodroid2.StationSaveManager;
 import net.programmierecke.radiodroid2.station.DataRadioStation;
 import org.junit.After;
@@ -46,6 +47,7 @@ public class PlaylistImportExportTest {
     }
 
     @Test
+    @SdkSuppress(minSdkVersion = 24)
     public void testExportImportPlaylist() {
         // Add a test station
         DataRadioStation station;
