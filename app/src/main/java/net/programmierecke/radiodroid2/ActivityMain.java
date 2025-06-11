@@ -1229,8 +1229,9 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
         if (isRunningOnTV()) {
             switch (keyCode) {
                 case KeyEvent.KEYCODE_MENU:
-                case KeyEvent.KEYCODE_DPAD_LEFT:
-                    // Open navigation drawer when menu button or left D-pad is pressed on TV
+                case KeyEvent.KEYCODE_TV_CONTENTS_MENU:
+                case KeyEvent.KEYCODE_0:
+                    // Open navigation drawer when menu button is pressed on TV
                     if (!mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
                         mDrawerLayout.openDrawer(GravityCompat.START);
                         return true;
@@ -1243,8 +1244,105 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
                         return true;
                     }
                     break;
+                case KeyEvent.KEYCODE_CHANNEL_UP:
+                    // Navigate to previous item in list
+                    if (navigateInCurrentList(-1)) {
+                        return true;
+                    }
+                    break;
+                case KeyEvent.KEYCODE_CHANNEL_DOWN:
+                    // Navigate to next item in list
+                    if (navigateInCurrentList(1)) {
+                        return true;
+                    }
+                    break;
             }
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    /**
+     * Navigate in the current list fragment when channel up/down is pressed on TV remote
+     * @param direction -1 for previous item, 1 for next item
+     * @return true if navigation was handled, false otherwise
+     */
+    private boolean navigateInCurrentList(int direction) {
+        Fragment currentFragment = mFragmentManager.getFragments().get(mFragmentManager.getFragments().size() - 1);
+        
+        // Handle different fragment types that contain lists
+        if (currentFragment instanceof FragmentStarred) {
+            return navigateInRecyclerView(((FragmentStarred) currentFragment).getRecyclerView(), direction);
+        } else if (currentFragment instanceof FragmentHistory) {
+            return navigateInRecyclerView(((FragmentHistory) currentFragment).getRecyclerView(), direction);
+        } else if (currentFragment instanceof FragmentTabs) {
+            // FragmentTabs contains nested fragments, get the current tab's fragment
+            Fragment activeTabFragment = ((FragmentTabs) currentFragment).getCurrentFragment();
+            if (activeTabFragment instanceof net.programmierecke.radiodroid2.station.FragmentStations) {
+                return navigateInRecyclerView(((net.programmierecke.radiodroid2.station.FragmentStations) activeTabFragment).getRecyclerView(), direction);
+            }
+        } else if (currentFragment instanceof net.programmierecke.radiodroid2.station.FragmentStations) {
+            return navigateInRecyclerView(((net.programmierecke.radiodroid2.station.FragmentStations) currentFragment).getRecyclerView(), direction);
+        }
+        
+        return false;
+    }
+
+    /**
+     * Navigate within a RecyclerView
+     * @param recyclerView the RecyclerView to navigate in
+     * @param direction -1 for previous item, 1 for next item
+     * @return true if navigation was successful, false otherwise
+     */
+    private boolean navigateInRecyclerView(androidx.recyclerview.widget.RecyclerView recyclerView, int direction) {
+        if (recyclerView == null || recyclerView.getAdapter() == null) {
+            return false;
+        }
+
+        androidx.recyclerview.widget.RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
+        if (layoutManager == null) {
+            return false;
+        }
+
+        // Get currently focused item position
+        View focusedView = recyclerView.getFocusedChild();
+        int currentPosition = 0;
+        
+        if (focusedView != null) {
+            currentPosition = recyclerView.getChildAdapterPosition(focusedView);
+        } else {
+            // If no item is focused, start from the first visible item
+            if (layoutManager instanceof androidx.recyclerview.widget.LinearLayoutManager) {
+                currentPosition = ((androidx.recyclerview.widget.LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
+            } else if (layoutManager instanceof androidx.recyclerview.widget.GridLayoutManager) {
+                currentPosition = ((androidx.recyclerview.widget.GridLayoutManager) layoutManager).findFirstVisibleItemPosition();
+            }
+        }
+
+        // Calculate new position
+        int newPosition = currentPosition + direction;
+        int itemCount = recyclerView.getAdapter().getItemCount();
+
+        // Ensure position is within bounds
+        if (newPosition < 0) {
+            newPosition = 0;
+        } else if (newPosition >= itemCount) {
+            newPosition = itemCount - 1;
+        }
+
+        // Only navigate if position actually changed
+        if (newPosition != currentPosition && newPosition >= 0 && newPosition < itemCount) {
+            // Scroll to the new position and focus it
+            final int finalNewPosition = newPosition;
+            recyclerView.scrollToPosition(finalNewPosition);
+            recyclerView.post(() -> {
+                androidx.recyclerview.widget.RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForAdapterPosition(finalNewPosition);
+                if (viewHolder != null && viewHolder.itemView != null) {
+                    viewHolder.itemView.requestFocus();
+                }
+            });
+            return true;
+        }
+        
+        return false;
     }
 }

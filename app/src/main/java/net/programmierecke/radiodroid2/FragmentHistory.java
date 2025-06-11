@@ -215,4 +215,12 @@ public class FragmentHistory extends Fragment implements IAdapterRefreshable {
         super.onDestroyView();
         rvStations.setAdapter(null);
     }
+
+    /**
+     * Get the RecyclerView for TV remote navigation
+     * @return the RecyclerView containing the stations list
+     */
+    public RecyclerView getRecyclerView() {
+        return rvStations;
+    }
 }

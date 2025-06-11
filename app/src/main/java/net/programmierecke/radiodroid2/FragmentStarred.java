@@ -241,4 +241,12 @@ public class FragmentStarred extends Fragment implements IAdapterRefreshable, Ob
     public void update(Observable o, Object arg) {
         RefreshListGui();
     }
+
+    /**
+     * Get the RecyclerView for TV remote navigation
+     * @return the RecyclerView containing the stations list
+     */
+    public RecyclerView getRecyclerView() {
+        return rvStations;
+    }
 }

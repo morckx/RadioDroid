@@ -224,4 +224,12 @@ public class FragmentStations extends FragmentBase implements IFragmentSearchabl
             swipeRefreshLayout.setRefreshing(false);
         }
     }
+
+    /**
+     * Get the RecyclerView for TV remote navigation
+     * @return the RecyclerView containing the stations list
+     */
+    public RecyclerView getRecyclerView() {
+        return rvStations;
+    }
 }

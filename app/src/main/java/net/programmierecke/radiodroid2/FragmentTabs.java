@@ -208,6 +208,17 @@ public class FragmentTabs extends Fragment implements IFragmentRefreshable, IFra
         }
     }
 
+    /**
+     * Get the currently visible fragment for TV remote navigation
+     * @return the currently visible fragment
+     */
+    public Fragment getCurrentFragment() {
+        if (viewPager != null && viewPager.getCurrentItem() < fragments.length) {
+            return fragments[viewPager.getCurrentItem()];
+        }
+        return null;
+    }
+
     class ViewPagerAdapter extends FragmentPagerAdapter {
         private final List<Fragment> mFragmentList = new ArrayList<>();
         private final List<Integer> mFragmentTitleList = new ArrayList<Integer>();
