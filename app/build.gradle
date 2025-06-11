@@ -59,7 +59,7 @@ android {
     defaultConfig {
         applicationId "net.programmierecke.radiodroid2"
         minSdkVersion 21
-        targetSdkVersion 34
+        targetSdkVersion 35
 
         versionCode 97
         versionName "0.86.900-morckx"
