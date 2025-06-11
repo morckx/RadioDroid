@@ -43,7 +43,7 @@
     <string name="nav_item_alarm">Alarm</string>
     <string name="tab_player_recordings">Opnames</string>
 
-    <string name="about_text">Deze app gebruikt de gratis radiostationsindex van\nhttps://www.radio-browser.info\nIedereen kan stations toevoegen of bewerken. Het is een soort van wiki voor online(streaming) radiostations.\n\nContact:\nsegler_alex@web.de\n\nBugtracker:\nhttps://github.com/segler-alex/RadioDroid/issues\n\nAls je deze software fijn vindt en wilt helpen, stuur me dan een e-mail. Ik heb iemand nodig met ontwerpervaring om deze oogstrelender te maken :) Iemand die pictogrammen kan creëren of afbeeldingen... Maar ook programmeurs die bugs willen oplossen of nieuwe functies willen toevoegen.\nIdeeën voor nieuwe functies zijn ook altijd welkom!\n\nDeze app is vrije software, uitgebracht onder de GPLv3-licentie.\nhttps://www.gnu.org/licenses/gpl-3.0.html</string>
+    <string name="about_text">Deze app gebruikt de gratis radiostationsindex van\nhttps://www.radio-browser.info\nIedereen kan stations toevoegen. Het werkt als een wiki voor online (streaming) radiostations.\n\nBugtracker:\nhttps://github.com/morckx/RadioDroid/issues\n(oorspronkelijk: https://github.com/segler-alex/RadioDroid/issues)\n\nDeze app is vrije software onder de GPLv3-licentie.\nhttps://www.gnu.org/licenses/gpl-3.0.html</string>
     <string name="about_version">Versie: %1$s</string>
     <string name="detail_star">Toevoegen aan favorieten</string>
     <string name="detail_unstar">Verwijderen uit favorieten</string>

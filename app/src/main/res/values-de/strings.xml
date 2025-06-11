@@ -35,7 +35,7 @@
     <string name="nav_item_alarm">Wecker</string>
     <string name="tab_player_recordings">Aufnahmen</string>
 
-    <string name="about_text">Diese App basiert auf dem freien Internetradio-Stationsverzeichnis https://www.radio-browser.info .\n\nDas Stationsverzeichnis funktioniert nach dem Wiki-Prinzip: jeder, auch Du, kann mithelfen, es aktuell zu halten.\n\nKontakt:\nsegler_alex@web.de\n\nSourcecode und Bugtracker:\nhttps://github.com/segler-alex/RadioDroid/issues\n\nIch freue mich immer über Mails mit Verbesserungsvorschlägen. Falls Du sonst irgendwie helfen willst: es gibt immer Bugs zu fixen :). Wenn Du Dein grafisches Talent einbringen möchtest, wäre ich besonders dankbar, speziell für schönere Icons, Hintergründe oder auch ein insgesamt besseres Design.\n\nDiese App wurde mit der GPLv3 https://www.gnu.org/licenses/gpl-3.0.html lizenziert.</string>
+    <string name="about_text">Diese App nutzt das kostenlose Radiostation-Verzeichnis von\nhttps://www.radio-browser.info\nJeder kann Stationen hinzufügen. Es funktioniert wie ein Wiki für Online-(Streaming-)Radiostationen.\n\nBugtracker:\nhttps://github.com/morckx/RadioDroid/issues\n(ursprünglich: https://github.com/segler-alex/RadioDroid/issues)\n\nDiese App ist freie Software, lizenziert unter der GPLv3.\nhttps://www.gnu.org/licenses/gpl-3.0.html</string>
     <string name="detail_star">Als Favorit setzen</string>
     <string name="detail_unstar">Als Favorit löschen</string>
     <string name="progress_loading">Lade...</string>

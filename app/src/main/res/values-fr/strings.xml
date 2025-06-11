@@ -58,7 +58,7 @@
     <string name="nav_item_settings">Réglages</string>
     <string name="nav_item_alarm">Alarme</string>
 
-    <string name="about_text">Cette application utilise le répertoire libre de stations radios à l\'adresse\nhttps://www.radio-browser.info\nChacun peut y ajouter des stations ou éditer celles déjà existantes. Ce répertoire fonctionne comme un wiki pour recenser les stations de webradios (en streaming).\n\nContact :\nsegler_alex@web.de\n\nSystème de suivi de bogues :\nhttps://github.com/segler-alex/RadioDroid/issues\n\nSi vous appréciez cette application et que vous voulez soutenir le développement, n\'hésitez pas à m\'envoyer un mail. Si vous avez de l\'expérience en graphisme, vous êtes le bienvenu pour rendre RadioDroid plus agréable à regarder ;) Je cherche aussi des programmeurs pour résoudre les bogues, et implémenter de nouvelles fonctionnalités !\nLes idées de nouvelles fonctionnalités sont d\'ailleurs toujours les bienvenues!\n\nCette application est un logiciel libre sous licence GNU GPLv3.\nhttps://www.gnu.org/licenses/gpl-3.0.html</string>
+    <string name="about_text">Cette application utilise le répertoire libre de stations radios à l\'adresse\nhttps://www.radio-browser.info\nChacun peut y ajouter des stations. Ce répertoire fonctionne comme un wiki pour les stations de radio en ligne (streaming).\n\nSuivi de bogues :\nhttps://github.com/morckx/RadioDroid/issues\n(initialement: https://github.com/segler-alex/RadioDroid/issues)\n\nCette application est un logiciel libre sous licence GPLv3.\nhttps://www.gnu.org/licenses/gpl-3.0.html</string>
     <string name="about_version">Version : %1$s</string>
     <string name="detail_star">Ajouter aux favoris</string>
     <string name="detail_unstar">Supprimer des favoris</string>

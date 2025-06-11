@@ -58,7 +58,7 @@
     <string name="nav_item_settings">Impostazioni</string>
     <string name="nav_item_alarm">Sveglia</string>
 
-    <string name="about_text">Questa applicazione usa il direttorio libero di radio presso\nhttps://www.radio-browser.info\nChiunque può aggiungere stazioni radio o modificare quelle esistenti. Funziona come una wiki per le stazioni radio che trasmettono (streaming) su internet.\n\Centatti:\nsegler_alex@web.de\n\Gestore di bachi:\nhttps://github.com/segler-alex/RadioDroid/issues\n\nSe ti piace questo software e vuoi aiutare, sentiti libero di inviare un email. Ho davvero bisogno di qualcuno con esperienza grafica che possa rendere l\'applicazione più bella da vedere :) Magari qualcuno che sa disegnare icone, immagini... Ma anche programmatori per sistemare i bachi, o implementare nuove caratteristiche. ;)\nInoltre sono sempre apprezzate idee per nuove caratteristiche!\n\nQuesta applicazione è software libero sotto la licenza\nhttps://www.gnu.org/licenses/gpl-3.0.html</string>
+    <string name="about_text">Questa applicazione usa il direttorio libero di stazioni radio presso\nhttps://www.radio-browser.info\nChiunque può aggiungere stazioni. Funziona come una wiki per le stazioni radio online (streaming).\n\nBugtracker:\nhttps://github.com/morckx/RadioDroid/issues\n(originariamente: https://github.com/segler-alex/RadioDroid/issues)\n\nQuesta applicazione è software libero sotto licenza GPLv3.\nhttps://www.gnu.org/licenses/gpl-3.0.html</string>
     <string name="about_version">Versione: %1$s</string>
     <string name="detail_star">Aggiungi ai preferiti</string>
     <string name="detail_unstar">Cancella dai favoriti</string>
