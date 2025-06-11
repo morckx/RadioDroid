@@ -1256,6 +1256,14 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
                         return true;
                     }
                     break;
+                case KeyEvent.KEYCODE_MEDIA_FAST_FORWARD:
+                    // Skip to next station
+                    PlayerServiceUtil.skipToNext();
+                    return true;
+                case KeyEvent.KEYCODE_MEDIA_REWIND:
+                    // Skip to previous station
+                    PlayerServiceUtil.skipToPrevious();
+                    return true;
             }
         }
         return super.onKeyDown(keyCode, event);
