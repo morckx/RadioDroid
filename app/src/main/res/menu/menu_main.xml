@@ -26,6 +26,13 @@
         app:showAsAction="ifRoom" />
 
     <item
+        android:id="@+id/action_set_sleep_timer"
+        android:icon="@drawable/ic_hourglass_empty_black_24dp"
+        android:nextFocusUp="@+id/action_search"
+        android:title="@string/nav_item_add_sleep"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/action_mpd"
         android:title="@string/settings_mpd"
         android:icon="@drawable/mpd"
@@ -36,13 +43,6 @@
         android:title="@string/media_route_menu_title"
         app:actionProviderClass="androidx.mediarouter.app.MediaRouteActionProvider"
         app:showAsAction="ifRoom"/>
-
-    <item
-        android:id="@+id/action_set_sleep_timer"
-        android:icon="@drawable/ic_hourglass_empty_black_24dp"
-        android:nextFocusUp="@+id/action_search"
-        android:title="@string/nav_item_add_sleep"
-        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/action_save"
