@@ -3,6 +3,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## Development snapshot [0.86.902-morckx] - 2025-06-10
+
+- Fixed recording on newer Android versions
+- Fixed playlist loading and saving on newer Android versions
+- Fixed radio-browser server fallback
+- Migrated from abandoned ExoPlayer to Media3
+- Migrated from abandoned Picasso library to Glide
+- Target SDK bumped from 34 to 36
+- All dependencies updated
+- Improved navigation on Android TV
+- Improved UI updates in full player mode
+
 ## Development snapshot [0.86.900-morckx] - 2025-01-05
 
 - Fixed radio-browser server fallback
