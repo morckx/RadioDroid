@@ -1245,12 +1245,14 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
                     }
                     break;
                 case KeyEvent.KEYCODE_CHANNEL_UP:
+                case KeyEvent.KEYCODE_PAGE_UP:
                     // Navigate to previous item in list
                     if (navigateInCurrentList(-1)) {
                         return true;
                     }
                     break;
                 case KeyEvent.KEYCODE_CHANNEL_DOWN:
+                case KeyEvent.KEYCODE_PAGE_DOWN:
                     // Navigate to next item in list
                     if (navigateInCurrentList(1)) {
                         return true;
