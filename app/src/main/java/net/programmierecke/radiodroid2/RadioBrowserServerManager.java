@@ -2,7 +2,10 @@ package net.programmierecke.radiodroid2;
 
 import android.util.Log;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.InetAddress;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Random;
 import java.util.Vector;
@@ -14,6 +17,26 @@ import java.util.Vector;
 public class RadioBrowserServerManager {
     static String currentServer = null;
     static String[] serverList = null;
+
+    /**
+     * Test if a server is reachable
+     * @param serverName the server to test
+     * @return true if server is reachable, false otherwise
+     */
+    private static boolean isServerAvailable(String serverName) {
+        try {
+            URL url = new URL("https://" + serverName + "/");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setConnectTimeout(3000); // 3 seconds timeout
+            connection.setReadTimeout(3000);
+            connection.setRequestMethod("GET"); // Just get headers, not content
+            int responseCode = connection.getResponseCode();
+            return (200 <= responseCode && responseCode < 300);
+        } catch (IOException e) {
+            Log.w("DNS", "Server " + serverName + " is not available: " + e.getMessage());
+            return false;
+        }
+    }
 
     /**
      * Blocking: do dns request do get a list of all available servers
@@ -28,20 +51,30 @@ public class RadioBrowserServerManager {
                 // do not use original variable, it could fall back to "all.api.radio-browser.info"
                 String currentHostAddress = item.getHostAddress();
                 InetAddress new_item = InetAddress.getByName(currentHostAddress);
-                Log.i("DNS", "Found: " + new_item.toString() + " -> " + new_item.getCanonicalHostName());
+                Log.i("DNS", "Found: " + new_item + " -> " + new_item.getCanonicalHostName());
                 String name = item.getCanonicalHostName();
                 if (!name.equals("all.api.radio-browser.info") && !name.equals(currentHostAddress)) {
-                    Log.i("DNS", "Added entry: '" + name+"'");
-                    listResult.add(name);
+                    // Test if server is available before adding it
+                    if (isServerAvailable(name)) {
+                        Log.i("DNS", "Added entry: '" + name + "'");
+                        listResult.add(name);
+                    } else {
+                        Log.i("DNS", "Skipping unavailable server: '" + name + "'");
+                    }
                 }
             }
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
-        if (listResult.size() == 0){
+        if (listResult.isEmpty()){
             // should we inform people that their internet provider is not able to do reverse lookups? (= is shit)
             Log.w("DNS", "Fallback to all.api.radio-browser.info because dns call did not work.");
-            listResult.add("all.api.radio-browser.info");
+            // Check if fallback server is available
+            if (isServerAvailable("all.api.radio-browser.info")) {
+                listResult.add("all.api.radio-browser.info");
+            } else {
+                Log.e("DNS", "Fallback server is also unavailable!");
+            }
         }
         Log.d("DNS", "doDnsServerListing() Found servers: " + listResult.size());
         return listResult.toArray(new String[0]);
