@@ -210,6 +210,45 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
 
             ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.app_name, R.string.app_name);
             mDrawerLayout.addDrawerListener(mDrawerToggle);
+            
+            // Add custom drawer listener for Android TV auto-selection
+            mDrawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
+                @Override
+                public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
+                    // Not needed
+                }
+
+                @Override
+                public void onDrawerOpened(@NonNull View drawerView) {
+                    // Auto-select current item when drawer opens on Android TV
+                    if (isRunningOnTV()) {
+                        try {
+                            Fragment currentFragment = mFragmentManager.getFragments().get(mFragmentManager.getFragments().size() - 1);
+                            if (currentFragment instanceof FragmentSettings) {
+                                // For settings fragment, use a simpler approach to avoid crashes
+                                selectCurrentDrawerItemForSettings();
+                            } else {
+                                // For other fragments, use the full auto-selection logic
+                                selectCurrentDrawerItem();
+                            }
+                        } catch (Exception e) {
+                            // Safety catch to prevent crashes
+                            Log.e(TAG, "Error in drawer auto-selection", e);
+                        }
+                    }
+                }
+
+                @Override
+                public void onDrawerClosed(@NonNull View drawerView) {
+                    // Not needed
+                }
+
+                @Override
+                public void onDrawerStateChanged(int newState) {
+                    // Not needed
+                }
+            });
+            
             mDrawerToggle.syncState();
 
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -1295,6 +1334,214 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
         }
         
         return false;
+    }
+
+    /**
+     * Simplified drawer focus method specifically for settings fragment to avoid crashes
+     */
+    private void selectCurrentDrawerItemForSettings() {
+        // Hide virtual keyboard on Android TV
+        if (mSearchView != null) {
+            mSearchView.clearFocus();
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(mSearchView.getWindowToken(), 0);
+        }
+        
+        if (mNavigationView != null) {
+            // Post with delay to ensure drawer is fully opened
+            mNavigationView.postDelayed(() -> {
+                try {
+                    // Clear all checked items first, then check only the settings item
+                    if (mNavigationView.getMenu() != null) {
+                        Menu menu = mNavigationView.getMenu();
+                        
+                        // Clear all items first
+                        for (int i = 0; i < menu.size(); i++) {
+                            MenuItem item = menu.getItem(i);
+                            if (item != null) {
+                                item.setChecked(false);
+                            }
+                        }
+                        
+                        // Then set only the settings item as checked
+                        MenuItem settingsItem = menu.findItem(R.id.nav_item_settings);
+                        if (settingsItem != null) {
+                            settingsItem.setChecked(true);
+                        }
+                    }
+                    
+                    // Use a simpler approach to focus the last item (settings)
+                    focusLastNavigationItem();
+                } catch (Exception e) {
+                    Log.e(TAG, "Error focusing settings in drawer", e);
+                }
+            }, 150); // Slightly longer delay for settings
+        }
+    }
+    
+    /**
+     * Focus the last item in the navigation drawer (settings item)
+     */
+    private void focusLastNavigationItem() {
+        if (mNavigationView == null) return;
+        
+        // Find the RecyclerView inside the NavigationView
+        for (int i = 0; i < mNavigationView.getChildCount(); i++) {
+            View child = mNavigationView.getChildAt(i);
+            if (child instanceof androidx.recyclerview.widget.RecyclerView) {
+                androidx.recyclerview.widget.RecyclerView recyclerView = (androidx.recyclerview.widget.RecyclerView) child;
+                
+                if (recyclerView.getAdapter() != null) {
+                    int lastPosition = recyclerView.getAdapter().getItemCount() - 1;
+                    if (lastPosition >= 0) {
+                        // Scroll to and focus the last position
+                        recyclerView.scrollToPosition(lastPosition);
+                        recyclerView.post(() -> {
+                            androidx.recyclerview.widget.RecyclerView.ViewHolder vh = 
+                                recyclerView.findViewHolderForAdapterPosition(lastPosition);
+                            if (vh != null && vh.itemView != null) {
+                                vh.itemView.requestFocus();
+                            }
+                        });
+                    }
+                }
+                break;
+            }
+        }
+    }
+
+    /**
+     * Select the current fragment's corresponding item in the navigation drawer on Android TV
+     */
+    private void selectCurrentDrawerItem() {
+        // Hide virtual keyboard on Android TV
+        if (mSearchView != null) {
+            mSearchView.clearFocus();
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(mSearchView.getWindowToken(), 0);
+        }
+        
+        if (mNavigationView != null && mNavigationView.getMenu() != null) {
+            // Get the menu item ID that corresponds to the current fragment
+            int currentMenuItemId = getCurrentFragmentMenuItemId();
+            
+            // Clear all checked items first, then check only the current item
+            Menu menu = mNavigationView.getMenu();
+            for (int i = 0; i < menu.size(); i++) {
+                MenuItem item = menu.getItem(i);
+                if (item != null) {
+                    item.setChecked(false);
+                }
+            }
+            
+            // Set only the current fragment's menu item as checked
+            MenuItem currentItem = menu.findItem(currentMenuItemId);
+            if (currentItem != null) {
+                currentItem.setChecked(true);
+            }
+            
+            // Post to ensure the drawer is fully opened before requesting focus
+            mNavigationView.postDelayed(() -> {
+                // Focus the specific navigation item that corresponds to current fragment
+                focusNavigationMenuItemByFragment(currentMenuItemId);
+            }, 100); // Small delay to ensure drawer animation is complete
+        }
+    }
+
+    /**
+     * Get the menu item ID that corresponds to the currently active fragment
+     */
+    private int getCurrentFragmentMenuItemId() {
+        try {
+            if (mFragmentManager == null || mFragmentManager.getFragments().isEmpty()) {
+                return R.id.nav_item_stations; // Safe default
+            }
+            
+            Fragment currentFragment = mFragmentManager.getFragments().get(mFragmentManager.getFragments().size() - 1);
+            
+            if (currentFragment == null) {
+                return R.id.nav_item_stations; // Safe default
+            }
+            
+            // Handle different fragment types to determine corresponding menu item
+            if (currentFragment instanceof FragmentStarred) {
+                return R.id.nav_item_starred;
+            } else if (currentFragment instanceof FragmentHistory) {
+                return R.id.nav_item_history;
+            } else if (currentFragment instanceof FragmentAlarm) {
+                return R.id.nav_item_alarm;
+            } else if (currentFragment instanceof FragmentSettings) {
+                return R.id.nav_item_settings;
+            } else if (currentFragment instanceof FragmentTabs) {
+                return R.id.nav_item_stations;
+            }
+            
+            // Default to stations if we can't determine the fragment type
+            return R.id.nav_item_stations;
+        } catch (Exception e) {
+            // Safety fallback in case of any exception
+            return R.id.nav_item_stations;
+        }
+    }
+
+    /**
+     * Focus the navigation menu item that corresponds to a specific fragment
+     */
+    private void focusNavigationMenuItemByFragment(int menuItemId) {
+        if (mNavigationView == null) return;
+        
+        // Find the RecyclerView inside the NavigationView
+        for (int i = 0; i < mNavigationView.getChildCount(); i++) {
+            View child = mNavigationView.getChildAt(i);
+            if (child instanceof androidx.recyclerview.widget.RecyclerView) {
+                androidx.recyclerview.widget.RecyclerView recyclerView = (androidx.recyclerview.widget.RecyclerView) child;
+                
+                // Find the position of our menu item in the navigation menu
+                Menu menu = mNavigationView.getMenu();
+                int targetPosition = -1;
+                for (int j = 0; j < menu.size(); j++) {
+                    if (menu.getItem(j).getItemId() == menuItemId) {
+                        targetPosition = j;
+                        break;
+                    }
+                }
+                
+                if (targetPosition >= 0) {
+                    // Adjust position - focus was one below the correct item, so add 1
+                    int adjustedPosition = targetPosition + 1;
+                    
+                    // Ensure we don't exceed the adapter bounds
+                    int adapterItemCount = recyclerView.getAdapter() != null ? recyclerView.getAdapter().getItemCount() : 0;
+                    final int finalTargetPosition = Math.min(adjustedPosition, adapterItemCount - 1);
+                    final int originalTargetPosition = targetPosition; // Make final for lambda
+                    
+                    // Try to focus the view at this adapter position
+                    androidx.recyclerview.widget.RecyclerView.ViewHolder viewHolder = 
+                        recyclerView.findViewHolderForAdapterPosition(finalTargetPosition);
+                    if (viewHolder != null && viewHolder.itemView != null) {
+                        viewHolder.itemView.requestFocus();
+                    } else {
+                        // If view holder not found, scroll to position and try again
+                        recyclerView.scrollToPosition(finalTargetPosition);
+                        recyclerView.post(() -> {
+                            androidx.recyclerview.widget.RecyclerView.ViewHolder vh = 
+                                recyclerView.findViewHolderForAdapterPosition(finalTargetPosition);
+                            if (vh != null && vh.itemView != null) {
+                                vh.itemView.requestFocus();
+                            } else {
+                                // Last resort: try the original position without adjustment
+                                androidx.recyclerview.widget.RecyclerView.ViewHolder fallbackVh = 
+                                    recyclerView.findViewHolderForAdapterPosition(originalTargetPosition);
+                                if (fallbackVh != null && fallbackVh.itemView != null) {
+                                    fallbackVh.itemView.requestFocus();
+                                }
+                            }
+                        });
+                    }
+                }
+                break;
+            }
+        }
     }
 
     /**

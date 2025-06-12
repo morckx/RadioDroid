@@ -79,14 +79,23 @@ public class FragmentSettings extends PreferenceFragmentCompat implements Shared
         myToolbar.setTitle(getPreferenceScreen().getTitle());
 
         if (Utils.bottomNavigationEnabled(activity)) {
-            if (isToplevel()) {
+            // On Android TV, always keep the home button enabled for drawer access
+            boolean isTV = activity.isRunningOnTV();
+            
+            if (isToplevel() && !isTV) {
                 activity.getSupportActionBar().setDisplayHomeAsUpEnabled(false);
                 activity.getSupportActionBar().setDisplayShowHomeEnabled(false);
                 myToolbar.setNavigationOnClickListener(v -> activity.onBackPressed());
             } else {
                 activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                 activity.getSupportActionBar().setDisplayShowHomeEnabled(true);
-                myToolbar.setNavigationOnClickListener(v -> activity.onBackPressed());
+                
+                // On Android TV, don't override the navigation click listener
+                // Let the default drawer toggle behavior handle it
+                if (!isTV) {
+                    myToolbar.setNavigationOnClickListener(v -> activity.onBackPressed());
+                }
+                // For TV, the ActivityMain's ActionBarDrawerToggle will handle navigation clicks
             }
         }
     }
