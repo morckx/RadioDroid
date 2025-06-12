@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## Development snapshot [0.86.902-morckx] - 2025-06-10
+## Development snapshot [0.86.902-morckx] - 2025-06-11
 
 - Fixed recording on newer Android versions
 - Fixed playlist loading and saving on newer Android versions
@@ -12,7 +12,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Migrated from abandoned Picasso library to Glide
 - Target SDK bumped from 34 to 36
 - All dependencies updated
-- Improved navigation on Android TV
+- Improved navigation on Android TV:
+  - Station list can now be navigated with Channel Up/Down keys
+  - Fast forward and rewind skips to the next/previous station
+  - Use the 0 to key to open the drawer
 - Improved UI updates in full player mode
 
 ## Development snapshot [0.86.900-morckx] - 2025-01-05
