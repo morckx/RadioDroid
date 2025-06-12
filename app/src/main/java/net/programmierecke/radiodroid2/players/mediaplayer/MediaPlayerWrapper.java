@@ -27,7 +27,7 @@ public class MediaPlayerWrapper implements PlayerWrapper, StreamProxyListener {
 
     final private String TAG = "MediaPlayerWrapper";
 
-    private Handler playerThreadHandler;
+    private final Handler playerThreadHandler;
 
     private MediaPlayer mediaPlayer;
     private StreamProxy proxy;
@@ -42,7 +42,7 @@ public class MediaPlayerWrapper implements PlayerWrapper, StreamProxyListener {
     private long totalTransferredBytes;
     private long currentPlaybackTransferredBytes;
 
-    private AtomicBoolean playerIsInLegalState = new AtomicBoolean(false);
+    private final AtomicBoolean playerIsInLegalState = new AtomicBoolean(false);
 
     public MediaPlayerWrapper(Handler playerThreadHandler) {
         this.playerThreadHandler = playerThreadHandler;

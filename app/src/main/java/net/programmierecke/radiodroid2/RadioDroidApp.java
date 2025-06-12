@@ -198,10 +198,8 @@ public class RadioDroidApp extends MultiDexApplication {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         ProxySettings proxySettings = ProxySettings.fromPreferences(sharedPref);
         if (proxySettings != null) {
-            if (!Utils.setOkHttpProxy(builder, proxySettings)) {
-                // proxy settings are not valid
-                return false;
-            }
+            // proxy settings are not valid
+            return Utils.setOkHttpProxy(builder, proxySettings);
         }
         return true;
     }

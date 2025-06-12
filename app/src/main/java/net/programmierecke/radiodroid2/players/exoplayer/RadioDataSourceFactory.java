@@ -11,11 +11,11 @@ import okhttp3.OkHttpClient;
 @UnstableApi
 public class RadioDataSourceFactory implements DataSource.Factory {
 
-    private OkHttpClient httpClient;
+    private final OkHttpClient httpClient;
     private final TransferListener transferListener;
-    private IcyDataSource.IcyDataSourceListener dataSourceListener;
-    private long retryTimeout;
-    private long retryDelay;
+    private final IcyDataSource.IcyDataSourceListener dataSourceListener;
+    private final long retryTimeout;
+    private final long retryDelay;
 
     public RadioDataSourceFactory(@NonNull OkHttpClient httpClient,
                                   @NonNull TransferListener transferListener,

@@ -15,8 +15,8 @@ import java.util.Calendar;
 
 public class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
     private TimePickerDialog.OnTimeSetListener callback;
-    private int initialHour;
-    private int initialMinute;
+    private final int initialHour;
+    private final int initialMinute;
 
     public TimePickerFragment() {
         final Calendar c = Calendar.getInstance();

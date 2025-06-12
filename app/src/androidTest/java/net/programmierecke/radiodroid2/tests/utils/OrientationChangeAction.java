@@ -68,8 +68,7 @@ public class OrientationChangeAction implements ViewAction {
 
         Activity activity = getActivity(view.getContext());
 
-        if (activity == null && view instanceof ViewGroup) {
-            ViewGroup v = (ViewGroup) view;
+        if (activity == null && view instanceof ViewGroup v) {
             int c = v.getChildCount();
             for (int i = 0; i < c && activity == null; ++i) {
                 activity = getActivity(v.getChildAt(i).getContext());

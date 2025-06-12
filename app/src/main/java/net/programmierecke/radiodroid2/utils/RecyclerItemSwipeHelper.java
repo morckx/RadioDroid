@@ -25,8 +25,8 @@ public class RecyclerItemSwipeHelper<ViewHolderType extends SwipeableViewHolder>
         void onSwiped(ViewHolderType viewHolder, int direction);
     }
 
-    private SwipeCallback<ViewHolderType> swipeListener;
-    private boolean swipeToDeleteIsEnabled;
+    private final SwipeCallback<ViewHolderType> swipeListener;
+    private final boolean swipeToDeleteIsEnabled;
     private IconicsDrawable icon;
     private final ColorDrawable background;
 

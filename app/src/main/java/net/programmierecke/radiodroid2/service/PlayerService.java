@@ -130,9 +130,9 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
     private PowerManager.WakeLock wakeLock;
     private WifiManager.WifiLock wifiLock;
 
-    private BecomingNoisyReceiver becomingNoisyReceiver = new BecomingNoisyReceiver();
-    private HeadsetConnectionReceiver headsetConnectionReceiver = new HeadsetConnectionReceiver();
-    private ConnectivityChecker connectivityChecker = new ConnectivityChecker();
+    private final BecomingNoisyReceiver becomingNoisyReceiver = new BecomingNoisyReceiver();
+    private final HeadsetConnectionReceiver headsetConnectionReceiver = new HeadsetConnectionReceiver();
+    private final ConnectivityChecker connectivityChecker = new ConnectivityChecker();
 
     private PauseReason pauseReason = PauseReason.NONE;
 
@@ -345,7 +345,7 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
 
     private MediaSessionCompat.Callback mediaSessionCallback = null;
 
-    private AudioManager.OnAudioFocusChangeListener afChangeListener =
+    private final AudioManager.OnAudioFocusChangeListener afChangeListener =
             new AudioManager.OnAudioFocusChangeListener() {
                 public void onAudioFocusChange(int focusChange) {
                     if (!radioPlayer.isLocal()) {
@@ -389,7 +389,7 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
                 }
             };
 
-    private ConnectivityChecker.ConnectivityCallback connectivityCallback = new ConnectivityChecker.ConnectivityCallback() {
+    private final ConnectivityChecker.ConnectivityCallback connectivityCallback = new ConnectivityChecker.ConnectivityCallback() {
         @Override
         public void onConnectivityChanged(boolean connected, ConnectivityChecker.ConnectionType connectionType) {
             if (connectionType == ConnectivityChecker.ConnectionType.METERED && sharedPref.getBoolean(METERED_CONNECTION_WARNING_KEY, false)) {
@@ -542,7 +542,7 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
                         resume();
                         break;
                     case ACTION_MEDIA_BUTTON:
-                        KeyEvent key = (KeyEvent) intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+                        KeyEvent key = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
                         if (key.getAction() == KeyEvent.ACTION_UP) {
                             int keycode = key.getKeyCode();
                             switch (keycode) {
@@ -1295,6 +1295,6 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
 
     @Override
     protected void onHandleWork(@NonNull Intent intent) {
-        Log.d(TAG, "onHandleWork called with intent: " + intent.toString());
+        Log.d(TAG, "onHandleWork called with intent: " + intent);
     }
 }

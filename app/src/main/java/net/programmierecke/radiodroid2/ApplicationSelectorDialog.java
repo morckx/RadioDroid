@@ -35,7 +35,7 @@ public class ApplicationSelectorDialog extends DialogFragment {
         List<ResolveInfo> resolveInfos = pm.queryIntentActivities(mainIntent, PackageManager.MATCH_DEFAULT_ONLY);
         for(ResolveInfo info : resolveInfos) {
             ApplicationInfo applicationInfo = info.activityInfo.applicationInfo;
-            if(BuildConfig.DEBUG) { Log.d("UUU", ""+applicationInfo.packageName + " -- "+ info.activityInfo.name+ " -> "); }
+            if(BuildConfig.DEBUG) { Log.d("UUU", applicationInfo.packageName + " -- "+ info.activityInfo.name+ " -> "); }
             arrayAdapter.add(""+pm.getApplicationLabel(applicationInfo));
             listInfos.add(info.activityInfo);
         }

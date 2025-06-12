@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class MPDServerData {
     public enum Status {
@@ -89,9 +90,9 @@ public class MPDServerData {
         if (isReachable != o.isReachable) return false;
         if (volume != o.volume) return false;
         if (connected != o.connected) return false;
-        if (password != null ? !password.equals(o.password) : o.password != null) return false;
-        if (name != null ? !name.equals(o.name) : o.name != null) return false;
-        if (hostname != null ? !hostname.equals(o.hostname) : o.hostname != null)
+        if (!Objects.equals(password, o.password)) return false;
+        if (!Objects.equals(name, o.name)) return false;
+        if (!Objects.equals(hostname, o.hostname))
             return false;
         return status == o.status;
     }

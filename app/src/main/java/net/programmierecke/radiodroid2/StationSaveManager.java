@@ -507,7 +507,7 @@ public class StationSaveManager extends Observable {
             MediaScannerConnection.scanFile(context, new String[]{f.getAbsolutePath()}, null, null);
             return result;
         } catch (Exception e) {
-            Log.e("SAVE", "File write failed: " + e.toString());
+            Log.e("SAVE", "File write failed: " + e);
             return false;
         }
     }
@@ -545,7 +545,7 @@ public class StationSaveManager extends Observable {
             }
             return false;
         } catch (Exception e) {
-            Log.e("SAVE", "MediaStore save failed: " + e.toString());
+            Log.e("SAVE", "MediaStore save failed: " + e);
             return false;
         }
     }
@@ -566,7 +566,7 @@ public class StationSaveManager extends Observable {
 
             return true;
         } catch (Exception e) {
-            Log.e("Exception", "File write failed: " + e.toString());
+            Log.e("Exception", "File write failed: " + e);
             return false;
         }
     }
@@ -638,7 +638,7 @@ public class StationSaveManager extends Observable {
                         cursor.close();
                     }
                 } catch (Exception e) {
-                    Log.w("LOAD", "MediaStore approach failed: " + e.toString() + ", falling back to direct file access");
+                    Log.w("LOAD", "MediaStore approach failed: " + e + ", falling back to direct file access");
                 }
             }
 
@@ -647,11 +647,11 @@ public class StationSaveManager extends Observable {
                 FileReader fr = new FileReader(f);
                 return LoadM3UReader(fr);
             } catch (Exception e) {
-                Log.e("LOAD", "Direct file access failed: " + e.toString());
+                Log.e("LOAD", "Direct file access failed: " + e);
                 return null;
             }
         } catch (Exception e) {
-            Log.e("LOAD", "File read failed: " + e.toString());
+            Log.e("LOAD", "File read failed: " + e);
             return null;
         }
     }
@@ -703,7 +703,7 @@ public class StationSaveManager extends Observable {
             }
             return listStationsSorted;
         } catch (Exception e) {
-            Log.e("LOAD", "File read failed: " + e.toString());
+            Log.e("LOAD", "File read failed: " + e);
             return null;
         }
     }

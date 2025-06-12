@@ -28,12 +28,12 @@ public class TagsView extends AppCompatTextView {
 
     // Credits to Nachos source
     private class RoundedBackgroundSpan extends ReplacementSpan {
-        private int mHeight;
-        private int mCornerRadius;
-        private int mTextHorizontalPadding;
-        private int mTextVerticalMargin;
-        private int mBackgroundColor;
-        private int mTextColor;
+        private final int mHeight;
+        private final int mCornerRadius;
+        private final int mTextHorizontalPadding;
+        private final int mTextVerticalMargin;
+        private final int mBackgroundColor;
+        private final int mTextColor;
 
         RoundedBackgroundSpan(int mHeight, int mCornerRadius, int mTextHorizontalPadding,
                               int mTextVerticalMargin, int mBackgroundColor, int mTextColor) {

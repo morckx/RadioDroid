@@ -8,6 +8,7 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 import java.util.Date;
+import java.util.Objects;
 
 @Entity(tableName = "track_history")
 public class TrackHistoryEntry {
@@ -59,7 +60,7 @@ public class TrackHistoryEntry {
         if (!track.equals(that.track)) return false;
         if (!artist.equals(that.artist)) return false;
         if (!title.equals(that.title)) return false;
-        if (artUrl != null ? !artUrl.equals(that.artUrl) : that.artUrl != null) return false;
+        if (!Objects.equals(artUrl, that.artUrl)) return false;
         if (!startTime.equals(that.startTime)) return false;
         return endTime.equals(that.endTime);
     }

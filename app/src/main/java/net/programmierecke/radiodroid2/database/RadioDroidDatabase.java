@@ -24,7 +24,7 @@ public abstract class RadioDroidDatabase extends RoomDatabase {
 
     private static volatile RadioDroidDatabase INSTANCE;
 
-    private Executor queryExecutor = Executors.newSingleThreadExecutor(runnable -> new Thread(runnable, "RadioDroidDatabase Executor"));
+    private final Executor queryExecutor = Executors.newSingleThreadExecutor(runnable -> new Thread(runnable, "RadioDroidDatabase Executor"));
 
     public static RadioDroidDatabase getDatabase(final Context context) {
         if (INSTANCE == null) {
@@ -45,7 +45,7 @@ public abstract class RadioDroidDatabase extends RoomDatabase {
         return queryExecutor;
     }
 
-    private static RoomDatabase.Callback CALLBACK = new RoomDatabase.Callback() {
+    private static final RoomDatabase.Callback CALLBACK = new RoomDatabase.Callback() {
         @Override
         public void onCreate(@NonNull SupportSQLiteDatabase db) {
             super.onCreate(db);

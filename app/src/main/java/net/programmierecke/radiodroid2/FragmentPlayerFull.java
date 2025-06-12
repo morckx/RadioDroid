@@ -89,8 +89,8 @@ public class FragmentPlayerFull extends Fragment {
 
     private boolean initialized = false;
 
-    private RefreshHandler refreshHandler = new RefreshHandler();
-    private TimedUpdateTask timedUpdateTask = new TimedUpdateTask(this);
+    private final RefreshHandler refreshHandler = new RefreshHandler();
+    private final TimedUpdateTask timedUpdateTask = new TimedUpdateTask(this);
     private static final int TIMED_UPDATE_INTERVAL = 1000; // 1 second
 
     private PlayerTrackMetadataCallback trackMetadataCallback;
@@ -101,7 +101,7 @@ public class FragmentPlayerFull extends Fragment {
     private java.util.Observer recordingsObserver;
 
     private FavouriteManager favouriteManager;
-    private FavouritesObserver favouritesObserver = new FavouritesObserver();
+    private final FavouritesObserver favouritesObserver = new FavouritesObserver();
 
     private TrackHistoryRepository trackHistoryRepository;
     private TrackHistoryAdapter trackHistoryAdapter;
@@ -707,8 +707,8 @@ public class FragmentPlayerFull extends Fragment {
 
     private static class PlayerTrackMetadataCallback implements TrackMetadataCallback {
         private boolean canceled = false;
-        private WeakReference<FragmentPlayerFull> fragmentWeakReference;
-        private TrackHistoryEntry trackHistoryEntry;
+        private final WeakReference<FragmentPlayerFull> fragmentWeakReference;
+        private final TrackHistoryEntry trackHistoryEntry;
 
         private PlayerTrackMetadataCallback(@NonNull WeakReference<FragmentPlayerFull> fragmentWeakReference, TrackHistoryEntry trackHistoryEntry) {
             this.fragmentWeakReference = fragmentWeakReference;
@@ -788,10 +788,10 @@ public class FragmentPlayerFull extends Fragment {
     }
 
     private class ArtAndInfoPagerAdapter extends PagerAdapter {
-        private ViewGroup layoutAlbumArt;
-        private ViewGroup layoutStationInfo;
+        private final ViewGroup layoutAlbumArt;
+        private final ViewGroup layoutStationInfo;
 
-        private String[] titles;
+        private final String[] titles;
 
         ImageView imageViewArt;
         TextView textViewStationDescription;
@@ -846,10 +846,10 @@ public class FragmentPlayerFull extends Fragment {
     }
 
     private class HistoryAndRecordsPagerAdapter extends PagerAdapter {
-        private ViewGroup layoutSongHistory;
-        private ViewGroup layoutRecordings;
+        private final ViewGroup layoutSongHistory;
+        private final ViewGroup layoutRecordings;
 
-        private String[] titles;
+        private final String[] titles;
 
         RecyclerView recyclerViewSongHistory;
         RecyclerView recyclerViewRecordings;

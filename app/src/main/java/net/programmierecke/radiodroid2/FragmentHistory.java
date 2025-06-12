@@ -106,7 +106,7 @@ public class FragmentHistory extends Fragment implements IAdapterRefreshable {
         LinearLayoutManager llm = new LinearLayoutManager(getContext());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
 
-        rvStations = (RecyclerView) view.findViewById(R.id.recyclerViewStations);
+        rvStations = view.findViewById(R.id.recyclerViewStations);
         rvStations.setAdapter(adapter);
         rvStations.setLayoutManager(llm);
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(rvStations.getContext(),
@@ -115,7 +115,7 @@ public class FragmentHistory extends Fragment implements IAdapterRefreshable {
 
         adapter.enableItemRemoval(rvStations);
 
-        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swiperefresh);
+        swipeRefreshLayout = view.findViewById(R.id.swiperefresh);
         if (swipeRefreshLayout != null) {
             swipeRefreshLayout.setOnRefreshListener(
                     new SwipeRefreshLayout.OnRefreshListener() {
@@ -184,8 +184,9 @@ public class FragmentHistory extends Fragment implements IAdapterRefreshable {
         for (DataRadioStation station_current: historyManager.listStations){
             boolean found = false;
             for (DataRadioStation station_new: list_new){
-                if (station_new.StationUuid.equals(station_current.StationUuid)){
+                if (station_new.StationUuid.equals(station_current.StationUuid)) {
                     found = true;
+                    break;
                 }
             }
             if (!found){

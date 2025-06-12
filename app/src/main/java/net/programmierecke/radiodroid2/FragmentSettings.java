@@ -106,7 +106,7 @@ public class FragmentSettings extends PreferenceFragmentCompat implements Shared
         refreshToolbar();
         if (s == null) {
             refreshToplevelIcons();
-            SearchPreference searchPreference = (SearchPreference) findPreference("searchPreference");
+            SearchPreference searchPreference = findPreference("searchPreference");
             SearchConfiguration config = searchPreference.getSearchConfiguration();
             config.setActivity((AppCompatActivity) getActivity());
             config.index(R.xml.preferences);

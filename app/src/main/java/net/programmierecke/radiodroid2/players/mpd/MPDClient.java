@@ -22,37 +22,37 @@ import java.util.concurrent.TimeUnit;
 public class MPDClient {
     private static final String TAG = "MPDClient";
 
-    private static int QUICK_REFRESH_TIMEOUT = 150;
-    private static int ALIVE_REFRESH_TIMEOUT = 1000;
-    private static int DEAD_REFRESH_TIMEOUT = 1000;
+    private static final int QUICK_REFRESH_TIMEOUT = 150;
+    private static final int ALIVE_REFRESH_TIMEOUT = 1000;
+    private static final int DEAD_REFRESH_TIMEOUT = 1000;
 
     private ScheduledExecutorService userTaskThreadPool;
     private ScheduledExecutorService connectionCheckerThreadPool;
 
-    private MPDServersRepository mpdServersRepository;
-    private LiveData<List<MPDServerData>> mpdServers;
+    private final MPDServersRepository mpdServersRepository;
+    private final LiveData<List<MPDServerData>> mpdServers;
 
-    private Handler mainThreadHandler;
+    private final Handler mainThreadHandler;
 
     // We queue changes to apply them in main thread instead of worrying about concurrent access to
     // the repository
-    private ConcurrentLinkedQueue<MPDServerData> serverChangesQueue = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<MPDServerData> serverChangesQueue = new ConcurrentLinkedQueue<>();
 
-    private Set<MPDServerData> aliveMpdServers = new HashSet<>();
-    private Set<MPDServerData> deadMpdServers = new HashSet<>();
+    private final Set<MPDServerData> aliveMpdServers = new HashSet<>();
+    private final Set<MPDServerData> deadMpdServers = new HashSet<>();
     private final Object serversLock = new Object();
 
     // The idea is to have quick frequent separate update of alive servers. And other rarer
     // update of presumable unavailable servers.
-    private QuickMPDStatusChecker quickMPDStatusChecker = new QuickMPDStatusChecker();
+    private final QuickMPDStatusChecker quickMPDStatusChecker = new QuickMPDStatusChecker();
     private Future quickCheckFuture;
     private final Object quickFutureLock = new Object();
 
-    private AliveMPDStatusChecker aliveMPDStatusChecker = new AliveMPDStatusChecker();
+    private final AliveMPDStatusChecker aliveMPDStatusChecker = new AliveMPDStatusChecker();
     private Future aliveCheckFuture;
     private final Object aliveFutureLock = new Object();
 
-    private DeadMPDStatusChecker deadMPDStatusChecker = new DeadMPDStatusChecker();
+    private final DeadMPDStatusChecker deadMPDStatusChecker = new DeadMPDStatusChecker();
     private Future deadCheckFuture;
     private final Object deadFutureLock = new Object();
 

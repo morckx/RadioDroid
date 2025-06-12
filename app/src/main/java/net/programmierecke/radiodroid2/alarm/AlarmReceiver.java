@@ -119,7 +119,7 @@ public class AlarmReceiver extends BroadcastReceiver {
     }
 
     IPlayerService itsPlayerService;
-    private ServiceConnection svcConn = new ServiceConnection() {
+    private final ServiceConnection svcConn = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder binder) {
             if(BuildConfig.DEBUG) { Log.d(TAG, "Service came online"); }
             itsPlayerService = IPlayerService.Stub.asInterface(binder);
@@ -197,7 +197,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                             }
                         } else {
                             Intent anIntent = new Intent(context, PlayerService.class);
-                            context.getApplicationContext().bindService(anIntent, svcConn, context.BIND_AUTO_CREATE);
+                            context.getApplicationContext().bindService(anIntent, svcConn, Context.BIND_AUTO_CREATE);
                             context.getApplicationContext().startService(anIntent);
                         }
                     } catch (Exception e) {

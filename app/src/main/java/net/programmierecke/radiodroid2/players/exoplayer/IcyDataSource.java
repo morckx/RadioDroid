@@ -128,7 +128,7 @@ public class IcyDataSource implements HttpDataSource {
         try {
             response = httpClient.newCall(request).execute();
         } catch (IOException e) {
-            throw new HttpDataSourceException("Unable to connect to " + dataSpec.uri.toString(), e,
+            throw new HttpDataSourceException("Unable to connect to " + dataSpec.uri, e,
                     dataSpec, HttpDataSourceException.TYPE_OPEN);
         }
 

@@ -39,9 +39,9 @@ import java.util.Observable;
  */
 public class RecordingsManager {
     private final static String TAG = "Recordings";
-    private DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-    private DateFormat timeFormatter = new SimpleDateFormat("HH-mm", Locale.US);
-    private Context context;
+    private final DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+    private final DateFormat timeFormatter = new SimpleDateFormat("HH-mm", Locale.US);
+    private final Context context;
 
     private class RecordingsObservable extends Observable {
         @Override
@@ -50,10 +50,10 @@ public class RecordingsManager {
         }
     }
 
-    private Observable savedRecordingsObservable = new RecordingsObservable();
+    private final Observable savedRecordingsObservable = new RecordingsObservable();
 
     private class RunningRecordableListener implements RecordableListener {
-        private RunningRecordingInfo runningRecordingInfo;
+        private final RunningRecordingInfo runningRecordingInfo;
         private boolean ended;
 
         private RunningRecordableListener(@NonNull RunningRecordingInfo runningRecordingInfo) {
@@ -89,8 +89,8 @@ public class RecordingsManager {
         }
     }
 
-    private Map<Recordable, RunningRecordingInfo> runningRecordings = new HashMap<>();
-    private ArrayList<DataRecording> savedRecordings = new ArrayList<>();
+    private final Map<Recordable, RunningRecordingInfo> runningRecordings = new HashMap<>();
+    private final ArrayList<DataRecording> savedRecordings = new ArrayList<>();
     
     public RecordingsManager(Context context) {
         this.context = context;

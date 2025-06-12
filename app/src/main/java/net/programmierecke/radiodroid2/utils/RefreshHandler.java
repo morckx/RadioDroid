@@ -16,7 +16,7 @@ public final class RefreshHandler {
         handler = new Handler(Looper.getMainLooper());
     }
 
-    public final void executePeriodically(final ObjectBoundRunnable task, final long interval) {
+    public void executePeriodically(final ObjectBoundRunnable task, final long interval) {
         if (runnableDecorator != null) {
             handler.removeCallbacks(runnableDecorator);
         }
@@ -25,7 +25,7 @@ public final class RefreshHandler {
         handler.post(runnableDecorator);
     }
 
-    public final void cancel() {
+    public void cancel() {
         if (runnableDecorator != null) {
             handler.removeCallbacks(runnableDecorator);
         }

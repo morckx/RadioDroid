@@ -28,7 +28,7 @@ import java.lang.reflect.Field;
  * - the user is dragging their finger up and the NestedScrollView is not scrolled to the bottom of its content.
  */
 public class RecyclerAwareNestedScrollView extends NestedScrollView {
-    private OverScroller mScroller;
+    private final OverScroller mScroller;
     public boolean isFling = false;
 
     public RecyclerAwareNestedScrollView(@NonNull Context context) {

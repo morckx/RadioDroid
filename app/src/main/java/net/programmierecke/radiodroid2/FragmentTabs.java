@@ -26,14 +26,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FragmentTabs extends Fragment implements IFragmentRefreshable, IFragmentSearchable {
-    private String itsAdressWWWLocal = "json/stations/bycountryexact/internet?order=clickcount&reverse=true";
-    private String itsAdressWWWTopClick = "json/stations/topclick/100";
-    private String itsAdressWWWTopVote = "json/stations/topvote/100";
-    private String itsAdressWWWChangedLately = "json/stations/lastchange/100";
-    private String itsAdressWWWCurrentlyHeard = "json/stations/lastclick/100";
-    private String itsAdressWWWTags = "json/tags";
-    private String itsAdressWWWCountries = "json/countrycodes";
-    private String itsAdressWWWLanguages = "json/languages";
+    private final String itsAdressWWWLocal = "json/stations/bycountryexact/internet?order=clickcount&reverse=true";
+    private final String itsAdressWWWTopClick = "json/stations/topclick/100";
+    private final String itsAdressWWWTopVote = "json/stations/topvote/100";
+    private final String itsAdressWWWChangedLately = "json/stations/lastchange/100";
+    private final String itsAdressWWWCurrentlyHeard = "json/stations/lastclick/100";
+    private final String itsAdressWWWTags = "json/tags";
+    private final String itsAdressWWWCountries = "json/countrycodes";
+    private final String itsAdressWWWLanguages = "json/languages";
 
     // Note: the actual order of tabs is defined
     // further down when populating the ViewPagerAdapter
@@ -52,8 +52,8 @@ public class FragmentTabs extends Fragment implements IFragmentRefreshable, IFra
     private String queuedSearchQuery; // Search may be requested before onCreateView so we should wait
     private StationsFilter.SearchStyle queuedSearchStyle;
 
-    private Fragment[] fragments = new Fragment[9];
-    private String[] addresses = new String[]{
+    private final Fragment[] fragments = new Fragment[9];
+    private final String[] addresses = new String[]{
             itsAdressWWWLocal,
             itsAdressWWWTopClick,
             itsAdressWWWTopVote,
@@ -70,7 +70,7 @@ public class FragmentTabs extends Fragment implements IFragmentRefreshable, IFra
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View x = inflater.inflate(R.layout.layout_tabs, null);
         final TabLayout tabLayout = getActivity().findViewById(R.id.tabs);
-        viewPager = (ViewPager) x.findViewById(R.id.viewpager);
+        viewPager = x.findViewById(R.id.viewpager);
 
         setupViewPager(viewPager);
 

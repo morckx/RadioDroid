@@ -40,11 +40,11 @@ public class TrackHistoryAdapter extends PagedListAdapter<TrackHistoryEntry, Tra
         }
     }
 
-    private Context context;
-    private FragmentActivity activity;
+    private final Context context;
+    private final FragmentActivity activity;
     private final LayoutInflater inflater;
     private boolean shouldLoadIcons;
-    private Drawable stationImagePlaceholder;
+    private final Drawable stationImagePlaceholder;
 
     public TrackHistoryAdapter(FragmentActivity activity) {
         super(DIFF_CALLBACK);
@@ -103,7 +103,7 @@ public class TrackHistoryAdapter extends PagedListAdapter<TrackHistoryEntry, Tra
         trackHistoryInfoDialog.show(activity.getSupportFragmentManager(), TrackHistoryInfoDialog.FRAGMENT_TAG);
     }
 
-    private static DiffUtil.ItemCallback<TrackHistoryEntry> DIFF_CALLBACK =
+    private static final DiffUtil.ItemCallback<TrackHistoryEntry> DIFF_CALLBACK =
             new DiffUtil.ItemCallback<TrackHistoryEntry>() {
                 @Override
                 public boolean areItemsTheSame(TrackHistoryEntry oldEntry, TrackHistoryEntry newEntry) {

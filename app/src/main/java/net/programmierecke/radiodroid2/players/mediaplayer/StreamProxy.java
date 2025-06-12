@@ -18,6 +18,7 @@ import java.net.ProtocolException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
@@ -34,11 +35,11 @@ public class StreamProxy implements Recordable {
 
     private static final int MAX_RETRIES = 100;
 
-    private OkHttpClient httpClient;
-    private StreamProxyListener callback;
+    private final OkHttpClient httpClient;
+    private final StreamProxyListener callback;
     private RecordableListener recordableListener;
-    private String uri;
-    private byte readBuffer[] = new byte[256 * 16];
+    private final String uri;
+    private final byte[] readBuffer = new byte[256 * 16];
     private volatile String localAddress = null;
     private boolean isStopped = false;
 
@@ -136,7 +137,7 @@ public class StreamProxy implements Recordable {
                 metadataBytesToRead -= readBytes;
                 readBytesBufferMetadata += readBytes;
                 if (metadataBytesToRead <= 0) {
-                    String s = new String(readBuffer, 0, metadataBytes, "utf-8");
+                    String s = new String(readBuffer, 0, metadataBytes, StandardCharsets.UTF_8);
                     if (BuildConfig.DEBUG) Log.d(TAG, "METADATA:" + s);
                     Map<String, String> rawMetadata = decodeShoutcastMetadata(s);
                     StreamLiveInfo streamLiveInfo = new StreamLiveInfo(rawMetadata);
@@ -218,7 +219,7 @@ public class StreamProxy implements Recordable {
                     outputStream.write(("HTTP/1.0 200 OK\r\n" +
                             "Pragma: no-cache\r\n" +
                             "Content-Type: " + contentType +
-                            "\r\n\r\n").getBytes("utf-8"));
+                            "\r\n\r\n").getBytes(StandardCharsets.UTF_8));
 
                     final String type = contentType.toString().toLowerCase();
 

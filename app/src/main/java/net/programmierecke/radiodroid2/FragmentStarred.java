@@ -78,7 +78,7 @@ public class FragmentStarred extends Fragment implements IAdapterRefreshable, Ob
 
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_stations, container, false);
-        rvStations = (RecyclerView) view.findViewById(R.id.recyclerViewStations);
+        rvStations = view.findViewById(R.id.recyclerViewStations);
 
         ItemAdapterStation adapter;
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getContext());
@@ -131,7 +131,7 @@ public class FragmentStarred extends Fragment implements IAdapterRefreshable, Ob
             }
         });
 
-        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swiperefresh);
+        swipeRefreshLayout = view.findViewById(R.id.swiperefresh);
         if (swipeRefreshLayout != null) {
             swipeRefreshLayout.setOnRefreshListener(
                     new SwipeRefreshLayout.OnRefreshListener() {
@@ -200,8 +200,9 @@ public class FragmentStarred extends Fragment implements IAdapterRefreshable, Ob
         for (DataRadioStation station_current: favouriteManager.listStations){
             boolean found = false;
             for (DataRadioStation station_new: list_new){
-                if (station_new.StationUuid.equals(station_current.StationUuid)){
+                if (station_new.StationUuid.equals(station_current.StationUuid)) {
                     found = true;
+                    break;
                 }
             }
             if (!found){

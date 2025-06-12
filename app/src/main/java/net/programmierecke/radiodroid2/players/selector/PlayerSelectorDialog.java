@@ -39,7 +39,7 @@ public class PlayerSelectorDialog extends BottomSheetDialogFragment {
 
     public static final String FRAGMENT_TAG = "mpd_servers_dialog_fragment";
 
-    private MPDClient mpdClient;
+    private final MPDClient mpdClient;
     private DataRadioStation stationToPlay;
 
     private BroadcastReceiver updateUIReceiver;

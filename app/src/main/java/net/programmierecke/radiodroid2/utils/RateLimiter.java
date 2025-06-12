@@ -5,8 +5,8 @@ import android.util.Log;
 import net.programmierecke.radiodroid2.BuildConfig;
 
 public class RateLimiter {
-    private int limit;
-    private long fullReplenishTime;
+    private final int limit;
+    private final long fullReplenishTime;
 
     private double available = 0;
 

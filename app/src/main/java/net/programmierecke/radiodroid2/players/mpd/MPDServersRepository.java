@@ -21,7 +21,7 @@ import java.util.List;
  * In future should be backed up by database.
  */
 public class MPDServersRepository {
-    private List<MPDServerData> servers;
+    private final List<MPDServerData> servers;
     private final MutableLiveData<List<MPDServerData>> serversLiveData = new MutableLiveData<>();
     private int lastServerId = -1;
 

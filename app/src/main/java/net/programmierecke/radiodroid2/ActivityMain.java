@@ -495,7 +495,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+                                           String[] permissions, int[] grantResults) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "on request permissions result:" + requestCode);
         }
@@ -519,7 +519,6 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
                     Log.w(TAG,"permission not granted -> simple save");
                     SaveFavouritesSimple();
                 }
-                return;
             }
         }
     }
@@ -638,7 +637,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
-        final Toolbar myToolbar = (Toolbar) findViewById(R.id.my_awesome_toolbar);
+        final Toolbar myToolbar = findViewById(R.id.my_awesome_toolbar);
         menuItemSleepTimer = menu.findItem(R.id.action_set_sleep_timer);
         menuItemSearch = menu.findItem(R.id.action_search);
         menuItemDelete = menu.findItem(R.id.action_delete);
@@ -1159,7 +1158,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
                             }
                             break;
                         default:
-                            Log.e(TAG, String.format("broadcastReceiver unexpected PlayerType '%s'", playerType.toString()));
+                            Log.e(TAG, String.format("broadcastReceiver unexpected PlayerType '%s'", playerType));
                     }
                 } else if (intent.getAction().equals(PlayerService.PLAYER_SERVICE_STATE_CHANGE)) {
                     if (PlayerServiceUtil.isPlaying()) {
@@ -1191,8 +1190,8 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
         seekDialog.setTitle(R.string.sleep_timer_title);
         seekDialog.setView(seekView);
 
-        final TextView seekTextView = (TextView) seekView.findViewById(R.id.timerTextView);
-        final SeekBar seekBar = (SeekBar) seekView.findViewById(R.id.timerSeekBar);
+        final TextView seekTextView = seekView.findViewById(R.id.timerTextView);
+        final SeekBar seekBar = seekView.findViewById(R.id.timerSeekBar);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -1246,7 +1245,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
     }
 
     public final Toolbar getToolbar() {
-        return (Toolbar) findViewById(R.id.my_awesome_toolbar);
+        return findViewById(R.id.my_awesome_toolbar);
     }
 
     @Override
@@ -1388,9 +1387,8 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
         // Find the RecyclerView inside the NavigationView
         for (int i = 0; i < mNavigationView.getChildCount(); i++) {
             View child = mNavigationView.getChildAt(i);
-            if (child instanceof androidx.recyclerview.widget.RecyclerView) {
-                androidx.recyclerview.widget.RecyclerView recyclerView = (androidx.recyclerview.widget.RecyclerView) child;
-                
+            if (child instanceof androidx.recyclerview.widget.RecyclerView recyclerView) {
+
                 if (recyclerView.getAdapter() != null) {
                     int lastPosition = recyclerView.getAdapter().getItemCount() - 1;
                     if (lastPosition >= 0) {
@@ -1493,9 +1491,8 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
         // Find the RecyclerView inside the NavigationView
         for (int i = 0; i < mNavigationView.getChildCount(); i++) {
             View child = mNavigationView.getChildAt(i);
-            if (child instanceof androidx.recyclerview.widget.RecyclerView) {
-                androidx.recyclerview.widget.RecyclerView recyclerView = (androidx.recyclerview.widget.RecyclerView) child;
-                
+            if (child instanceof androidx.recyclerview.widget.RecyclerView recyclerView) {
+
                 // Find the position of our menu item in the navigation menu
                 Menu menu = mNavigationView.getMenu();
                 int targetPosition = -1;

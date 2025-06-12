@@ -50,13 +50,13 @@ public class RadioPlayer implements PlayerWrapper.PlayListener, Recordable {
         void foundLiveStreamInfo(StreamLiveInfo liveInfo);
     }
 
-    private PlayerWrapper currentPlayer;
-    private Context mainContext;
+    private final PlayerWrapper currentPlayer;
+    private final Context mainContext;
 
     private String streamName;
 
     private HandlerThread playerThread;
-    private Handler playerThreadHandler;
+    private final Handler playerThreadHandler;
 
     private PlayerListener playerListener;
     private PlayState playState = PlayState.Idle;
@@ -65,7 +65,7 @@ public class RadioPlayer implements PlayerWrapper.PlayListener, Recordable {
 
     private PlayStationTask playStationTask;
 
-    private Runnable bufferCheckRunnable = new Runnable() {
+    private final Runnable bufferCheckRunnable = new Runnable() {
         @Override
         public void run() {
             final long bufferTimeMs = currentPlayer.getBufferedMs();

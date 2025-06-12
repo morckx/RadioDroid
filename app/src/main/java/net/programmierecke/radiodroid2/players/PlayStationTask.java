@@ -40,10 +40,10 @@ public class PlayStationTask extends AsyncTask<Void, Void, String> {
         void onPostExecute(ExecutionResult executionResult);
     }
 
-    private PlayFunc playFunc;
-    private PostExecuteTask postExecuteTask;
-    private DataRadioStation stationToPlay;
-    private WeakReference<Context> contextWeakReference;
+    private final PlayFunc playFunc;
+    private final PostExecuteTask postExecuteTask;
+    private final DataRadioStation stationToPlay;
+    private final WeakReference<Context> contextWeakReference;
 
     public PlayStationTask(@NonNull DataRadioStation stationToPlay, @NonNull Context ctx,
                            @NonNull PlayFunc playFunc, @Nullable PostExecuteTask postExecuteTask) {

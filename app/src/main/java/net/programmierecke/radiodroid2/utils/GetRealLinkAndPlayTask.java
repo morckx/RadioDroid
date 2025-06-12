@@ -14,11 +14,11 @@ import java.lang.ref.WeakReference;
 import okhttp3.OkHttpClient;
 
 public class GetRealLinkAndPlayTask extends AsyncTask<Void, Void, String> {
-    private WeakReference<Context> contextRef;
-    private DataRadioStation station;
-    private WeakReference<IPlayerService> playerServiceRef;
+    private final WeakReference<Context> contextRef;
+    private final DataRadioStation station;
+    private final WeakReference<IPlayerService> playerServiceRef;
 
-    private OkHttpClient httpClient;
+    private final OkHttpClient httpClient;
 
     public GetRealLinkAndPlayTask(Context context, DataRadioStation station, IPlayerService playerService) {
         this.contextRef = new WeakReference<>(context);

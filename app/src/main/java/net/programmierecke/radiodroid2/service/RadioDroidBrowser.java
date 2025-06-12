@@ -57,18 +57,18 @@ public class RadioDroidBrowser {
 
     private static final int IMAGE_LOAD_TIMEOUT_MS = 2000;
 
-    private RadioDroidApp radioDroidApp;
+    private final RadioDroidApp radioDroidApp;
 
-    private Map<String, DataRadioStation> stationIdToStation = new HashMap<>();
+    private final Map<String, DataRadioStation> stationIdToStation = new HashMap<>();
 
     private static class RetrieveStationsIconAndSendResult extends AsyncTask<Void, Void, Void> {
-        private MediaBrowserServiceCompat.Result<List<MediaBrowserCompat.MediaItem>> result;
-        private List<DataRadioStation> stations;
-        private WeakReference<Context> contextRef;
+        private final MediaBrowserServiceCompat.Result<List<MediaBrowserCompat.MediaItem>> result;
+        private final List<DataRadioStation> stations;
+        private final WeakReference<Context> contextRef;
 
-        private Map<String, Bitmap> stationIdToIcon = new HashMap<>();
+        private final Map<String, Bitmap> stationIdToIcon = new HashMap<>();
         private CountDownLatch countDownLatch;
-        private  Resources resources;
+        private final Resources resources;
         // Glide custom targets for image loading
         List<ImageLoader.BitmapTarget> imageLoadTargets = new ArrayList<>();
 

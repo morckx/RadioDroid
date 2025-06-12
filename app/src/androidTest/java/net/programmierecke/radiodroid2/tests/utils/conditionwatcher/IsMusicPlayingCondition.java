@@ -8,7 +8,7 @@ import androidx.test.core.app.ApplicationProvider;
 import javax.annotation.Nonnull;
 
 public class IsMusicPlayingCondition implements ConditionWatcher.Condition {
-    private boolean expectPlaying;
+    private final boolean expectPlaying;
 
     public IsMusicPlayingCondition(boolean expectPlaying) {
         this.expectPlaying = expectPlaying;

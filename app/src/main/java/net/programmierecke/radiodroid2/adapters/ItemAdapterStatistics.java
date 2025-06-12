@@ -11,8 +11,8 @@ import net.programmierecke.radiodroid2.data.DataStatistics;
 import net.programmierecke.radiodroid2.R;
 
 public class ItemAdapterStatistics extends ArrayAdapter<DataStatistics> {
-	private Context context;
-	private int resourceId;
+	private final Context context;
+	private final int resourceId;
 
 	public ItemAdapterStatistics(Context context, int resourceId) {
 		super(context, resourceId);
@@ -30,13 +30,13 @@ public class ItemAdapterStatistics extends ArrayAdapter<DataStatistics> {
 			v = vi.inflate(resourceId, null);
 		}
 
-		TextView aTextViewTop = (TextView) v.findViewById(R.id.stats_name);
-		TextView aTextViewBottom = (TextView) v.findViewById(R.id.stats_value);
+		TextView aTextViewTop = v.findViewById(R.id.stats_name);
+		TextView aTextViewBottom = v.findViewById(R.id.stats_value);
 		if (aTextViewTop != null) {
-			aTextViewTop.setText("" + aData.Name);
+			aTextViewTop.setText(aData.Name);
 		}
 		if (aTextViewBottom != null) {
-			aTextViewBottom.setText("" + aData.Value);
+			aTextViewBottom.setText(aData.Value);
 		}
 
 		return v;

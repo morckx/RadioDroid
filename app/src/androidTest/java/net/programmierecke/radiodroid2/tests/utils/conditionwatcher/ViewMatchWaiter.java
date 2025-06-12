@@ -16,8 +16,8 @@ import static androidx.test.espresso.assertion.ViewAssertions.matches;
  * Inspired by https://github.com/AzimoLabs/ConditionWatcher/issues/7
  */
 public class ViewMatchWaiter {
-    private Matcher<View> viewMatcher;
-    private ConditionWatcher.Policy policy;
+    private final Matcher<View> viewMatcher;
+    private final ConditionWatcher.Policy policy;
 
     public ViewMatchWaiter(@Nonnull Matcher<View> viewMatcher) {
         this.viewMatcher = viewMatcher;

@@ -33,7 +33,7 @@ public abstract class CustomFilter {
     private static final int FINISH_TOKEN = 0xDEADBEEF;
 
     private Handler mThreadHandler;
-    private Handler mResultHandler;
+    private final Handler mResultHandler;
 
     private Delayer mDelayer;
 
@@ -186,13 +186,13 @@ public abstract class CustomFilter {
      * <p>Listener used to receive a notification upon completion of a filtering
      * operation.</p>
      */
-    public static interface FilterListener {
+    public interface FilterListener {
         /**
          * <p>Notifies the end of a filtering operation.</p>
          *
          * @param count the number of values computed by the filter
          */
-        public void onFilterComplete(int count);
+        void onFilterComplete(int count);
     }
 
     /**

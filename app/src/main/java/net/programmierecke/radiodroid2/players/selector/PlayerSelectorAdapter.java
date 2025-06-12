@@ -94,13 +94,13 @@ public class PlayerSelectorAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
     private int fixedViewsCount;
 
-    private List<Integer> viewTypes = new ArrayList<>();
+    private final List<Integer> viewTypes = new ArrayList<>();
 
-    private DataRadioStation stationToPlay;
+    private final DataRadioStation stationToPlay;
 
     private ActionListener actionListener;
 
-    private MPDClient mpdClient;
+    private final MPDClient mpdClient;
     private List<MPDServerData> mpdServers;
 
     protected PlayerSelectorAdapter(@NonNull Context context, @Nullable DataRadioStation stationToPlay) {
@@ -342,7 +342,7 @@ public class PlayerSelectorAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         return position - fixedViewsCount;
     }
 
-    private static DiffUtil.ItemCallback<MPDServerData> DIFF_CALLBACK =
+    private static final DiffUtil.ItemCallback<MPDServerData> DIFF_CALLBACK =
             new DiffUtil.ItemCallback<MPDServerData>() {
                 @Override
                 public boolean areItemsTheSame(MPDServerData oldEntry, MPDServerData newEntry) {

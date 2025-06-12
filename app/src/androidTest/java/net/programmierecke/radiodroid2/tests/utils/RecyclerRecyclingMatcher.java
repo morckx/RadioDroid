@@ -11,7 +11,7 @@ import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
 public class RecyclerRecyclingMatcher {
-    private static float MAX_SIZE_K = 1.25f;
+    private static final float MAX_SIZE_K = 1.25f;
 
     public static Matcher<View> recyclerRecycles() {
         return new TypeSafeMatcher<View>(RecyclerView.class) {

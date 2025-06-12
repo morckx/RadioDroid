@@ -13,7 +13,7 @@ import okhttp3.mockwebserver.MockWebServer;
 
 public class HttpToMockInterceptor implements Interceptor {
 
-    private InetSocketAddress address;
+    private final InetSocketAddress address;
 
     public HttpToMockInterceptor(MockWebServer mockWebServer) {
         address = new InetSocketAddress(mockWebServer.getHostName(), mockWebServer.getPort());

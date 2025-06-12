@@ -15,12 +15,13 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 
 public class MPDAsyncTask implements Runnable {
-    private static String TAG = "MPDAsyncTask";
+    private static final String TAG = "MPDAsyncTask";
 
     public interface ReadStage {
         boolean onRead(@NonNull MPDAsyncTask task, @NonNull String result);
@@ -72,8 +73,8 @@ public class MPDAsyncTask implements Runnable {
 
             Socket s = new Socket();
             s.connect(new InetSocketAddress(mpdServerData.hostname, mpdServerData.port), (int) timeoutMs);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(s.getInputStream(), Charset.forName("UTF-8")));
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(s.getOutputStream(), Charset.forName("UTF-8")));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(s.getInputStream(), StandardCharsets.UTF_8));
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(s.getOutputStream(), StandardCharsets.UTF_8));
 
             onConnected(reader, writer);
 

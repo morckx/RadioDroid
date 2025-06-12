@@ -17,7 +17,7 @@ public class ItemAdapaterContextMenuStation extends ItemAdapterStation implement
     private final double DISMISS_MENU_DRAG_THRESHOLD = 0.15;
     private final long NEVER_IN_THE_FUTURE = Long.MAX_VALUE / 2;
     MaterialPopupMenu contextMenu = null;
-    private RecyclerItemMoveAndSwipeHelper<ItemAdapterStation.StationViewHolder> swipeAndMoveHelper = null;
+    private final RecyclerItemMoveAndSwipeHelper<ItemAdapterStation.StationViewHolder> swipeAndMoveHelper = null;
     private long timeLastDragEnded = 0;
 
     ItemAdapaterContextMenuStation(FragmentActivity fragmentActivity, int resourceId, StationsFilter.FilterType filterType) {

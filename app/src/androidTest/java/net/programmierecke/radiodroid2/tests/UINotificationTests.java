@@ -70,8 +70,8 @@ public class UINotificationTests {
     }
 
     private static class UIObjectWaiterCondition implements ConditionWatcher.Condition {
-        private UiDevice uiDevice;
-        private BySelector bySelector;
+        private final UiDevice uiDevice;
+        private final BySelector bySelector;
 
         public UIObjectWaiterCondition(UiDevice uiDevice, BySelector bySelector) {
             this.uiDevice = uiDevice;

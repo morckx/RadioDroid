@@ -41,7 +41,7 @@ public class RecordingsAdapter extends RecyclerView.Adapter<RecordingsAdapter.Re
         }
     }
 
-    private Context context;
+    private final Context context;
     private List<DataRecording> recordings;
 
     public RecordingsAdapter(@NonNull Context context) {

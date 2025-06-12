@@ -105,7 +105,7 @@ public class FragmentStations extends FragmentBase implements IFragmentSearchabl
 
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_stations_remote, container, false);
-        rvStations = (RecyclerView) view.findViewById(R.id.recyclerViewStations);
+        rvStations = view.findViewById(R.id.recyclerViewStations);
         layoutError = view.findViewById(R.id.layoutError);
         btnRetry = view.findViewById(R.id.btnRefresh);
 
@@ -169,7 +169,7 @@ public class FragmentStations extends FragmentBase implements IFragmentSearchabl
                 llm.getOrientation());
         rvStations.addItemDecoration(dividerItemDecoration);
 
-        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swiperefresh);
+        swipeRefreshLayout = view.findViewById(R.id.swiperefresh);
         swipeRefreshLayout.setOnRefreshListener(
                 () -> {
                     if (hasUrl()) {

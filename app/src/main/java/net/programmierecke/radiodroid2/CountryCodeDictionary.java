@@ -43,7 +43,7 @@ public class CountryCodeDictionary {
         }
     }
 
-    private Map<String, String> codeToCountry = new HashMap<>();
+    private final Map<String, String> codeToCountry = new HashMap<>();
 
     public void load(Context context) {
         Resources resources = context.getResources();

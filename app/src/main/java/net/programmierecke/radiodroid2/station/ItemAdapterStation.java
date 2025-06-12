@@ -81,18 +81,18 @@ public class ItemAdapterStation
     private IAdapterRefreshable refreshable;
     FragmentActivity activity;
 
-    private BroadcastReceiver updateUIReceiver;
+    private final BroadcastReceiver updateUIReceiver;
 
     private int expandedPosition = -1;
     public int playingStationPosition = -1;
 
     Drawable stationImagePlaceholder;
 
-    private FavouriteManager favouriteManager;
+    private final FavouriteManager favouriteManager;
 
     private StationsFilter filter;
 
-    private TagsView.TagSelectionCallback tagSelectionCallback = new TagsView.TagSelectionCallback() {
+    private final TagsView.TagSelectionCallback tagSelectionCallback = new TagsView.TagSelectionCallback() {
         @Override
         public void onTagSelected(String tag) {
             Intent i = new Intent(getContext(), ActivityMain.class);
@@ -386,7 +386,7 @@ public class ItemAdapterStation
         if (isExpanded) {
             holder.viewDetails = holder.stubDetails == null ? holder.viewDetails : holder.stubDetails.inflate();
             holder.stubDetails = null;
-            holder.viewTags = (TagsView) holder.viewDetails.findViewById(R.id.viewTags);
+            holder.viewTags = holder.viewDetails.findViewById(R.id.viewTags);
             holder.buttonVisitWebsite = holder.viewDetails.findViewById(R.id.buttonVisitWebsite);
             holder.buttonShare = holder.viewDetails.findViewById(R.id.buttonShare);
             holder.buttonBookmark = holder.viewDetails.findViewById(R.id.buttonBookmark);

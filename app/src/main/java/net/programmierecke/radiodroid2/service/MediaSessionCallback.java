@@ -20,8 +20,8 @@ public class MediaSessionCallback extends MediaSessionCompat.Callback {
     public static final String ACTION_PLAY_STATION_BY_UUID = "PLAY_STATION_BY_UUID";
     public static final String EXTRA_STATION_UUID = "STATION_UUID";
 
-    private Context context;
-    private IPlayerService playerService;
+    private final Context context;
+    private final IPlayerService playerService;
 
     public MediaSessionCallback(Context context, IPlayerService playerService) {
         this.context = context;

@@ -30,10 +30,10 @@ import okhttp3.Response;
 public class LfmMetadataSearcher {
     private static final String API_GET_TRACK_METADATA = "http://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key=%s&artist=%s&track=%s&format=json";
 
-    private OkHttpClient httpClient;
-    private Gson gson = new Gson();
+    private final OkHttpClient httpClient;
+    private final Gson gson = new Gson();
 
-    private RateLimiter rateLimiter = new RateLimiter(4, 60 * 1000);
+    private final RateLimiter rateLimiter = new RateLimiter(4, 60 * 1000);
 
     public LfmMetadataSearcher(OkHttpClient httpClient) {
         this.httpClient = httpClient;

@@ -78,7 +78,7 @@ public class MockHttpDispatcher extends Dispatcher {
             return IcyStreamGenerator.generateIcyStream(getClass(), "/test.mp3");
         }
 
-        Log.w("MockHttpDispatcher", String.format("No handling of \"%s\"", request.toString()));
+        Log.w("MockHttpDispatcher", String.format("No handling of \"%s\"", request));
 
         return new MockResponse().setResponseCode(404);
     }

@@ -13,7 +13,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.isDisplayingAtLeast;
 public class ScrollToRecyclerItemAction implements ViewAction {
     private static final int VIEW_DISPLAY_PERCENTAGE = 50;
 
-    private int itemIdx;
+    private final int itemIdx;
 
     public static ScrollToRecyclerItemAction scrollToRecyclerItem(int itemIdx) {
         return new ScrollToRecyclerItemAction(itemIdx);

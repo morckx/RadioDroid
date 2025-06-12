@@ -54,6 +54,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.Date;
@@ -119,7 +120,7 @@ public class Utils {
     }
 
     public static String getCacheFile(Context ctx, String theURI) {
-        StringBuilder chaine = new StringBuilder("");
+        StringBuilder chaine = new StringBuilder();
         try {
             String aFileName = theURI.toLowerCase().replace("http://", "");
             aFileName = aFileName.toLowerCase().replace("https://", "");
@@ -135,7 +136,7 @@ public class Utils {
             long hours = mins / 60;
 
             if (BuildConfig.DEBUG) {
-                Log.d("UTIL", "File last modified : " + lastModDate.toString() + " secs=" + secs + "  mins=" + mins + " hours=" + hours);
+                Log.d("UTIL", "File last modified : " + lastModDate + " secs=" + secs + "  mins=" + mins + " hours=" + hours);
             }
 
             if (hours < 1) {
@@ -169,7 +170,7 @@ public class Utils {
 
             File f = new File(ctx.getCacheDir() + "/" + aFileName);
             FileOutputStream aStream = new FileOutputStream(f);
-            aStream.write(content.getBytes("utf-8"));
+            aStream.write(content.getBytes(StandardCharsets.UTF_8));
             aStream.close();
         } catch (Exception e) {
             Log.e("UTIL", "writeFileCache() could not write to cache file for:" + theURI);
@@ -465,7 +466,7 @@ public class Utils {
     }
 
     // Storage Permissions
-    private static String[] PERMISSIONS_STORAGE = {
+    private static final String[] PERMISSIONS_STORAGE = {
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
 

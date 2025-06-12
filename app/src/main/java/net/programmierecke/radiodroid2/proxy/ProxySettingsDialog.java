@@ -144,14 +144,14 @@ public class ProxySettingsDialog extends DialogFragment {
     }
 
     private static class ConnectionTesterTask extends AsyncTask<Void, Void, Void> {
-        private WeakReference<TextView> textProxyTestResult;
+        private final WeakReference<TextView> textProxyTestResult;
 
         private OkHttpClient okHttpClient;
         private Call call;
 
-        private String connectionSuccessStr;
-        private String connectionFailedStr;
-        private String connectionInvalidInputStr;
+        private final String connectionSuccessStr;
+        private final String connectionFailedStr;
+        private final String connectionInvalidInputStr;
 
         private boolean requestSucceeded = false;
         private String errorStr;

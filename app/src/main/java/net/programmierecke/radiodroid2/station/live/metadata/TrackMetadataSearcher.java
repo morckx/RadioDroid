@@ -7,7 +7,7 @@ import net.programmierecke.radiodroid2.station.live.metadata.lastfm.LfmMetadataS
 import okhttp3.OkHttpClient;
 
 public class TrackMetadataSearcher {
-    private LfmMetadataSearcher lfmMetadataSearcher;
+    private final LfmMetadataSearcher lfmMetadataSearcher;
 
     public TrackMetadataSearcher(OkHttpClient httpClient) {
         lfmMetadataSearcher = new LfmMetadataSearcher(httpClient);

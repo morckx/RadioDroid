@@ -2,6 +2,7 @@ package net.programmierecke.radiodroid2.station;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -15,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -56,9 +58,9 @@ public class StationsFilter extends CustomFilter {
     private final String TAG = "StationsFilter";
     private final int FUZZY_SEARCH_THRESHOLD = 55;
 
-    private FilterType filterType;
-    private Context context;
-    private DataProvider dataProvider;
+    private final FilterType filterType;
+    private final Context context;
+    private final DataProvider dataProvider;
 
     private String lastRemoteQuery = "";
     private List<DataRadioStation> filteredStationsList;
@@ -102,45 +104,50 @@ public class StationsFilter extends CustomFilter {
         p.put("reverse", "true");
         p.put("hidebroken", ""+(!show_broken));
 
-        try {
-            String queryEncoded = URLEncoder.encode(query, "utf-8");
-            queryEncoded = queryEncoded.replace("+", "%20");
-
-            String searchUrl = null;
-            switch (searchStyle){
-                case ByName:
-                    searchUrl = "json/stations/byname/" + queryEncoded;
-                    break;
-                case ByCountryCodeExact:
-                    searchUrl = "json/stations/bycountrycodeexact/" + queryEncoded;
-                    break;
-                case ByLanguageExact:
-                    searchUrl = "json/stations/bylanguageexact/" + queryEncoded;
-                    break;
-                case ByTagExact:
-                    searchUrl = "json/stations/bytagexact/" + queryEncoded;
-                    break;
-                default:
-                    Log.d("FILTER", "unknown search style: "+searchStyle);
-                    lastRemoteSearchStatus = SearchStatus.ERROR;
-                    return new ArrayList<>();
-            }
-
-            Log.d("FILTER", "searchGlobal 2:" + query);
-
-            String resultString = Utils.downloadFeedRelative(httpClient, radioDroidApp, searchUrl, false, p);
-            if (resultString != null) {
-                Log.d("FILTER", "searchGlobal 3a:" + query);
-                List<DataRadioStation> result = DataRadioStation.DecodeJson(resultString);
-                lastRemoteSearchStatus = SearchStatus.SUCCESS;
-                return result;
-            }else{
-                Log.d("FILTER", "searchGlobal 3b:" + query);
+        String queryEncoded = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            queryEncoded = URLEncoder.encode(query, StandardCharsets.UTF_8);
+        } else {
+            try {
+                queryEncoded = URLEncoder.encode(query, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                Log.e(TAG, "Error encoding query: " + e.getMessage());
                 lastRemoteSearchStatus = SearchStatus.ERROR;
                 return new ArrayList<>();
             }
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+        }
+        queryEncoded = queryEncoded.replace("+", "%20");
+
+        String searchUrl = null;
+        switch (searchStyle){
+            case ByName:
+                searchUrl = "json/stations/byname/" + queryEncoded;
+                break;
+            case ByCountryCodeExact:
+                searchUrl = "json/stations/bycountrycodeexact/" + queryEncoded;
+                break;
+            case ByLanguageExact:
+                searchUrl = "json/stations/bylanguageexact/" + queryEncoded;
+                break;
+            case ByTagExact:
+                searchUrl = "json/stations/bytagexact/" + queryEncoded;
+                break;
+            default:
+                Log.d("FILTER", "unknown search style: "+searchStyle);
+                lastRemoteSearchStatus = SearchStatus.ERROR;
+                return new ArrayList<>();
+        }
+
+        Log.d("FILTER", "searchGlobal 2:" + query);
+
+        String resultString = Utils.downloadFeedRelative(httpClient, radioDroidApp, searchUrl, false, p);
+        if (resultString != null) {
+            Log.d("FILTER", "searchGlobal 3a:" + query);
+            List<DataRadioStation> result = DataRadioStation.DecodeJson(resultString);
+            lastRemoteSearchStatus = SearchStatus.SUCCESS;
+            return result;
+        }else{
+            Log.d("FILTER", "searchGlobal 3b:" + query);
             lastRemoteSearchStatus = SearchStatus.ERROR;
             return new ArrayList<>();
         }

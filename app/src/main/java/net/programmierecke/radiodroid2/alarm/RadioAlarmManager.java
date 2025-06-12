@@ -24,8 +24,8 @@ import com.google.gson.reflect.TypeToken;
 public class RadioAlarmManager {
 
     private static final int ONE_DAY_IN_MILLIS = 24 * 60 * 60 * 1000;
-    private Context context;
-    private List<DataRadioStationAlarm> list = new ArrayList<DataRadioStationAlarm>();
+    private final Context context;
+    private final List<DataRadioStationAlarm> list = new ArrayList<DataRadioStationAlarm>();
     final int pendingIntentFlag =  Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? PendingIntent.FLAG_IMMUTABLE : 0;
 
 
@@ -36,7 +36,7 @@ public class RadioAlarmManager {
         }
     }
 
-    private Observable savedAlarmsObservable = new AlarmsObservable();
+    private final Observable savedAlarmsObservable = new AlarmsObservable();
 
     public RadioAlarmManager(Context context){
         this.context = context;

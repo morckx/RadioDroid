@@ -20,7 +20,7 @@ public class ItemAdapterCategory extends RecyclerView.Adapter<ItemAdapterCategor
     }
 
     private List<DataCategory> categoriesList;
-    private int resourceId;
+    private final int resourceId;
     private CategoryClickListener categoryClickListener;
 
     class CategoryViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -30,9 +30,9 @@ public class ItemAdapterCategory extends RecyclerView.Adapter<ItemAdapterCategor
 
         CategoryViewHolder(View itemView) {
             super(itemView);
-            textViewName = (TextView) itemView.findViewById(R.id.textViewTop);
-            textViewCount = (TextView) itemView.findViewById(R.id.textViewBottom);
-            iconView = (ImageView) itemView.findViewById(R.id.iconCategoryViewIcon);
+            textViewName = itemView.findViewById(R.id.textViewTop);
+            textViewCount = itemView.findViewById(R.id.textViewBottom);
+            iconView = itemView.findViewById(R.id.iconCategoryViewIcon);
             itemView.setOnClickListener(this);
         }
 
