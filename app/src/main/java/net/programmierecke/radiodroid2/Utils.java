@@ -228,7 +228,7 @@ public class Utils {
 
     public static String downloadFeedRelative(OkHttpClient httpClient, Context ctx, String theRelativeUri, boolean forceUpdate, Map<String, String> dictParams) {
         // try current server for download
-        String currentServer = RadioBrowserServerManager.getCurrentServer();
+        String currentServer = RadioBrowserServerManager.getCurrentServer(httpClient);
         if (currentServer == null) {
             return null;
         }
@@ -240,7 +240,7 @@ public class Utils {
         }
 
         // get a list of all servers
-        String[] serverList = RadioBrowserServerManager.getServerList(false);
+        String[] serverList = RadioBrowserServerManager.getServerList(false, httpClient);
 
         // try all other servers for download
         for (String newServer : serverList) {

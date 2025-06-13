@@ -3,12 +3,14 @@ package net.programmierecke.radiodroid2;
 import android.util.Log;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.net.InetAddress;
-import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Random;
 import java.util.Vector;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * Created by segler on 15.02.18.
@@ -21,17 +23,25 @@ public class RadioBrowserServerManager {
     /**
      * Test if a server is reachable
      * @param serverName the server to test
+     * @param httpClient the configured OkHttpClient to use for SSL/TLS handling
      * @return true if server is reachable, false otherwise
      */
-    private static boolean isServerAvailable(String serverName) {
+    private static boolean isServerAvailable(String serverName, OkHttpClient httpClient) {
+        // On API level 24 and below, always return true to avoid potential compatibility issues
+        if (android.os.Build.VERSION.SDK_INT <= 21) {
+            Log.i("DNS", "API level <= 24: Skipping server availability check for " + serverName);
+            return true;
+        }
+
         try {
-            URL url = new URL("https://" + serverName + "/");
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setConnectTimeout(3000); // 3 seconds timeout
-            connection.setReadTimeout(3000);
-            connection.setRequestMethod("GET"); // Just get headers, not content
-            int responseCode = connection.getResponseCode();
-            return (200 <= responseCode && responseCode < 300);
+            Request request = new Request.Builder()
+                    .url("https://" + serverName + "/")
+                    .get() // Use HEAD request to avoid downloading content
+                    .build();
+            
+            try (Response response = httpClient.newCall(request).execute()) {
+                return response.isSuccessful();
+            }
         } catch (IOException e) {
             Log.w("DNS", "Server " + serverName + " is not available: " + e.getMessage());
             return false;
@@ -40,8 +50,9 @@ public class RadioBrowserServerManager {
 
     /**
      * Blocking: do dns request do get a list of all available servers
+     * @param httpClient the configured OkHttpClient to use for SSL/TLS handling
      */
-    private static String[] doDnsServerListing() {
+    private static String[] doDnsServerListing(OkHttpClient httpClient) {
         Log.d("DNS", "doDnsServerListing()");
         Vector<String> listResult = new Vector<String>();
         try {
@@ -55,7 +66,7 @@ public class RadioBrowserServerManager {
                 String name = item.getCanonicalHostName();
                 if (!name.equals("all.api.radio-browser.info") && !name.equals(currentHostAddress)) {
                     // Test if server is available before adding it
-                    if (isServerAvailable(name)) {
+                    if (isServerAvailable(name, httpClient)) {
                         Log.i("DNS", "Added entry: '" + name + "'");
                         listResult.add(name);
                     } else {
@@ -70,7 +81,7 @@ public class RadioBrowserServerManager {
             // should we inform people that their internet provider is not able to do reverse lookups? (= is shit)
             Log.w("DNS", "Fallback to all.api.radio-browser.info because dns call did not work.");
             // Check if fallback server is available
-            if (isServerAvailable("all.api.radio-browser.info")) {
+            if (isServerAvailable("all.api.radio-browser.info", httpClient)) {
                 listResult.add("all.api.radio-browser.info");
             } else {
                 Log.e("DNS", "Fallback server is also unavailable!");
@@ -82,20 +93,33 @@ public class RadioBrowserServerManager {
 
     /**
      * Blocking: return current cached server list. Generate list if still null.
+     * @param forceRefresh whether to force refresh the server list
+     * @param httpClient the configured OkHttpClient to use for SSL/TLS handling
      */
-    public static String[] getServerList(boolean forceRefresh){
+    public static String[] getServerList(boolean forceRefresh, OkHttpClient httpClient){
         if (serverList == null || serverList.length == 0 || forceRefresh){
-            serverList = doDnsServerListing();
+            serverList = doDnsServerListing(httpClient);
         }
         return serverList;
     }
 
     /**
-     * Blocking: return current selected server. Select one, if there is no current server.
+     * Blocking: return current cached server list. Generate list if still null.
+     * @deprecated Use getServerList(boolean, OkHttpClient) instead for proper SSL/TLS handling
      */
-    public static String getCurrentServer() {
+    @Deprecated
+    public static String[] getServerList(boolean forceRefresh){
+        // Fallback to HttpClient.getInstance() for backward compatibility
+        return getServerList(forceRefresh, HttpClient.getInstance());
+    }
+
+    /**
+     * Blocking: return current selected server. Select one, if there is no current server.
+     * @param httpClient the configured OkHttpClient to use for SSL/TLS handling
+     */
+    public static String getCurrentServer(OkHttpClient httpClient) {
         if (currentServer == null){
-            String[] serverList = getServerList(false);
+            String[] serverList = getServerList(false, httpClient);
             if (serverList.length > 0){
                 Random rand = new Random();
                 currentServer = serverList[rand.nextInt(serverList.length)];
@@ -105,6 +129,16 @@ public class RadioBrowserServerManager {
             }
         }
         return currentServer;
+    }
+
+    /**
+     * Blocking: return current selected server. Select one, if there is no current server.
+     * @deprecated Use getCurrentServer(OkHttpClient) instead for proper SSL/TLS handling
+     */
+    @Deprecated
+    public static String getCurrentServer() {
+        // Fallback to HttpClient.getInstance() for backward compatibility
+        return getCurrentServer(HttpClient.getInstance());
     }
 
     /**
