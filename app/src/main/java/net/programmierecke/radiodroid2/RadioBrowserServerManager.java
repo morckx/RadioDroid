@@ -28,7 +28,7 @@ public class RadioBrowserServerManager {
      */
     private static boolean isServerAvailable(String serverName, OkHttpClient httpClient) {
         // On API level 24 and below, always return true to avoid potential compatibility issues
-        if (android.os.Build.VERSION.SDK_INT <= 21) {
+        if (android.os.Build.VERSION.SDK_INT <= 24) {
             Log.i("DNS", "API level <= 24: Skipping server availability check for " + serverName);
             return true;
         }
