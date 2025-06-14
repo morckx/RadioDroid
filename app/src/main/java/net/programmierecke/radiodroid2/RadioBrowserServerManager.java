@@ -1,6 +1,10 @@
 package net.programmierecke.radiodroid2;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
+
+import androidx.preference.PreferenceManager;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -24,9 +28,25 @@ public class RadioBrowserServerManager {
      * Test if a server is reachable
      * @param serverName the server to test
      * @param httpClient the configured OkHttpClient to use for SSL/TLS handling
+     * @param context the application context to access preferences
      * @return true if server is reachable, false otherwise
      */
-    private static boolean isServerAvailable(String serverName, OkHttpClient httpClient) {
+    private static boolean isServerAvailable(String serverName, OkHttpClient httpClient, Context context) {
+        // Check if Radio Browser server checking is disabled in preferences
+        if (context != null) {
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+            boolean checkRadioBrowserServer = sharedPreferences.getBoolean("settings_check_radio_browser_server", false);
+
+            if (!checkRadioBrowserServer) {
+                Log.i("DNS", "Radio Browser server checking disabled in preferences, skipping server availability check for " + serverName);
+                return true;
+            }
+        } else {
+            Log.w("DNS", "Context is null, skipping server availability check for " + serverName);
+            // If context is null, we cannot access preferences, so we skip the check
+            return true;
+        }
+        
         // On API level 24 and below, always return true to avoid potential compatibility issues
         if (android.os.Build.VERSION.SDK_INT <= 24) {
             Log.i("DNS", "API level <= 24: Skipping server availability check for " + serverName);
@@ -51,8 +71,9 @@ public class RadioBrowserServerManager {
     /**
      * Blocking: do dns request do get a list of all available servers
      * @param httpClient the configured OkHttpClient to use for SSL/TLS handling
+     * @param context the application context to access preferences
      */
-    private static String[] doDnsServerListing(OkHttpClient httpClient) {
+    private static String[] doDnsServerListing(OkHttpClient httpClient, Context context) {
         Log.d("DNS", "doDnsServerListing()");
         Vector<String> listResult = new Vector<String>();
         try {
@@ -66,7 +87,7 @@ public class RadioBrowserServerManager {
                 String name = item.getCanonicalHostName();
                 if (!name.equals("all.api.radio-browser.info") && !name.equals(currentHostAddress)) {
                     // Test if server is available before adding it
-                    if (isServerAvailable(name, httpClient)) {
+                    if (isServerAvailable(name, httpClient, context)) {
                         Log.i("DNS", "Added entry: '" + name + "'");
                         listResult.add(name);
                     } else {
@@ -81,7 +102,7 @@ public class RadioBrowserServerManager {
             // should we inform people that their internet provider is not able to do reverse lookups? (= is shit)
             Log.w("DNS", "Fallback to all.api.radio-browser.info because dns call did not work.");
             // Check if fallback server is available
-            if (isServerAvailable("all.api.radio-browser.info", httpClient)) {
+            if (isServerAvailable("all.api.radio-browser.info", httpClient, context)) {
                 listResult.add("all.api.radio-browser.info");
             } else {
                 Log.e("DNS", "Fallback server is also unavailable!");
@@ -95,31 +116,43 @@ public class RadioBrowserServerManager {
      * Blocking: return current cached server list. Generate list if still null.
      * @param forceRefresh whether to force refresh the server list
      * @param httpClient the configured OkHttpClient to use for SSL/TLS handling
+     * @param context the application context to access preferences
      */
-    public static String[] getServerList(boolean forceRefresh, OkHttpClient httpClient){
+    public static String[] getServerList(boolean forceRefresh, OkHttpClient httpClient, Context context){
         if (serverList == null || serverList.length == 0 || forceRefresh){
-            serverList = doDnsServerListing(httpClient);
+            serverList = doDnsServerListing(httpClient, context);
         }
         return serverList;
     }
 
     /**
      * Blocking: return current cached server list. Generate list if still null.
-     * @deprecated Use getServerList(boolean, OkHttpClient) instead for proper SSL/TLS handling
+     * @deprecated Use getServerList(boolean, OkHttpClient, Context) instead for proper SSL/TLS handling
      */
     @Deprecated
     public static String[] getServerList(boolean forceRefresh){
         // Fallback to HttpClient.getInstance() for backward compatibility
-        return getServerList(forceRefresh, HttpClient.getInstance());
+        return getServerList(forceRefresh, HttpClient.getInstance(), null);
+    }
+    
+    /**
+     * Blocking: return current cached server list. Generate list if still null.
+     * @deprecated Use getServerList(boolean, OkHttpClient, Context) instead for proper SSL/TLS handling and preference support
+     */
+    @Deprecated
+    public static String[] getServerList(boolean forceRefresh, OkHttpClient httpClient){
+        // Fallback to null context for backward compatibility
+        return getServerList(forceRefresh, httpClient, null);
     }
 
     /**
      * Blocking: return current selected server. Select one, if there is no current server.
      * @param httpClient the configured OkHttpClient to use for SSL/TLS handling
+     * @param context the application context to access preferences
      */
-    public static String getCurrentServer(OkHttpClient httpClient) {
+    public static String getCurrentServer(OkHttpClient httpClient, Context context) {
         if (currentServer == null){
-            String[] serverList = getServerList(false, httpClient);
+            String[] serverList = getServerList(false, httpClient, context);
             if (serverList.length > 0){
                 Random rand = new Random();
                 currentServer = serverList[rand.nextInt(serverList.length)];
@@ -133,12 +166,22 @@ public class RadioBrowserServerManager {
 
     /**
      * Blocking: return current selected server. Select one, if there is no current server.
-     * @deprecated Use getCurrentServer(OkHttpClient) instead for proper SSL/TLS handling
+     * @deprecated Use getCurrentServer(OkHttpClient, Context) instead for proper SSL/TLS handling and preference support
      */
     @Deprecated
     public static String getCurrentServer() {
         // Fallback to HttpClient.getInstance() for backward compatibility
-        return getCurrentServer(HttpClient.getInstance());
+        return getCurrentServer(HttpClient.getInstance(), null);
+    }
+    
+    /**
+     * Blocking: return current selected server. Select one, if there is no current server.
+     * @deprecated Use getCurrentServer(OkHttpClient, Context) instead for proper SSL/TLS handling and preference support
+     */
+    @Deprecated
+    public static String getCurrentServer(OkHttpClient httpClient) {
+        // Fallback to null context for backward compatibility
+        return getCurrentServer(httpClient, null);
     }
 
     /**

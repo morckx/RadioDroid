@@ -140,6 +140,11 @@ public class FragmentSettings extends PreferenceFragmentCompat implements Shared
                 }
             });
 
+            // Hide Radio Browser server check preference on API <= 24
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
+                findPreference("settings_check_radio_browser_server").setVisible(false);
+            }
+
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
                 findPreference("settings_retry_timeout").setVisible(false);
                 findPreference("settings_retry_delay").setVisible(false);
@@ -220,7 +225,7 @@ public class FragmentSettings extends PreferenceFragmentCompat implements Shared
         final AsyncTask<Void, Void, String[]> xxx = new AsyncTask<Void, Void, String[]>() {
             @Override
             protected String[] doInBackground(Void... params) {
-                return RadioBrowserServerManager.getServerList(false);
+                return RadioBrowserServerManager.getServerList(false, HttpClient.getInstance(), getContext());
             }
 
             @Override

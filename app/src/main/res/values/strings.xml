@@ -171,6 +171,9 @@
     <string name="settings_resume_timeout">Resume timeout</string>
     <string name="settings_retry_timeout">Retry timeout</string>
     <string name="settings_retry_delay">Reconnection delay</string>
+    <string name="settings_check_radio_browser_server">Check Radio Browser server before using</string>
+    <string name="settings_check_radio_browser_server_desc_on">Test Radio Browser server availability before making requests</string>
+    <string name="settings_check_radio_browser_server_desc_off">Skip Radio Browser server availability checks (faster startup)</string>
     <string name="settings_proxy">Proxy</string>
     <string name="settings_proxy_login">Username</string>
     <string name="settings_proxy_password">Password</string>

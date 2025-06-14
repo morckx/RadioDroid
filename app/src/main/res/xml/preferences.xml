@@ -258,6 +258,12 @@
             android:summary="@string/settings_seconds_format"
             search:summary=""
             android:title="@string/settings_resume_timeout" />
+        <SwitchPreferenceCompat
+            android:key="settings_check_radio_browser_server"
+            android:defaultValue="false"
+            android:title="@string/settings_check_radio_browser_server"
+            android:summaryOn="@string/settings_check_radio_browser_server_desc_on"
+            android:summaryOff="@string/settings_check_radio_browser_server_desc_off" />
         <Preference
             android:key="settings_proxy"
             android:title="@string/settings_proxy" />
