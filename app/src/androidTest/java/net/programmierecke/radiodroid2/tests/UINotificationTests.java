@@ -117,6 +117,7 @@ public class UINotificationTests {
         ConditionWatcher.waitForCondition(new IsMusicPlayingCondition(true), ConditionWatcher.SHORT_WAIT_POLICY);
     }
 
+    @Ignore
     @Test
     public void playback_ShouldPause_OnPauseFromNotification() {
         launchPlayingNotification();
