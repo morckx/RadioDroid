@@ -519,6 +519,9 @@ public class FragmentPlayerFull extends Fragment {
     }
 
     private void fullUpdate() {
+        if (!isAdded() || getContext() == null) {
+            return;
+        }
         DataRadioStation station = Utils.getCurrentOrLastStation(requireContext());
 
         if (station != null) {
