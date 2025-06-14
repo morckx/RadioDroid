@@ -220,21 +220,19 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
 
                 @Override
                 public void onDrawerOpened(@NonNull View drawerView) {
-                    // Auto-select current item when drawer opens on Android TV
-                    if (isRunningOnTV()) {
-                        try {
-                            Fragment currentFragment = mFragmentManager.getFragments().get(mFragmentManager.getFragments().size() - 1);
-                            if (currentFragment instanceof FragmentSettings) {
-                                // For settings fragment, use a simpler approach to avoid crashes
-                                selectCurrentDrawerItemForSettings();
-                            } else {
-                                // For other fragments, use the full auto-selection logic
-                                selectCurrentDrawerItem();
-                            }
-                        } catch (Exception e) {
-                            // Safety catch to prevent crashes
-                            Log.e(TAG, "Error in drawer auto-selection", e);
+                    // Auto-select current item when drawer opens
+                    try {
+                        Fragment currentFragment = mFragmentManager.getFragments().get(mFragmentManager.getFragments().size() - 1);
+                        if (currentFragment instanceof FragmentSettings) {
+                            // For settings fragment, use a simpler approach to avoid crashes
+                            selectCurrentDrawerItemForSettings();
+                        } else {
+                            // For other fragments, use the full auto-selection logic
+                            selectCurrentDrawerItem();
                         }
+                    } catch (Exception e) {
+                        // Safety catch to prevent crashes
+                        Log.e(TAG, "Error in drawer auto-selection", e);
                     }
                 }
 
