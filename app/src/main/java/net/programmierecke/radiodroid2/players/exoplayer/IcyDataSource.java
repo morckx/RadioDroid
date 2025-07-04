@@ -1,6 +1,8 @@
 package net.programmierecke.radiodroid2.players.exoplayer;
 
 
+import static androidx.media3.common.util.Util.closeQuietly;
+
 import android.net.Uri;
 
 import androidx.annotation.NonNull;
@@ -28,7 +30,7 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 
 import static net.programmierecke.radiodroid2.Utils.getMimeType;
-import static okhttp3.internal.Util.closeQuietly;
+
 
 /**
  * An {@link HttpDataSource} that uses {@link OkHttpClient},

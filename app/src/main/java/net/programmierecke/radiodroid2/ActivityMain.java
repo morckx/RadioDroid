@@ -1,5 +1,7 @@
 package net.programmierecke.radiodroid2;
 
+import static net.programmierecke.radiodroid2.service.MediaSessionCallback.EXTRA_STATION_UUID;
+
 import android.app.TimePickerDialog;
 import android.app.UiModeManager;
 import android.content.BroadcastReceiver;
@@ -12,11 +14,11 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
-import android.provider.OpenableColumns;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.OpenableColumns;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -82,8 +84,6 @@ import java.util.Date;
 
 import okhttp3.OkHttpClient;
 
-import static net.programmierecke.radiodroid2.service.MediaSessionCallback.EXTRA_STATION_UUID;
-
 public class ActivityMain extends AppCompatActivity implements SearchView.OnQueryTextListener,
         NavigationView.OnNavigationItemSelectedListener,
         BottomNavigationView.OnNavigationItemSelectedListener,
@@ -102,36 +102,19 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
 
     public static final String ACTION_SHOW_LOADING = "net.programmierecke.radiodroid2.show_loading";
     public static final String ACTION_HIDE_LOADING = "net.programmierecke.radiodroid2.hide_loading";
-
-    private static final String TAG = "RadioDroid";
-
-    private final String TAG_SEARCH_URL = "json/stations/bytagexact";
-    private final String SAVE_LAST_MENU_ITEM = "LAST_MENU_ITEM";
-
     public static final int PERM_REQ_STORAGE_FAV_SAVE = 1;
     public static final int PERM_REQ_STORAGE_FAV_LOAD = 2;
-
+    private static final String TAG = "RadioDroid";
     // Request code for creating a PDF document.
     private static final int ACTION_SAVE_FILE = 1;
     private static final int ACTION_LOAD_FILE = 2;
-
-    private SearchView mSearchView;
-
-    private AppBarLayout appBarLayout;
-    private TabLayout tabsView;
-
+    private final String TAG_SEARCH_URL = "json/stations/bytagexact";
+    private final String SAVE_LAST_MENU_ITEM = "LAST_MENU_ITEM";
     DrawerLayout mDrawerLayout;
     NavigationView mNavigationView;
     BottomNavigationView mBottomNavigationView;
     FragmentManager mFragmentManager;
-
-    private BottomSheetBehavior playerBottomSheet;
-
-    private FragmentPlayerSmall smallPlayerFragment;
-    private FragmentPlayerFull fullPlayerFragment;
-
     BroadcastReceiver broadcastReceiver;
-
     MenuItem menuItemSearch;
     MenuItem menuItemDelete;
     MenuItem menuItemSleepTimer;
@@ -141,7 +124,12 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
     MenuItem menuItemListView;
     MenuItem menuItemAddAlarm;
     MenuItem menuItemMpd;
-
+    private SearchView mSearchView;
+    private AppBarLayout appBarLayout;
+    private TabLayout tabsView;
+    private BottomSheetBehavior playerBottomSheet;
+    private FragmentPlayerSmall smallPlayerFragment;
+    private FragmentPlayerFull fullPlayerFragment;
     private SharedPreferences sharedPref;
 
     private int selectedMenuItem;
@@ -165,8 +153,8 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
         setTheme(Utils.getThemeResId(this));
         setContentView(R.layout.layout_main);
 
-        Log.d(TAG, "FilesDir: "+getFilesDir().getAbsolutePath());
-        Log.d(TAG, "CacheDir: "+getCacheDir().getAbsolutePath());
+        Log.d(TAG, "FilesDir: " + getFilesDir().getAbsolutePath());
+        Log.d(TAG, "CacheDir: " + getCacheDir().getAbsolutePath());
         try {
             File dir = new File(getFilesDir().getAbsolutePath());
             if (dir.isDirectory()) {
@@ -200,7 +188,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
         mNavigationView = findViewById(R.id.my_navigation_view);
         mBottomNavigationView = findViewById(R.id.bottom_navigation);
 
-        if (useBottomNavigation() ) {
+        if (useBottomNavigation()) {
             mBottomNavigationView.setOnNavigationItemSelectedListener(this);
             mNavigationView.setVisibility(View.GONE);
             mNavigationView.getLayoutParams().width = 0;
@@ -210,7 +198,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
 
             ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.app_name, R.string.app_name);
             mDrawerLayout.addDrawerListener(mDrawerToggle);
-            
+
             // Add custom drawer listener for Android TV auto-selection
             mDrawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
                 @Override
@@ -246,7 +234,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
                     // Not needed
                 }
             });
-            
+
             mDrawerToggle.syncState();
 
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -505,7 +493,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     LoadFavourites();
                 } else {
-                    Log.w(TAG,"permission not granted -> simple load");
+                    Log.w(TAG, "permission not granted -> simple load");
                     LoadFavouritesSimple();
                 }
                 return;
@@ -514,7 +502,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     SaveFavourites();
                 } else {
-                    Log.w(TAG,"permission not granted -> simple save");
+                    Log.w(TAG, "permission not granted -> simple save");
                     SaveFavouritesSimple();
                 }
             }
@@ -595,9 +583,9 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
             }.execute();
         } else {
             final String searchTag = extras.getString(EXTRA_SEARCH_TAG);
-            Log.d("MAIN","received search request for tag 1: "+searchTag);
+            Log.d("MAIN", "received search request for tag 1: " + searchTag);
             if (searchTag != null) {
-                Log.d("MAIN","received search request for tag 2: "+searchTag);
+                Log.d("MAIN", "received search request for tag 2: " + searchTag);
                 Search(StationsFilter.SearchStyle.ByTagExact, searchTag);
             }
         }
@@ -662,7 +650,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
                     Log.d(TAG, "SearchView has focus");
                     prevTabsVisibility = tabsView.getVisibility();
                     tabsView.setVisibility(View.GONE);
-                    if (isRunningOnTV())  {
+                    if (isRunningOnTV()) {
                         showSoftKeyboard(mSearchView);
                     }
                 } else {
@@ -758,8 +746,8 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && view.getWindowInsetsController() != null) {
             view.getWindowInsetsController().show(WindowInsets.Type.ime());
         } else {
-           InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-           imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
         }
     }
 
@@ -776,16 +764,15 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
                 RadioDroidApp radioDroidApp = (RadioDroidApp) getApplication();
                 FavouriteManager favouriteManager = radioDroidApp.getFavouriteManager();
                 HistoryManager historyManager = radioDroidApp.getHistoryManager();
-                try{
+                try {
                     OutputStream os = getContentResolver().openOutputStream(uri);
                     OutputStreamWriter writer = new OutputStreamWriter(os);
                     if (selectedMenuItem == R.id.nav_item_starred) {
                         favouriteManager.SaveM3UWriter(writer);
-                    }else if (selectedMenuItem == R.id.nav_item_history) {
+                    } else if (selectedMenuItem == R.id.nav_item_history) {
                         historyManager.SaveM3UWriter(writer);
                     }
-                }
-                catch (Exception e){
+                } catch (Exception e) {
                     Log.e(TAG, "Unable to write to file " + e);
                 }
             }
@@ -797,7 +784,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
                 Log.d(TAG, "Choosen load path: " + uri);
                 RadioDroidApp radioDroidApp = (RadioDroidApp) getApplication();
                 FavouriteManager favouriteManager = radioDroidApp.getFavouriteManager();
-                try{
+                try {
                     InputStream is = getContentResolver().openInputStream(uri);
                     InputStreamReader reader = new InputStreamReader(is);
                     // Extract display name from SAF Uri
@@ -815,8 +802,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
                         }
                     }
                     favouriteManager.LoadM3USimple(reader, displayName);
-                }
-                catch (Exception e){
+                } catch (Exception e) {
                     Log.e(TAG, "Unable to load to file " + e);
                 }
             }
@@ -834,7 +820,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
             if (dialog instanceof SaveFileDialog) {
                 if (selectedMenuItem == R.id.nav_item_starred) {
                     favouriteManager.SaveM3U(file.getParent(), file.getName());
-                }else if (selectedMenuItem == R.id.nav_item_history) {
+                } else if (selectedMenuItem == R.id.nav_item_history) {
                     historyManager.SaveM3U(file.getParent(), file.getName());
                 }
             } else if (dialog instanceof OpenFileDialog) {
@@ -1309,12 +1295,13 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
 
     /**
      * Navigate in the current list fragment when channel up/down is pressed on TV remote
+     *
      * @param direction -1 for previous item, 1 for next item
      * @return true if navigation was handled, false otherwise
      */
     private boolean navigateInCurrentList(int direction) {
         Fragment currentFragment = mFragmentManager.getFragments().get(mFragmentManager.getFragments().size() - 1);
-        
+
         // Handle different fragment types that contain lists
         if (currentFragment instanceof FragmentStarred) {
             return navigateInRecyclerView(((FragmentStarred) currentFragment).getRecyclerView(), direction);
@@ -1329,7 +1316,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
         } else if (currentFragment instanceof net.programmierecke.radiodroid2.station.FragmentStations) {
             return navigateInRecyclerView(((net.programmierecke.radiodroid2.station.FragmentStations) currentFragment).getRecyclerView(), direction);
         }
-        
+
         return false;
     }
 
@@ -1343,45 +1330,42 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(mSearchView.getWindowToken(), 0);
         }
-        
+
         if (mNavigationView != null) {
             // Post with delay to ensure drawer is fully opened
-            mNavigationView.postDelayed(() -> {
-                try {
-                    // Clear all checked items first, then check only the settings item
-                    if (mNavigationView.getMenu() != null) {
-                        Menu menu = mNavigationView.getMenu();
-                        
-                        // Clear all items first
-                        for (int i = 0; i < menu.size(); i++) {
-                            MenuItem item = menu.getItem(i);
-                            if (item != null) {
-                                item.setChecked(false);
-                            }
-                        }
-                        
-                        // Then set only the settings item as checked
-                        MenuItem settingsItem = menu.findItem(R.id.nav_item_settings);
-                        if (settingsItem != null) {
-                            settingsItem.setChecked(true);
-                        }
+            try {
+                // Clear all checked items first, then check only the settings item
+                mNavigationView.getMenu();
+                Menu menu = mNavigationView.getMenu();
+
+                // Clear all items first
+                for (int i = 0; i < menu.size(); i++) {
+                    MenuItem item = menu.getItem(i);
+                    if (item != null) {
+                        item.setChecked(false);
                     }
-                    
-                    // Use a simpler approach to focus the last item (settings)
-                    focusLastNavigationItem();
-                } catch (Exception e) {
-                    Log.e(TAG, "Error focusing settings in drawer", e);
                 }
-            }, 150); // Slightly longer delay for settings
+
+                // Then set only the settings item as checked
+                MenuItem settingsItem = menu.findItem(R.id.nav_item_settings);
+                if (settingsItem != null) {
+                    settingsItem.setChecked(true);
+                }
+
+                // Use a simpler approach to focus the last item (settings)
+                focusLastNavigationItem();
+            } catch (Exception e) {
+                Log.e(TAG, "Error focusing settings in drawer", e);
+            }
         }
     }
-    
+
     /**
      * Focus the last item in the navigation drawer (settings item)
      */
     private void focusLastNavigationItem() {
         if (mNavigationView == null) return;
-        
+
         // Find the RecyclerView inside the NavigationView
         for (int i = 0; i < mNavigationView.getChildCount(); i++) {
             View child = mNavigationView.getChildAt(i);
@@ -1393,8 +1377,8 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
                         // Scroll to and focus the last position
                         recyclerView.scrollToPosition(lastPosition);
                         recyclerView.post(() -> {
-                            androidx.recyclerview.widget.RecyclerView.ViewHolder vh = 
-                                recyclerView.findViewHolderForAdapterPosition(lastPosition);
+                            androidx.recyclerview.widget.RecyclerView.ViewHolder vh =
+                                    recyclerView.findViewHolderForAdapterPosition(lastPosition);
                             if (vh != null && vh.itemView != null) {
                                 vh.itemView.requestFocus();
                             }
@@ -1416,11 +1400,11 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(mSearchView.getWindowToken(), 0);
         }
-        
+
         if (mNavigationView != null && mNavigationView.getMenu() != null) {
             // Get the menu item ID that corresponds to the current fragment
             int currentMenuItemId = getCurrentFragmentMenuItemId();
-            
+
             // Clear all checked items first, then check only the current item
             Menu menu = mNavigationView.getMenu();
             for (int i = 0; i < menu.size(); i++) {
@@ -1429,18 +1413,14 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
                     item.setChecked(false);
                 }
             }
-            
+
             // Set only the current fragment's menu item as checked
             MenuItem currentItem = menu.findItem(currentMenuItemId);
             if (currentItem != null) {
                 currentItem.setChecked(true);
             }
-            
-            // Post to ensure the drawer is fully opened before requesting focus
-            mNavigationView.postDelayed(() -> {
-                // Focus the specific navigation item that corresponds to current fragment
-                focusNavigationMenuItemByFragment(currentMenuItemId);
-            }, 100); // Small delay to ensure drawer animation is complete
+
+            focusNavigationMenuItemByFragment(currentMenuItemId);
         }
     }
 
@@ -1452,13 +1432,13 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
             if (mFragmentManager == null || mFragmentManager.getFragments().isEmpty()) {
                 return R.id.nav_item_stations; // Safe default
             }
-            
+
             Fragment currentFragment = mFragmentManager.getFragments().get(mFragmentManager.getFragments().size() - 1);
-            
+
             if (currentFragment == null) {
                 return R.id.nav_item_stations; // Safe default
             }
-            
+
             // Handle different fragment types to determine corresponding menu item
             if (currentFragment instanceof FragmentStarred) {
                 return R.id.nav_item_starred;
@@ -1471,7 +1451,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
             } else if (currentFragment instanceof FragmentTabs) {
                 return R.id.nav_item_stations;
             }
-            
+
             // Default to stations if we can't determine the fragment type
             return R.id.nav_item_stations;
         } catch (Exception e) {
@@ -1485,7 +1465,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
      */
     private void focusNavigationMenuItemByFragment(int menuItemId) {
         if (mNavigationView == null) return;
-        
+
         // Find the RecyclerView inside the NavigationView
         for (int i = 0; i < mNavigationView.getChildCount(); i++) {
             View child = mNavigationView.getChildAt(i);
@@ -1500,33 +1480,33 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
                         break;
                     }
                 }
-                
+
                 if (targetPosition >= 0) {
                     // Adjust position - focus was one below the correct item, so add 1
                     int adjustedPosition = targetPosition + 1;
-                    
+
                     // Ensure we don't exceed the adapter bounds
                     int adapterItemCount = recyclerView.getAdapter() != null ? recyclerView.getAdapter().getItemCount() : 0;
                     final int finalTargetPosition = Math.min(adjustedPosition, adapterItemCount - 1);
                     final int originalTargetPosition = targetPosition; // Make final for lambda
-                    
+
                     // Try to focus the view at this adapter position
-                    androidx.recyclerview.widget.RecyclerView.ViewHolder viewHolder = 
-                        recyclerView.findViewHolderForAdapterPosition(finalTargetPosition);
+                    androidx.recyclerview.widget.RecyclerView.ViewHolder viewHolder =
+                            recyclerView.findViewHolderForAdapterPosition(finalTargetPosition);
                     if (viewHolder != null && viewHolder.itemView != null) {
                         viewHolder.itemView.requestFocus();
                     } else {
                         // If view holder not found, scroll to position and try again
                         recyclerView.scrollToPosition(finalTargetPosition);
                         recyclerView.post(() -> {
-                            androidx.recyclerview.widget.RecyclerView.ViewHolder vh = 
-                                recyclerView.findViewHolderForAdapterPosition(finalTargetPosition);
+                            androidx.recyclerview.widget.RecyclerView.ViewHolder vh =
+                                    recyclerView.findViewHolderForAdapterPosition(finalTargetPosition);
                             if (vh != null && vh.itemView != null) {
                                 vh.itemView.requestFocus();
                             } else {
                                 // Last resort: try the original position without adjustment
-                                androidx.recyclerview.widget.RecyclerView.ViewHolder fallbackVh = 
-                                    recyclerView.findViewHolderForAdapterPosition(originalTargetPosition);
+                                androidx.recyclerview.widget.RecyclerView.ViewHolder fallbackVh =
+                                        recyclerView.findViewHolderForAdapterPosition(originalTargetPosition);
                                 if (fallbackVh != null && fallbackVh.itemView != null) {
                                     fallbackVh.itemView.requestFocus();
                                 }
@@ -1541,8 +1521,9 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
 
     /**
      * Navigate within a RecyclerView
+     *
      * @param recyclerView the RecyclerView to navigate in
-     * @param direction -1 for previous item, 1 for next item
+     * @param direction    -1 for previous item, 1 for next item
      * @return true if navigation was successful, false otherwise
      */
     private boolean navigateInRecyclerView(androidx.recyclerview.widget.RecyclerView recyclerView, int direction) {
@@ -1558,7 +1539,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
         // Get currently focused item position
         View focusedView = recyclerView.getFocusedChild();
         int currentPosition = 0;
-        
+
         if (focusedView != null) {
             currentPosition = recyclerView.getChildAdapterPosition(focusedView);
         } else {
@@ -1594,7 +1575,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
             });
             return true;
         }
-        
+
         return false;
     }
 }
