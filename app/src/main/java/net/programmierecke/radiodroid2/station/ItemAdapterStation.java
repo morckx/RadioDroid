@@ -441,7 +441,11 @@ public class ItemAdapterStation
             } else {
                 Context context = getContext();
                 holder.buttonPlayInternalOrExternal.setContentDescription(getContext().getString(R.string.detail_play_in_external_player));
-                holder.buttonPlayInternalOrExternal.setImageDrawable(new IconicsDrawable(getContext(), CommunityMaterial.Icon2.cmd_play_box_outline).size(IconicsSize.dp(24)));
+                IconicsDrawable drawable = new IconicsDrawable(getContext(), CommunityMaterial.Icon2.cmd_play_box_outline);
+                float density = getContext().getResources().getDisplayMetrics().density;
+                drawable.setSizeXPx((int)(24 * density));
+                drawable.setSizeYPx((int)(24 * density));
+                holder.buttonPlayInternalOrExternal.setImageDrawable(drawable);
                 holder.buttonPlayInternalOrExternal.setOnClickListener(v -> Utils.playAndWarnIfMetered((RadioDroidApp) context.getApplicationContext(), station,
                         PlayerType.EXTERNAL, () -> PlayStationTask.playExternal(station, context).execute()));
             }

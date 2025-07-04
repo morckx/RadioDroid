@@ -36,9 +36,11 @@ public class RecyclerItemSwipeHelper<ViewHolderType extends SwipeableViewHolder>
         swipeToDeleteIsEnabled = ((swipeDirs & ItemTouchHelper.LEFT) > 0) || ((swipeDirs & ItemTouchHelper.RIGHT) > 0);
         background = new ColorDrawable(Utils.themeAttributeToColor(R.attr.swipeDeleteBackgroundColor, context, Color.RED));
         if (swipeToDeleteIsEnabled) {
-            icon = new IconicsDrawable(context, GoogleMaterial.Icon.gmd_delete_sweep)
-                    .size(IconicsSize.dp(48))
-                    .color(IconicsColor.colorInt(Utils.themeAttributeToColor(R.attr.swipeDeleteIconColor, context, Color.WHITE)));
+            icon = new IconicsDrawable(context, GoogleMaterial.Icon.gmd_delete_sweep);
+            icon.setSizeXPx((int)(48 * context.getResources().getDisplayMetrics().density));
+            icon.setSizeYPx((int)(48 * context.getResources().getDisplayMetrics().density));
+            android.content.res.ColorStateList colorList = android.content.res.ColorStateList.valueOf(Utils.themeAttributeToColor(R.attr.swipeDeleteIconColor, context, Color.WHITE));
+            icon.setColorList(colorList);
         }
     }
 

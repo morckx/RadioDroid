@@ -618,7 +618,14 @@ public class Utils {
     }
 
     public static IconicsDrawable IconicsIcon(Context context, IIcon icon) {
-        return new IconicsDrawable(context, icon).size(IconicsSize.TOOLBAR_ICON_SIZE).padding(IconicsSize.TOOLBAR_ICON_PADDING).color(IconicsColor.colorInt(getIconColor(context)));
+        IconicsDrawable drawable = new IconicsDrawable(context, icon);
+        float density = context.getResources().getDisplayMetrics().density;
+        drawable.setSizeXPx((int)(24 * density)); // IconicsSize.TOOLBAR_ICON_SIZE
+        drawable.setSizeYPx((int)(24 * density));
+        drawable.setPaddingPx((int)(4 * density)); // IconicsSize.TOOLBAR_ICON_PADDING  
+        android.content.res.ColorStateList colorList = android.content.res.ColorStateList.valueOf(getIconColor(context));
+        drawable.setColorList(colorList);
+        return drawable;
     }
 
     public static String getMimeType(String url, String defaultMimeType) {

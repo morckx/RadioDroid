@@ -39,7 +39,7 @@ object StationPopupMenu {
                 } else {
                     item {
                         labelRes = R.string.context_menu_play_in_external_player
-                        iconDrawable = IconicsDrawable(context, CommunityMaterial.Icon2.cmd_play_box_outline).sizeDp(24)
+                        iconDrawable = IconicsDrawable(context, CommunityMaterial.Icon2.cmd_play_box_outline).apply { sizeDp = 24 }
                         callback = {
                             Utils.playAndWarnIfMetered(context.applicationContext as RadioDroidApp, station,
                                     PlayerType.EXTERNAL) { PlayStationTask.playExternal(station, context).execute() }
@@ -48,7 +48,7 @@ object StationPopupMenu {
                 }
                 item {
                     labelRes = R.string.context_menu_visit_homepage
-                    iconDrawable = IconicsDrawable(context, GoogleMaterial.Icon.gmd_home).sizeDp(24)
+                    iconDrawable = IconicsDrawable(context, GoogleMaterial.Icon.gmd_home).apply { sizeDp = 24 }
                     callback = {
                         StationActions.openStationHomeUrl(activity, station)
                     }
