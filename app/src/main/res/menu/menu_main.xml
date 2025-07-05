@@ -11,7 +11,7 @@
         android:icon="@drawable/ic_search_24dp"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         android:nextFocusDown="@+id/action_set_sleep_timer"
-        app:showAsAction="always" />
+        app:showAsAction="always|collapseActionView" />
 
     <item
         android:id="@+id/action_icons_view"

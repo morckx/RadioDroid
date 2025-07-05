@@ -1156,11 +1156,17 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
 
     // Loading listener
     private void showLoadingIcon() {
-        findViewById(R.id.progressBarLoading).setVisibility(View.VISIBLE);
+        View progressBar = findViewById(R.id.progressBarLoading);
+        if (progressBar != null) {
+            progressBar.setVisibility(View.VISIBLE);
+        }
     }
 
     private void hideLoadingIcon() {
-        findViewById(R.id.progressBarLoading).setVisibility(View.GONE);
+        View progressBar = findViewById(R.id.progressBarLoading);
+        if (progressBar != null) {
+            progressBar.setVisibility(View.GONE);
+        }
     }
 
     private void changeTimer() {
