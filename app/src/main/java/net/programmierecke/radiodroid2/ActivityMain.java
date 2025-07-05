@@ -33,6 +33,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -344,6 +345,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
 
         ((RadioDroidApp) getApplication()).getCastHandler().onCreate(this);
 
+        setupBackPressedCallback();
         setupStartUpFragment();
     }
 
@@ -404,59 +406,74 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
         return false;
     }
 
-    @Override
-    public void onBackPressed() {
-        if (playerBottomSheet.getState() == BottomSheetBehavior.STATE_EXPANDED) {
-            playerBottomSheet.setState(BottomSheetBehavior.STATE_COLLAPSED);
-            return;
-        }
+    private void setupBackPressedCallback() {
+        OnBackPressedCallback backPressedCallback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (playerBottomSheet.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+                    playerBottomSheet.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                    return;
+                }
 
-        int backStackCount = mFragmentManager.getBackStackEntryCount();
-        FragmentManager.BackStackEntry backStackEntry;
+                int backStackCount = mFragmentManager.getBackStackEntryCount();
+                FragmentManager.BackStackEntry backStackEntry;
 
-        if (backStackCount > 0) {
-            // FRAGMENT_FROM_BACKSTACK value added as a backstack name for non-root fragments like Recordings, About, etc
-            backStackEntry = mFragmentManager.getBackStackEntryAt(mFragmentManager.getBackStackEntryCount() - 1);
-            if (backStackEntry.getName().equals("SearchPreferenceFragment")) {
-                super.onBackPressed();
-                return;
+                if (backStackCount > 0) {
+                    // FRAGMENT_FROM_BACKSTACK value added as a backstack name for non-root fragments like Recordings, About, etc
+                    backStackEntry = mFragmentManager.getBackStackEntryAt(mFragmentManager.getBackStackEntryCount() - 1);
+                    if (backStackEntry.getName().equals("SearchPreferenceFragment")) {
+                        // Disable this callback temporarily and call system back
+                        setEnabled(false);
+                        getOnBackPressedDispatcher().onBackPressed();
+                        setEnabled(true);
+                        return;
+                    }
+                    int parsedId = Integer.parseInt(backStackEntry.getName());
+                    if (parsedId == FRAGMENT_FROM_BACKSTACK) {
+                        // Disable this callback temporarily and call system back
+                        setEnabled(false);
+                        getOnBackPressedDispatcher().onBackPressed();
+                        setEnabled(true);
+                        invalidateOptionsMenu();
+                        return;
+                    }
+                }
+
+                // Don't support backstack with BottomNavigationView
+                if (useBottomNavigation()) {
+                    // I'm giving 3 seconds on making a choice
+                    if (lastExitTry != null && new Date().getTime() < lastExitTry.getTime() + 3 * 1000) {
+                        PlayerServiceUtil.shutdownService();
+                        finish();
+                    } else {
+                        Toast.makeText(ActivityMain.this, R.string.alert_press_back_to_exit, Toast.LENGTH_SHORT).show();
+                        lastExitTry = new Date();
+                        return;
+                    }
+                }
+
+                if (backStackCount > 1) {
+                    backStackEntry = mFragmentManager.getBackStackEntryAt(mFragmentManager.getBackStackEntryCount() - 2);
+
+                    selectedMenuItem = Integer.parseInt(backStackEntry.getName());
+
+                    if (!useBottomNavigation()) {
+                        mNavigationView.setCheckedItem(selectedMenuItem);
+                    }
+                    invalidateOptionsMenu();
+
+                } else {
+                    finish();
+                    return;
+                }
+                // Disable this callback temporarily and call system back
+                setEnabled(false);
+                getOnBackPressedDispatcher().onBackPressed();
+                setEnabled(true);
             }
-            int parsedId = Integer.parseInt(backStackEntry.getName());
-            if (parsedId == FRAGMENT_FROM_BACKSTACK) {
-                super.onBackPressed();
-                invalidateOptionsMenu();
-                return;
-            }
-        }
+        };
 
-        // Don't support backstack with BottomNavigationView
-        if (useBottomNavigation()) {
-            // I'm giving 3 seconds on making a choice
-            if (lastExitTry != null && new Date().getTime() < lastExitTry.getTime() + 3 * 1000) {
-                PlayerServiceUtil.shutdownService();
-                finish();
-            } else {
-                Toast.makeText(this, R.string.alert_press_back_to_exit, Toast.LENGTH_SHORT).show();
-                lastExitTry = new Date();
-                return;
-            }
-        }
-
-        if (backStackCount > 1) {
-            backStackEntry = mFragmentManager.getBackStackEntryAt(mFragmentManager.getBackStackEntryCount() - 2);
-
-            selectedMenuItem = Integer.parseInt(backStackEntry.getName());
-
-            if (!useBottomNavigation()) {
-                mNavigationView.setCheckedItem(selectedMenuItem);
-            }
-            invalidateOptionsMenu();
-
-        } else {
-            finish();
-            return;
-        }
-        super.onBackPressed();
+        getOnBackPressedDispatcher().addCallback(this, backPressedCallback);
     }
 
     public boolean isRunningOnTV() {
@@ -1293,6 +1310,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
         invalidateOptionsMenu();
     }
 
+    @SuppressWarnings("GestureBackNavigation")
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         // Handle TV remote control keys
@@ -1308,7 +1326,9 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
                     }
                     break;
                 case KeyEvent.KEYCODE_BACK:
-                    // Close drawer first if it's open
+                    // Close drawer first if it's open (TV remote only)
+                    // Note: This handles TV remote KEYCODE_BACK events specifically for drawer management
+                    // Main back navigation is handled by OnBackPressedDispatcher
                     if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
                         mDrawerLayout.closeDrawer(GravityCompat.START);
                         return true;
