@@ -642,10 +642,6 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
 
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                if (useBottomNavigation()) {
-                    mBottomNavigationView.setVisibility(hasFocus ? View.GONE : View.VISIBLE);
-                }
-
                 if (hasFocus) {
                     Log.d(TAG, "SearchView has focus");
                     prevTabsVisibility = tabsView.getVisibility();
