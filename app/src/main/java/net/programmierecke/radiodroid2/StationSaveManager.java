@@ -689,7 +689,10 @@ public class StationSaveManager extends Observable {
             List<DataRadioStation> listStationsSorted = new ArrayList<DataRadioStation>();
             for (String uuid: listUuids)
             {
-                assert listStationsNew != null;
+                if (listStationsNew == null) {
+                    Log.w("LOAD", "Failed to load stations from server");
+                    return new ArrayList<>();
+                }
                 for (DataRadioStation s: listStationsNew){
                     if (uuid.equals(s.StationUuid)){
                         listStationsSorted.add(s);
