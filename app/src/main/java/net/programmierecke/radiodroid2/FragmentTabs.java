@@ -159,7 +159,12 @@ public class FragmentTabs extends Fragment implements IFragmentRefreshable, IFra
             Bundle bundle = new Bundle();
             bundle.putString("url", addresses[i]);
 
+            // Enable search for the dedicated search tab
             if (i == IDX_SEARCH) {
+                bundle.putBoolean(FragmentStations.KEY_SEARCH_ENABLED, true);
+            }
+            // Enable search for all station fragments on TV devices for better navigation
+            else if (fragments[i] instanceof FragmentStations && Utils.isRunningOnTV(getContext())) {
                 bundle.putBoolean(FragmentStations.KEY_SEARCH_ENABLED, true);
             }
 

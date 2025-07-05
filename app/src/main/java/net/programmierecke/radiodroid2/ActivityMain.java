@@ -1169,6 +1169,52 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
         }
     }
 
+    public void focusSearchView() {
+        focusSearchView(true); // TV-only by default
+    }
+    
+    public void focusSearchView(boolean tvOnly) {
+        Log.d(TAG, "focusSearchView called, mSearchView=" + (mSearchView != null) + ", isTV=" + isRunningOnTV() + ", menuItemSearch=" + (menuItemSearch != null) + ", tvOnly=" + tvOnly);
+        
+        if (mSearchView != null && (!tvOnly || isRunningOnTV())) {
+            Log.d(TAG, "Attempting to focus search view" + (tvOnly ? " on TV" : ""));
+            
+            // Ensure search menu item is visible and expand its action view
+            if (menuItemSearch != null) {
+                Log.d(TAG, "Making search menu item visible and expanding action view");
+                menuItemSearch.setVisible(true);
+                
+                // Expand the action view to show the search field
+                boolean expanded = menuItemSearch.expandActionView();
+                Log.d(TAG, "Search menu item expansion result: " + expanded);
+                
+                if (expanded) {
+                    // Configure the search view after expansion
+                    mSearchView.setIconifiedByDefault(false);
+                    mSearchView.setIconified(false);
+                    
+                    // Focus the search view
+                    boolean focused = mSearchView.requestFocus();
+                    Log.d(TAG, "Search view focus result: " + focused);
+                    
+                    // Show keyboard - try a delayed approach for better compatibility
+                    mSearchView.post(() -> {
+                        showSoftKeyboard(mSearchView);
+                        Log.d(TAG, "Delayed keyboard show attempt completed");
+                    });
+                    
+                    Log.d(TAG, "Search view setup completed");
+                } else {
+                    Log.d(TAG, "Failed to expand search action view");
+                }
+            } else {
+                Log.d(TAG, "menuItemSearch is null");
+            }
+        } else {
+            Log.d(TAG, "Cannot focus search view - mSearchView=" + (mSearchView != null) + ", isTV=" + isRunningOnTV() + ", tvOnly=" + tvOnly);
+        }
+    }
+
     private void changeTimer() {
         final AlertDialog.Builder seekDialog = new AlertDialog.Builder(this);
         View seekView = View.inflate(this, R.layout.layout_timer_chooser, null);

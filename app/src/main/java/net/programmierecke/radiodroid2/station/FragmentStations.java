@@ -190,7 +190,34 @@ public class FragmentStations extends FragmentBase implements IFragmentSearchabl
             Search(lastSearchStyle, lastQuery);
         }
 
+        // Auto-focus search field on Android TV devices will be handled in onResume()
+
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        
+        // Debug logging to understand execution flow
+        Log.d("STATIONS", "onResume: searchEnabled=" + searchEnabled + ", isTV=" + Utils.isRunningOnTV(getContext()) + ", context=" + (getContext() != null));
+        
+        // Auto-focus search field on Android TV devices
+        if (searchEnabled && Utils.isRunningOnTV(getContext())) {
+            Log.d("STATIONS", "onResume: TV detected, will attempt to auto-focus search after delay");
+            // Use a longer delay to ensure the activity and search view are fully ready
+            new android.os.Handler().postDelayed(() -> {
+                Log.d("STATIONS", "Delayed runnable executing for TV auto-focus, activity=" + getActivity() + ", isAdded=" + isAdded());
+                if (getActivity() instanceof ActivityMain && isAdded()) {
+                    Log.d("STATIONS", "Calling focusSearchView on ActivityMain");
+                    ((ActivityMain) getActivity()).focusSearchView();
+                } else {
+                    Log.d("STATIONS", "Cannot call focusSearchView - activity not ready or fragment not added");
+                }
+            }, 500); // 500ms delay
+        } else {
+            Log.d("STATIONS", "NOT attempting TV auto-focus: searchEnabled=" + searchEnabled + ", isTV=" + Utils.isRunningOnTV(getContext()));
+        }
     }
 
     @Override
