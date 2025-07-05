@@ -3,6 +3,32 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## Development snapshot [0.86.903-morckx] - 2025-07-05
+
+### Fixed
+
+- Fixed app crash when importing playlists with failed network requests
+- Fixed fragment context crash in FragmentPlayerFull when called after detachment
+- Fixed fragment deselection behavior for all devices (not just TV)
+- Migrated back navigation to AndroidX OnBackPressedDispatcher for Android 16+ compatibility
+- Resolved lint errors for gesture back navigation compatibility
+
+### Added
+
+- New setting to enable/disable radio-browser server availability checking
+  - You can try this if your connection to the radio-browser server is is broken. I helps, however, only when the problem is that mirrors are listed in the DNS record, which do not work.
+
+### Changed
+
+- Updated OkHttp to version 5.0.0
+- Updated Iconics library to version 5.4.0
+- Updated Gradle to version 8.13
+- Updated all other dependencies to latest versions
+- Improved radio-browser server management: skip unavailable servers automatically
+- Improved error handling in playlist import functionality
+- Updated back button handling to use modern AndroidX APIs
+- Enhanced TV remote control compatibility for drawer navigation
+
 ## Development snapshot [0.86.902-morckx] - 2025-06-11
 
 - Fixed recording on newer Android versions
