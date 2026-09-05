@@ -368,23 +368,16 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
         Fragment f = null;
         String backStackTag = String.valueOf(selectedMenuItem);
 
-        switch (selectedMenuItem) {
-            case R.id.nav_item_stations:
-                f = new FragmentTabs();
-                break;
-            case R.id.nav_item_starred:
-                f = new FragmentStarred();
-                break;
-            case R.id.nav_item_history:
-                f = new FragmentHistory();
-                break;
-            case R.id.nav_item_alarm:
-                f = new FragmentAlarm();
-                break;
-            case R.id.nav_item_settings:
-                f = new FragmentSettings();
-                break;
-            default:
+        if (selectedMenuItem == R.id.nav_item_stations) {
+            f = new FragmentTabs();
+        } else if (selectedMenuItem == R.id.nav_item_starred) {
+            f = new FragmentStarred();
+        } else if (selectedMenuItem == R.id.nav_item_history) {
+            f = new FragmentHistory();
+        } else if (selectedMenuItem == R.id.nav_item_alarm) {
+            f = new FragmentAlarm();
+        } else if (selectedMenuItem == R.id.nav_item_settings) {
+            f = new FragmentSettings();
         }
 
         // Without "Immediate", "Settings" fragment may become forever stuck in limbo receiving onResume.
@@ -693,61 +686,51 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
         }
         menuItemMpd.setVisible(mpd_is_visible);
 
-        switch (selectedMenuItem) {
-            case R.id.nav_item_stations: {
-                menuItemSleepTimer.setVisible(true);
-                menuItemSearch.setVisible(true);
-                menuItemSearch.getActionView().setActivated(true);
-                menuItemSearch.getActionView().setFocusable(true);
-                ((SearchView) menuItemSearch.getActionView()).setIconifiedByDefault(false);
+        if (selectedMenuItem == R.id.nav_item_stations) {
+            menuItemSleepTimer.setVisible(true);
+            menuItemSearch.setVisible(true);
+            menuItemSearch.getActionView().setActivated(true);
+            menuItemSearch.getActionView().setFocusable(true);
+            ((SearchView) menuItemSearch.getActionView()).setIconifiedByDefault(false);
 //                ((SearchView) menuItemSearch.getActionView()).setIconified(false);
-                myToolbar.setTitle(R.string.nav_item_stations);
-                break;
-            }
-            case R.id.nav_item_starred: {
-                menuItemSleepTimer.setVisible(true);
-                //menuItemSearch.setVisible(true);
-                menuItemSave.setVisible(true);
-                menuItemLoad.setVisible(true);
-                menuItemSave.setTitle(R.string.nav_item_save_playlist);
+            myToolbar.setTitle(R.string.nav_item_stations);
+        } else if (selectedMenuItem == R.id.nav_item_starred) {
+            menuItemSleepTimer.setVisible(true);
+            //menuItemSearch.setVisible(true);
+            menuItemSave.setVisible(true);
+            menuItemLoad.setVisible(true);
+            menuItemSave.setTitle(R.string.nav_item_save_playlist);
 
-                if (sharedPref.getBoolean("icons_only_favorites_style", false)) {
-                    menuItemListView.setVisible(true);
-                } else if (sharedPref.getBoolean("load_icons", false)) {
-                    menuItemIconsView.setVisible(true);
-                }
-                if (radioDroidApp.getFavouriteManager().isEmpty()) {
-                    menuItemDelete.setVisible(false);
-                } else {
-                    menuItemDelete.setVisible(true).setTitle(R.string.action_delete_favorites);
-                }
-                myToolbar.setTitle(R.string.nav_item_starred);
-                break;
+            if (sharedPref.getBoolean("icons_only_favorites_style", false)) {
+                menuItemListView.setVisible(true);
+            } else if (sharedPref.getBoolean("load_icons", false)) {
+                menuItemIconsView.setVisible(true);
             }
-            case R.id.nav_item_history: {
-                menuItemSleepTimer.setVisible(true);
-                //menuItemSearch.setVisible(true);
-                menuItemSave.setVisible(true);
-                menuItemSave.setTitle(R.string.nav_item_save_history_playlist);
+            if (radioDroidApp.getFavouriteManager().isEmpty()) {
+                menuItemDelete.setVisible(false);
+            } else {
+                menuItemDelete.setVisible(true).setTitle(R.string.action_delete_favorites);
+            }
+            myToolbar.setTitle(R.string.nav_item_starred);
+        } else if (selectedMenuItem == R.id.nav_item_history) {
+            menuItemSleepTimer.setVisible(true);
+            //menuItemSearch.setVisible(true);
+            menuItemSave.setVisible(true);
+            menuItemSave.setTitle(R.string.nav_item_save_history_playlist);
 
-                if (!radioDroidApp.getHistoryManager().isEmpty()) {
-                    menuItemDelete.setVisible(true).setTitle(R.string.action_delete_history);
-                }
-                myToolbar.setTitle(R.string.nav_item_history);
-                break;
+            if (!radioDroidApp.getHistoryManager().isEmpty()) {
+                menuItemDelete.setVisible(true).setTitle(R.string.action_delete_history);
             }
-            case R.id.nav_item_alarm: {
-                menuItemAddAlarm.setVisible(true);
-                myToolbar.setTitle(R.string.nav_item_alarm);
-                break;
-            }
- /* settings fragment sets the toolbar title depending on the current preference screen
-            case R.id.nav_item_settings: {
-                myToolbar.setTitle(R.string.nav_item_settings);
-                break;
-            }
- */
+            myToolbar.setTitle(R.string.nav_item_history);
+        } else if (selectedMenuItem == R.id.nav_item_alarm) {
+            menuItemAddAlarm.setVisible(true);
+            myToolbar.setTitle(R.string.nav_item_alarm);
         }
+ /* settings fragment sets the toolbar title depending on the current preference screen
+        else if (selectedMenuItem == R.id.nav_item_settings) {
+            myToolbar.setTitle(R.string.nav_item_settings);
+        }
+ */
 
         ((RadioDroidApp) getApplication()).getCastHandler().getRouteItem(getApplicationContext(), menu);
 
@@ -878,37 +861,37 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
 
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
-        switch (menuItem.getItemId()) {
-            case android.R.id.home:
-                mDrawerLayout.openDrawer(GravityCompat.START);  // OPEN DRAWER
-                return true;
-            case R.id.action_save:
-                try {
-                    if (Utils.verifyStoragePermissions(this, PERM_REQ_STORAGE_FAV_SAVE)) {
-                        SaveFavourites();
-                    }
-                } catch (Exception e) {
-                    Log.e("MAIN", e.toString());
+        int itemId = menuItem.getItemId();
+        if (itemId == android.R.id.home) {
+            mDrawerLayout.openDrawer(GravityCompat.START);  // OPEN DRAWER
+            return true;
+        } else if (itemId == R.id.action_save) {
+            try {
+                if (Utils.verifyStoragePermissions(this, PERM_REQ_STORAGE_FAV_SAVE)) {
+                    SaveFavourites();
                 }
+            } catch (Exception e) {
+                Log.e("MAIN", e.toString());
+            }
 
-                return true;
-            case R.id.action_load:
-                try {
-                    if (Utils.verifyStoragePermissions(this, PERM_REQ_STORAGE_FAV_LOAD)) {
-                        LoadFavourites();
-                    }
-                } catch (Exception e) {
-                    Log.e("MAIN", e.toString());
+            return true;
+        } else if (itemId == R.id.action_load) {
+            try {
+                if (Utils.verifyStoragePermissions(this, PERM_REQ_STORAGE_FAV_LOAD)) {
+                    LoadFavourites();
                 }
-                return true;
-            case R.id.action_set_sleep_timer:
-                changeTimer();
-                return true;
-            case R.id.action_mpd:
-                selectMPDServer();
-                return true;
-            case R.id.action_delete:
-                if (selectedMenuItem == R.id.nav_item_history) {
+            } catch (Exception e) {
+                Log.e("MAIN", e.toString());
+            }
+            return true;
+        } else if (itemId == R.id.action_set_sleep_timer) {
+            changeTimer();
+            return true;
+        } else if (itemId == R.id.action_mpd) {
+            selectMPDServer();
+            return true;
+        } else if (itemId == R.id.action_delete) {
+            if (selectedMenuItem == R.id.nav_item_history) {
                     new AlertDialog.Builder(this)
                             .setMessage(this.getString(R.string.alert_delete_history))
                             .setCancelable(true)
@@ -946,20 +929,20 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
                             .setNegativeButton(this.getString(R.string.no), null)
                             .show();
                 }
-                return true;
-            case R.id.action_list_view:
-                sharedPref.edit().putBoolean("icons_only_favorites_style", false).apply();
-                recreate();
-                return true;
-            case R.id.action_icons_view:
-                sharedPref.edit().putBoolean("icons_only_favorites_style", true).apply();
-                recreate();
-                return true;
-            case R.id.action_add_alarm:
-                TimePickerFragment newFragment = new TimePickerFragment();
-                newFragment.setCallback(this);
-                newFragment.show(getSupportFragmentManager(), "timePicker");
-                return true;
+            return true;
+        } else if (itemId == R.id.action_list_view) {
+            sharedPref.edit().putBoolean("icons_only_favorites_style", false).apply();
+            recreate();
+            return true;
+        } else if (itemId == R.id.action_icons_view) {
+            sharedPref.edit().putBoolean("icons_only_favorites_style", true).apply();
+            recreate();
+            return true;
+        } else if (itemId == R.id.action_add_alarm) {
+            TimePickerFragment newFragment = new TimePickerFragment();
+            newFragment.setCallback(this);
+            newFragment.show(getSupportFragmentManager(), "timePicker");
+            return true;
         }
         return super.onOptionsItemSelected(menuItem);
     }

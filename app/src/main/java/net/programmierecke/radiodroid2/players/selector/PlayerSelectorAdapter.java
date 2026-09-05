@@ -267,27 +267,19 @@ public class PlayerSelectorAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             }
 
             dropDownMenu.setOnMenuItemClickListener(menuItem -> {
-                switch (menuItem.getItemId()) {
-                    case R.id.action_edit: {
-                        if (actionListener != null) {
-                            actionListener.editServer(mpdServerData);
-                        }
-                        break;
+                int itemId = menuItem.getItemId();
+                if (itemId == R.id.action_edit) {
+                    if (actionListener != null) {
+                        actionListener.editServer(mpdServerData);
                     }
-                    case R.id.action_remove: {
-                        if (actionListener != null) {
-                            actionListener.removeServer(mpdServerData);
-                        }
-                        break;
+                } else if (itemId == R.id.action_remove) {
+                    if (actionListener != null) {
+                        actionListener.removeServer(mpdServerData);
                     }
-                    case R.id.action_play: {
-                        PlayStationTask.playMPD(mpdClient, mpdServerData, stationToPlay, context).execute();
-                        break;
-                    }
-                    case R.id.action_pause: {
-                        mpdClient.enqueueTask(mpdServerData, new MPDPauseTask(null));
-                        break;
-                    }
+                } else if (itemId == R.id.action_play) {
+                    PlayStationTask.playMPD(mpdClient, mpdServerData, stationToPlay, context).execute();
+                } else if (itemId == R.id.action_pause) {
+                    mpdClient.enqueueTask(mpdServerData, new MPDPauseTask(null));
                 }
 
                 return true;

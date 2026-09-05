@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
 apply plugin: "de.undercouch.download"
 
 buildscript {
@@ -35,34 +34,46 @@ def getAvailableLocales() {
     }
 }
 
+def gitHash = { ->
+    try {
+        def out = providers.exec {
+            commandLine 'git', 'rev-parse', '--short', 'HEAD'
+        }.standardOutput.asText.get().trim()
+        return out.isEmpty() ? "No commit hash" : out
+    } catch (Exception ignored) {
+        return "No commit hash"
+    }
+}
+
+def buildDate = { ->
+    new Date().format('yyyy-MM-dd HH:mm:ss')
+}
+
+def appVersionName = "0.86.903-morckx"
+
 android {
     flavorDimensions "one"
-    compileSdkVersion 36
+    compileSdk 37
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
 
-    kotlin {
-        jvmToolchain {
-            languageVersion.set(JavaLanguageVersion.of("17"))
-        }
-    }
-
     buildFeatures {
         viewBinding true
         aidl true
         buildConfig true
+        resValues true
     }
 
     defaultConfig {
         applicationId "net.programmierecke.radiodroid2"
-        minSdkVersion 21
-        targetSdkVersion 36
+        minSdk 21
+        targetSdk 37
 
         versionCode 99
-        versionName "0.86.903-morckx"
+        versionName appVersionName
 
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
@@ -77,6 +88,12 @@ android {
         // It must neither be present in /res/values/strings.xml
         // nor in /res/values/string_no_translate.xml
         resValue 'string', 'app_name_untranslated', 'RadioDroid'
+
+        // Build metadata shown on the About screen (FragmentAbout). These do not
+        // vary per variant, so they are injected here rather than via the (removed
+        // in AGP 9) applicationVariants API.
+        resValue 'string', 'GIT_HASH', gitHash()
+        resValue 'string', 'BUILD_DATE', buildDate()
 
         // There is no easy way to get available locales during runtime, and especially before
         // tests setup.
@@ -111,7 +128,7 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.txt'
 
             lintOptions {
                 disable 'MissingTranslation'
@@ -134,7 +151,10 @@ android {
 
     testOptions {
         unitTests.all {
-            useJUnit()
+            // Tests use JUnit 5 (jupiter); the vintage engine on the classpath keeps
+            // any JUnit 4 tests running. useJUnit() (JUnit 4 only) cannot discover
+            // jupiter tests, which fails under Gradle 9's failOnNoDiscoveredTests.
+            useJUnitPlatform()
         }
         animationsDisabled = true
         unitTests.returnDefaultValues = true
@@ -147,6 +167,12 @@ android {
         dest new File("app/src/main/res/raw", "fallback_stations.json")
         overwrite true
         tempAndMove true
+    }
+}
+
+kotlin {
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of("17"))
     }
 }
 
@@ -208,6 +234,8 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.13.3'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.13.3'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.13.3'
+    // Required on the test runtime classpath by Gradle 9's useJUnitPlatform().
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.13.3'
 
     androidTestImplementation 'androidx.test:core:1.6.1'
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'
@@ -229,65 +257,28 @@ dependencies {
 // Gradle 3.0
 // https://stackoverflow.com/questions/44800028/change-apk-filename-in-gradle-failed-with-gradle3-0-0-alpha4
 
-android.applicationVariants.configureEach { variant ->
-
-    variant.outputs.configureEach { output ->
-
-        // get app_name field from defaultConfig
-        def appName = variant.mergedFlavor.resValues.get('string/app_name_untranslated').getValue()
-        appName = "${appName}"
-
-        // concat new App name with each flavor's name
-
+// Rename the output APKs to include the app name, flavor, build type, version
+// and git hash. The legacy `android.applicationVariants` / `outputFileName` API
+// was removed in AGP 9, so this uses the current AndroidComponents variant API.
+androidComponents {
+    onVariants(selector().all()) { variant ->
+        def appName = "RadioDroid"
         variant.productFlavors.each { flavor ->
-            appName += "-${flavor.name}"
+            // productFlavors entries are (dimension, name) pairs
+            appName += "-${flavor.second}"
         }
-
-        // optionally add buildType name
-        appName += "-${variant.buildType.name}"
-
-        // your requirement: if buildType == debug, add DEV to App name
-        if (variant.buildType.name == "debug") {
+        appName += "-${variant.buildType}"
+        if (variant.buildType == "debug") {
             appName += "-DEV"
         }
-
-        // if you want, you can set a new resValue
-        // variant.resValue 'string', 'app_name', appName
-
-        /*
-         * Gets the version name from the latest Git tag
-         */
-
-        def gitHash = { ->
-            def stdout = new ByteArrayOutputStream()
-            try {
-                exec {
-                    commandLine 'git', 'rev-parse', '--short', 'HEAD'
-                    standardOutput = stdout
-                }
-                return stdout.toString().trim()
-            } catch (Exception ignored) {
-                return "No commit hash"
-            }
+        if (!appVersionName.isEmpty()) {
+            appName += "-" + appVersionName
         }
+        appName += "-" + gitHash() + ".apk"
 
-        resValue 'string', 'GIT_HASH', gitHash()
-
-        def getBuildDate = {
-            new Date().format('yyyy-MM-dd HH:mm:ss')
+        variant.outputs.each { output ->
+            output.outputFileName.set(appName)
         }
-
-        resValue 'string', 'BUILD_DATE', getBuildDate()
-
-        def finalName = appName
-
-        if (!versionName.isEmpty()) {
-            finalName += "-" + versionName
-        }
-
-        finalName += "-" + gitHash() + ".apk"
-        // outputFileName = "${variant.name}-${variant.versionName}.apk"
-        outputFileName = finalName
     }
 }
 
