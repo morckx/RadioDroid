@@ -85,7 +85,12 @@ public class RadioBrowserServerManager {
                 InetAddress new_item = InetAddress.getByName(currentHostAddress);
                 Log.i("DNS", "Found: " + new_item + " -> " + new_item.getCanonicalHostName());
                 String name = item.getCanonicalHostName();
-                if (!name.equals("all.api.radio-browser.info") && !name.equals(currentHostAddress)) {
+                // Only accept mirrors that belong to the radio-browser.info domain
+                // (note the minus between "radio" and "browser"); reverse DNS can
+                // return a host outside it. See issue #243.
+                if (!name.equals("all.api.radio-browser.info")
+                        && !name.equals(currentHostAddress)
+                        && name.endsWith(".radio-browser.info")) {
                     // Test if server is available before adding it
                     if (isServerAvailable(name, httpClient, context)) {
                         Log.i("DNS", "Added entry: '" + name + "'");
