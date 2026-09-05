@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     strategy:
+      fail-fast: false
       matrix:
         api-level: [24, 25, 33]
     steps:
@@ -86,3 +87,13 @@ jobs:
             adb uninstall net.programmierecke.radiodroid2.test || true
             echo "Running tests..."
             ./gradlew ${{ matrix.api-level < 30 && 'connectedFreeDebugAndroidTest' ||  'connectedPlayDebugAndroidTest' }}
+
+      - name: Upload instrumented test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-test-report-api${{ matrix.api-level }}
+          path: |
+            app/build/reports/androidTests/connected/**
+            app/build/outputs/androidTest-results/connected/**
+          if-no-files-found: warn
