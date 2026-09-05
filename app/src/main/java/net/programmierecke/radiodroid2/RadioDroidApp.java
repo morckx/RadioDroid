@@ -5,9 +5,10 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.widget.Toast;
 
+import android.app.Application;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.multidex.MultiDexApplication;
 import androidx.preference.PreferenceManager;
 
 import com.bumptech.glide.Glide;
@@ -33,7 +34,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class RadioDroidApp extends MultiDexApplication {
+public class RadioDroidApp extends Application {
 
     private HistoryManager historyManager;
     private FavouriteManager favouriteManager;
