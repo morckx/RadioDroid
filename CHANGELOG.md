@@ -3,6 +3,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## Development snapshot [0.86.904-morckx] - 2026-09-05
+
+### Fixed
+
+- Only accept radio-browser.info mirrors from reverse DNS lookups, so hosts outside that domain are no longer used as API servers (#243)
+
+### Changed
+
+- Upgraded to compileSdk/targetSdk 37 (Gradle 9.7.1, Android Gradle Plugin 9.4.0)
+- Raised minSdk from 21 to 23 (Android 6.0)
+- Updated Media3 to 1.11.0
+- Updated OkHttp to 5.5.0
+- Updated Glide to 5.0.9
+- Updated Iconics to 5.6.0
+- Updated AppCompat, Material, ConstraintLayout, Tracing and Gson
+- Dropped the redundant androidx.multidex dependency (native at minSdk 23)
+
 ## Development snapshot [0.86.903-morckx] - 2025-07-05
 
 ### Fixed
@@ -16,7 +33,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 
 - New setting to enable/disable radio-browser server availability checking
-  - You can try this if your connection to the radio-browser server is is broken. I helps, however, only when the problem is that mirrors are listed in the DNS record, which do not work.
+  - You can try this if your connection to the radio-browser server is is broken. It helps, however, only when the problem is that mirrors are listed in the DNS record, which do not work.
 
 ### Changed
 
