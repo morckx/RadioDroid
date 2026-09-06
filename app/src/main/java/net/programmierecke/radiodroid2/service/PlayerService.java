@@ -960,9 +960,11 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
         // Rewind (if shown), then play/pause, then next follow.
         int actionIndex = 2;
 
-        // Rewind feature: show a -15s action when playing and there is buffered audio.
-        boolean rewindAvailable = (currentPlayerState == PlayState.Playing)
-                && radioPlayer != null && radioPlayer.canSeekBackward();
+        // Rewind feature: show a -15s action when playing a non-HLS (progressive) stream,
+        // which is where the time-shift buffer applies. We intentionally don't gate on the
+        // buffer being non-empty (which flickers and needs a rebuild) — the buffer fills
+        // within a second or two and seekBackward safely no-ops until then.
+        boolean rewindAvailable = (currentPlayerState == PlayState.Playing) && !isHls;
         if (rewindAvailable) {
             Intent rewindIntent = new Intent(itsContext, PlayerService.class);
             rewindIntent.setAction(ACTION_REWIND);
@@ -1286,6 +1288,12 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
             }
         }
         sendBroadCast(PLAYER_SERVICE_META_UPDATE);
+
+        // Rewind feature: now that we know whether the stream is HLS, rebuild the
+        // notification so the -15s action appears (non-HLS) or stays hidden (HLS).
+        if (notificationIsActive) {
+            updateNotification();
+        }
     }
 
     @Override
