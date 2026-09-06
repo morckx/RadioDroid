@@ -143,6 +143,11 @@ public class RadioPlayer implements PlayerWrapper.PlayListener, Recordable {
         }
     }
 
+    // PROTOTYPE (rewind feature): jump back within the retained back-buffer.
+    public final void seekBackward(long ms) {
+        playerThreadHandler.post(() -> currentPlayer.seekBackward(ms));
+    }
+
     public final void pause() {
         cancelStationLinkRetrieval();
 

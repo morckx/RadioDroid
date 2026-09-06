@@ -172,6 +172,13 @@ public class MediaPlayerWrapper implements PlayerWrapper, StreamProxyListener {
         return -1;
     }
 
+    // PROTOTYPE (rewind feature): MediaPlayer streams live and retains no back-buffer,
+    // so it cannot rewind.
+    @Override
+    public long seekBackward(long ms) {
+        return 0;
+    }
+
     @Override
     public int getAudioSessionId() {
         if (mediaPlayer != null) {

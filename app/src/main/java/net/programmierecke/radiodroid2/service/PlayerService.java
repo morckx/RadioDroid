@@ -103,6 +103,10 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
     private final String ACTION_SKIP_TO_NEXT = "next";
     private final String ACTION_SKIP_TO_PREVIOUS = "previous";
     private final String ACTION_STOP = "stop";
+    // PROTOTYPE (rewind feature): rewind by REWIND_MS_EXTRA ms (default 15000).
+    // Test with: adb shell am start -a net.programmierecke.radiodroid2.rewind ...
+    private final String ACTION_REWIND = "net.programmierecke.radiodroid2.rewind";
+    private final String REWIND_MS_EXTRA = "rewind_ms";
 
     private static final float FULL_VOLUME = 100f;
     private static final float DUCK_VOLUME = 40f;
@@ -540,6 +544,12 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
                         break;
                     case ACTION_RESUME:
                         resume();
+                        break;
+                    case ACTION_REWIND:
+                        if (radioPlayer != null) {
+                            long ms = intent.getLongExtra(REWIND_MS_EXTRA, 15000);
+                            radioPlayer.seekBackward(ms);
+                        }
                         break;
                     case ACTION_MEDIA_BUTTON:
                         KeyEvent key = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);

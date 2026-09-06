@@ -33,6 +33,11 @@ public interface PlayerWrapper extends Recordable {
 
     long getBufferedMs();
 
+    // PROTOTYPE (rewind feature): jump back by the given number of ms within any
+    // retained back-buffer. Returns how many ms were actually skipped back (0 if the
+    // player cannot rewind, e.g. MediaPlayer or nothing buffered).
+    long seekBackward(long ms);
+
     int getAudioSessionId();
 
     long getTotalTransferredBytes();

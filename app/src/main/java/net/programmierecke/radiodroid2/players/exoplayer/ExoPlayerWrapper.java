@@ -17,7 +17,9 @@ import androidx.annotation.Nullable;
 import androidx.preference.PreferenceManager;
 
 import androidx.media3.common.C;
+import androidx.media3.exoplayer.DefaultLoadControl;
 import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.exoplayer.LoadControl;
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.PlaybackParameters;
@@ -56,6 +58,11 @@ import okhttp3.OkHttpClient;
 public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSourceListener, Player.Listener {
 
     final private String TAG = "ExoPlayerWrapper";
+
+    // PROTOTYPE (rewind feature): how much already-played audio ExoPlayer should retain
+    // so we can seek backwards into it. Will become configurable (15-120s) if the
+    // prototype proves out.
+    private static final int REWIND_BACK_BUFFER_MS = 120_000;
 
     private ExoPlayer player;
     private PlayListener stateListener;
@@ -114,7 +121,16 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
         }
 
         if (player == null) {
-            player = new ExoPlayer.Builder(context).build();
+            // PROTOTYPE (rewind feature): ask ExoPlayer to retain already-played audio so we
+            // can seek backwards into it on live streams. 120s back-buffer, retained from the
+            // last keyframe so seeks land on a decodable position.
+            LoadControl loadControl = new DefaultLoadControl.Builder()
+                    .setBackBuffer(REWIND_BACK_BUFFER_MS, /* retainBackBufferFromKeyframe= */ true)
+                    .build();
+
+            player = new ExoPlayer.Builder(context)
+                    .setLoadControl(loadControl)
+                    .build();
             player.setAudioAttributes(new AudioAttributes.Builder().setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
                     .setUsage(isAlarm ? C.USAGE_ALARM : C.USAGE_MEDIA).build(), false);
 
@@ -197,6 +213,25 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
         }
 
         return 0;
+    }
+
+    // PROTOTYPE (rewind feature): jump back by the given amount within the retained
+    // back-buffer, clamped so we never seek before the earliest retained position.
+    // Returns how many ms we actually moved back (0 if nothing was available).
+    @Override
+    public long seekBackward(long ms) {
+        if (player == null) {
+            return 0;
+        }
+        long current = player.getCurrentPosition();
+        // For a live progressive stream the timeline window starts at 0; the earliest
+        // *available* position is bounded by the back-buffer we asked ExoPlayer to keep.
+        long target = Math.max(0, current - ms);
+        long moved = current - target;
+        Log.i(TAG, "seekBackward: current=" + current + " target=" + target
+                + " moved=" + moved + " (requested " + ms + ")");
+        player.seekTo(target);
+        return moved;
     }
 
     @Override
