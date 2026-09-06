@@ -10,6 +10,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.bluetooth.BluetoothA2dp;
 import android.bluetooth.BluetoothHeadset;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -103,10 +104,6 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
     private final String ACTION_SKIP_TO_NEXT = "next";
     private final String ACTION_SKIP_TO_PREVIOUS = "previous";
     private final String ACTION_STOP = "stop";
-    // PROTOTYPE (rewind feature): rewind by REWIND_MS_EXTRA ms (default 15000).
-    // Test with: adb shell am start -a net.programmierecke.radiodroid2.rewind ...
-    private final String ACTION_REWIND = "net.programmierecke.radiodroid2.rewind";
-    private final String REWIND_MS_EXTRA = "rewind_ms";
 
     private static final float FULL_VOLUME = 100f;
     private static final float DUCK_VOLUME = 40f;
@@ -137,6 +134,21 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
     private final BecomingNoisyReceiver becomingNoisyReceiver = new BecomingNoisyReceiver();
     private final HeadsetConnectionReceiver headsetConnectionReceiver = new HeadsetConnectionReceiver();
     private final ConnectivityChecker connectivityChecker = new ConnectivityChecker();
+
+    // PROTOTYPE (rewind feature): a broadcast-triggerable rewind, so it can be exercised
+    // from adb without any UI. Test with:
+    //   adb shell am broadcast -a net.programmierecke.radiodroid2.REWIND --el rewind_ms 15000
+    private static final String ACTION_REWIND_DEBUG = "net.programmierecke.radiodroid2.REWIND";
+    private final BroadcastReceiver rewindDebugReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (radioPlayer != null) {
+                long ms = intent.getLongExtra("rewind_ms", 15000);
+                Log.i(TAG, "REWIND broadcast received, ms=" + ms);
+                radioPlayer.seekBackward(ms);
+            }
+        }
+    };
 
     private PauseReason pauseReason = PauseReason.NONE;
 
@@ -481,6 +493,15 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
 
         registerReceiver(headsetConnectionReceiver, headsetConnectionFilter);
 
+        // PROTOTYPE (rewind feature): register the adb-triggerable rewind receiver.
+        // Exported so `adb shell am broadcast` (an external sender) can reach it.
+        final IntentFilter rewindFilter = new IntentFilter(ACTION_REWIND_DEBUG);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(rewindDebugReceiver, rewindFilter, Context.RECEIVER_EXPORTED);
+        } else {
+            registerReceiver(rewindDebugReceiver, rewindFilter);
+        }
+
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "RadioDroid2 Player", NotificationManager.IMPORTANCE_LOW);
@@ -504,6 +525,7 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
         radioPlayer.destroy();
 
         unregisterReceiver(headsetConnectionReceiver);
+        unregisterReceiver(rewindDebugReceiver); // PROTOTYPE (rewind feature)
     }
 
     @Override
@@ -544,12 +566,6 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
                         break;
                     case ACTION_RESUME:
                         resume();
-                        break;
-                    case ACTION_REWIND:
-                        if (radioPlayer != null) {
-                            long ms = intent.getLongExtra(REWIND_MS_EXTRA, 15000);
-                            radioPlayer.seekBackward(ms);
-                        }
                         break;
                     case ACTION_MEDIA_BUTTON:
                         KeyEvent key = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
