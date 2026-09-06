@@ -275,11 +275,28 @@
             android:contentDescription="@string/detail_play"
             android:scaleType="fitXY"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/buttonNext"
+            app:layout_constraintEnd_toStartOf="@+id/buttonGoLive"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/buttonRewind"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_play_circle" />
+
+        <!-- Go-live sits between play/pause and next. Shown only when playback is rewound;
+             collapses (gone) otherwise, so next falls through toward play. -->
+        <ImageButton
+            android:id="@+id/buttonGoLive"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/description_btn_go_live"
+            android:scaleType="fitXY"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/buttonNext"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/buttonPlay"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_skip_to_live_circle" />
 
         <ImageButton
             android:id="@+id/buttonNext"
@@ -291,7 +308,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/buttonFavorite"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/buttonPlay"
+            app:layout_constraintStart_toEndOf="@+id/buttonGoLive"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_skip_next_circle" />
 
@@ -303,28 +320,11 @@
             android:contentDescription="@string/action_favorite"
             android:scaleType="fitXY"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/buttonGoLive"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/buttonNext"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_star_24dp" />
-
-        <!-- Go-live sits at the far right (rightmost position). Shown only when playback is
-             rewound; collapses (gone) otherwise, so favourite falls through to the edge. -->
-        <ImageButton
-            android:id="@+id/buttonGoLive"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/description_btn_go_live"
-            android:scaleType="fitXY"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/buttonFavorite"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_skip_to_live_circle" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
