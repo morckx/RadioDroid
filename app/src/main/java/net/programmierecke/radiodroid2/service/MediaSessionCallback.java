@@ -96,6 +96,16 @@ public class MediaSessionCallback extends MediaSessionCompat.Callback {
     }
 
     @Override
+    public void onRewind() {
+        // Rewind feature: -15s from the system media controls / lock screen.
+        try {
+            playerService.SeekBackward(15000);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public void onPlayFromMediaId(String mediaId, Bundle extras) {
         final String stationId = RadioDroidBrowser.stationIdFromMediaId(mediaId);
 

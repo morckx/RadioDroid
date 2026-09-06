@@ -792,6 +792,15 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
             actions |= PlaybackStateCompat.ACTION_PLAY;
         }
 
+        // Rewind feature: expose ACTION_REWIND on the MediaSession for non-HLS streams.
+        // Android 13+ renders the media notification from these PlaybackState actions
+        // (not from Notification.addAction), so this is what makes the -15s button appear
+        // in the system media notification / lock screen.
+        if (!isHls && (state == PlaybackStateCompat.STATE_PLAYING
+                || state == PlaybackStateCompat.STATE_BUFFERING)) {
+            actions |= PlaybackStateCompat.ACTION_REWIND;
+        }
+
         PlaybackStateCompat.Builder playbackStateBuilder = new PlaybackStateCompat.Builder();
         playbackStateBuilder.setActions(actions);
 
@@ -1289,9 +1298,14 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
         }
         sendBroadCast(PLAYER_SERVICE_META_UPDATE);
 
-        // Rewind feature: now that we know whether the stream is HLS, rebuild the
-        // notification so the -15s action appears (non-HLS) or stays hidden (HLS).
+        // Rewind feature: now that we know whether the stream is HLS, refresh the media
+        // session state (Android 13+ renders the notification's media buttons from the
+        // PlaybackState actions) and the notification, so the -15s button appears for
+        // non-HLS streams or stays hidden for HLS.
         if (notificationIsActive) {
+            if (radioPlayer != null && radioPlayer.isPlaying()) {
+                setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING);
+            }
             updateNotification();
         }
     }
