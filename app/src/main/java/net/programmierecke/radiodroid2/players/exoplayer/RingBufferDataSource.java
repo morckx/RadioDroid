@@ -58,6 +58,10 @@ public class RingBufferDataSource implements DataSource {
      */
     private long pendingReadPos = -1;
 
+    // Latched "playback is rewound" flag: set on rewind, cleared on go-live. Not derived
+    // from readBytePos because ExoPlayer's read cursor sprints ahead of playback. Guarded by lock.
+    private boolean rewound = false;
+
     // Byte-rate measurement, for mapping a rewind duration to a byte offset. Guarded by lock.
     private long firstByteWallClockMs = 0;
 
@@ -257,6 +261,7 @@ public class RingBufferDataSource implements DataSource {
 
             long movedBytes = readBytePos - target;
             pendingReadPos = target;
+            rewound = true;
             long movedMs = movedBytes * 1000 / bytesPerSecond;
             Log.i(TAG, "rewindBy: requested " + ms + "ms (" + rewindBytes + " bytes @ "
                     + bytesPerSecond + " B/s), moved " + movedMs + "ms to pos " + target
@@ -281,6 +286,7 @@ public class RingBufferDataSource implements DataSource {
                 }
             }
             long movedBytes = target - readBytePos;
+            rewound = false;
             if (movedBytes <= 0) {
                 return 0; // already at (or past) the snapped live edge
             }
@@ -291,11 +297,15 @@ public class RingBufferDataSource implements DataSource {
         }
     }
 
-    /** Whether the read cursor is currently behind the live edge (i.e. rewound). */
+    /**
+     * Whether playback is currently rewound (behind live). This is a latched flag set by
+     * rewindBy() and cleared by seekToLive(), NOT derived from readBytePos: ExoPlayer reads
+     * ahead greedily to fill its decode buffer, so the read cursor races back to the live
+     * edge within ~1s even though the audio being *played* is still well behind live.
+     */
     public boolean isBehindLive() {
         synchronized (lock) {
-            // A small tolerance so we don't flicker right at the edge.
-            return (liveBytePos - readBytePos) > 4096;
+            return rewound;
         }
     }
 

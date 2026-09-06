@@ -4,8 +4,12 @@
     android:viewportWidth="24"
     android:viewportHeight="24"
     android:tint="?attr/colorControlNormal">
-    <!-- Fast-forward-to-live: double chevron plus an end bar -->
+    <!-- Circle outline -->
     <path
         android:fillColor="@android:color/white"
-        android:pathData="M4,18l8.5,-6L4,6v12zM13,6v12l8.5,-6L13,6z" />
+        android:pathData="M12,2C6.48,2 2,6.48 2,12s4.48,10 10,10 10,-4.48 10,-10S17.52,2 12,2zM12,20c-4.41,0 -8,-3.59 -8,-8s3.59,-8 8,-8 8,3.59 8,8 -3.59,8 -8,8z" />
+    <!-- Fast-forward-to-live: a play triangle plus an end bar, inside the circle -->
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M8,8.5v7l5,-3.5zM14,8.5h1.5v7h-1.5z" />
 </vector>
