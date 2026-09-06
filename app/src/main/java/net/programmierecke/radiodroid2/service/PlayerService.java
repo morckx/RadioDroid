@@ -103,6 +103,9 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
     private final String ACTION_RESUME = "resume";
     private final String ACTION_SKIP_TO_NEXT = "next";
     private final String ACTION_SKIP_TO_PREVIOUS = "previous";
+    private final String ACTION_REWIND = "rewind";
+    // Rewind feature: notification rewind step. Matches the in-app button default.
+    private static final long NOTIFICATION_REWIND_STEP_MS = 15000;
     private final String ACTION_STOP = "stop";
 
     private static final float FULL_VOLUME = 100f;
@@ -553,6 +556,11 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
                     case ACTION_RESUME:
                         resume();
                         break;
+                    case ACTION_REWIND:
+                        if (radioPlayer != null) {
+                            radioPlayer.seekBackward(NOTIFICATION_REWIND_STEP_MS);
+                        }
+                        break;
                     case ACTION_MEDIA_BUTTON:
                         KeyEvent key = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
                         if (key.getAction() == KeyEvent.ACTION_UP) {
@@ -948,6 +956,22 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
                 .addAction(R.drawable.ic_stop_white_24dp, getString(R.string.action_stop), pendingIntentStop)
                 .addAction(R.drawable.ic_skip_previous_24dp, getString(R.string.action_skip_to_previous), pendingIntentPrevious);
 
+        // Action indices for the compact view. Actions so far: [0]stop, [1]previous.
+        // Rewind (if shown), then play/pause, then next follow.
+        int actionIndex = 2;
+
+        // Rewind feature: show a -15s action when playing and there is buffered audio.
+        boolean rewindAvailable = (currentPlayerState == PlayState.Playing)
+                && radioPlayer != null && radioPlayer.canSeekBackward();
+        if (rewindAvailable) {
+            Intent rewindIntent = new Intent(itsContext, PlayerService.class);
+            rewindIntent.setAction(ACTION_REWIND);
+            PendingIntent pendingIntentRewind = PendingIntent.getService(itsContext, 0, rewindIntent, pendingIntentFlag);
+            notificationBuilder.addAction(R.drawable.ic_replay_15_white_24dp, getString(R.string.description_btn_rewind), pendingIntentRewind);
+            actionIndex++;
+        }
+
+        int playPauseIndex = actionIndex;
         if (currentPlayerState == PlayState.Playing || currentPlayerState == PlayState.PrePlaying) {
             Intent pauseIntent = new Intent(itsContext, PlayerService.class);
             pauseIntent.setAction(ACTION_PAUSE);
@@ -966,11 +990,12 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
                     .setDeleteIntent(pendingIntentStop)
                     .setOngoing(false);
         }
+        int nextIndex = playPauseIndex + 1;
 
         notificationBuilder.addAction(R.drawable.ic_skip_next_24dp, getString(R.string.action_skip_to_next), pendingIntentNext)
                 .setStyle(new MediaStyle()
                         .setMediaSession(mediaSession.getSessionToken())
-                        .setShowActionsInCompactView(1, 2, 3 /* previous, play/pause, next */)
+                        .setShowActionsInCompactView(playPauseIndex - 1, playPauseIndex, nextIndex)
                         .setCancelButtonIntent(pendingIntentStop)
                         .setShowCancelButton(true));
         Notification notification = notificationBuilder.build();
