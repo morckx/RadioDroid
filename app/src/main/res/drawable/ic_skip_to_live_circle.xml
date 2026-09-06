@@ -4,12 +4,10 @@
     android:viewportWidth="24"
     android:viewportHeight="24"
     android:tint="?attr/colorControlNormal">
-    <!-- Circle outline -->
+    <!-- "Skip to live edge": a single play triangle plus an end bar (jump to the end / now).
+         Centered with padding to match the skip icons' footprint, and a single triangle to
+         avoid looking like skip-to-next-station (which is a double triangle). -->
     <path
         android:fillColor="@android:color/white"
-        android:pathData="M12,2C6.48,2 2,6.48 2,12s4.48,10 10,10 10,-4.48 10,-10S17.52,2 12,2zM12,20c-4.41,0 -8,-3.59 -8,-8s3.59,-8 8,-8 8,3.59 8,8 -3.59,8 -8,8z" />
-    <!-- Fast-forward-to-live: a play triangle plus an end bar, inside the circle -->
-    <path
-        android:fillColor="@android:color/white"
-        android:pathData="M8,8.5v7l5,-3.5zM14,8.5h1.5v7h-1.5z" />
+        android:pathData="M7,6l8,6l-8,6zM16,6h2v12h-2z" />
 </vector>
