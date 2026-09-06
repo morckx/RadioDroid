@@ -186,6 +186,27 @@ public class PlayerServiceUtil {
         }
     }
 
+    public static void seekBackward(long ms) {
+        if (itsPlayerService != null) {
+            try {
+                itsPlayerService.SeekBackward(ms);
+            } catch (RemoteException e) {
+                Log.e("", "" + e);
+            }
+        }
+    }
+
+    public static boolean canSeekBackward() {
+        if (itsPlayerService != null) {
+            try {
+                return itsPlayerService.canSeekBackward();
+            } catch (RemoteException e) {
+                Log.e("", "" + e);
+            }
+        }
+        return false;
+    }
+
     public static void pause(PauseReason pauseReason) {
         if (itsPlayerService != null) {
             try {

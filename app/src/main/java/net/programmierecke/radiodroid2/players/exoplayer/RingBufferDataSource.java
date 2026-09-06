@@ -376,6 +376,21 @@ public class RingBufferDataSource implements DataSource {
         }
     }
 
+    /**
+     * How many ms of audio behind the current read cursor are available to rewind into,
+     * estimated via the measured byte-rate. 0 if not enough data yet.
+     */
+    public long getRewindableMs() {
+        synchronized (lock) {
+            long bytesPerSecond = measuredBytesPerSecond();
+            if (bytesPerSecond <= 0) {
+                return 0;
+            }
+            long rewindableBytes = readBytePos - oldestRetainedBytePos;
+            return rewindableBytes * 1000 / bytesPerSecond;
+        }
+    }
+
     @Nullable
     @Override
     public Uri getUri() {

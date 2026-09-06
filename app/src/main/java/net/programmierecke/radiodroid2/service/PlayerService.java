@@ -135,20 +135,6 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
     private final HeadsetConnectionReceiver headsetConnectionReceiver = new HeadsetConnectionReceiver();
     private final ConnectivityChecker connectivityChecker = new ConnectivityChecker();
 
-    // PROTOTYPE (rewind feature): a broadcast-triggerable rewind, so it can be exercised
-    // from adb without any UI. Test with:
-    //   adb shell am broadcast -a net.programmierecke.radiodroid2.REWIND --el rewind_ms 15000
-    private static final String ACTION_REWIND_DEBUG = "net.programmierecke.radiodroid2.REWIND";
-    private final BroadcastReceiver rewindDebugReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (radioPlayer != null) {
-                long ms = intent.getLongExtra("rewind_ms", 15000);
-                Log.i(TAG, "REWIND broadcast received, ms=" + ms);
-                radioPlayer.seekBackward(ms);
-            }
-        }
-    };
 
     private PauseReason pauseReason = PauseReason.NONE;
 
@@ -192,6 +178,16 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
 
         public void SkipToPrevious() throws RemoteException {
             PlayerService.this.previous();
+        }
+
+        public void SeekBackward(long ms) throws RemoteException {
+            if (radioPlayer != null) {
+                radioPlayer.seekBackward(ms);
+            }
+        }
+
+        public boolean canSeekBackward() throws RemoteException {
+            return radioPlayer != null && radioPlayer.canSeekBackward();
         }
 
         public void Play(boolean isAlarm) throws RemoteException {
@@ -493,15 +489,6 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
 
         registerReceiver(headsetConnectionReceiver, headsetConnectionFilter);
 
-        // PROTOTYPE (rewind feature): register the adb-triggerable rewind receiver.
-        // Exported so `adb shell am broadcast` (an external sender) can reach it.
-        final IntentFilter rewindFilter = new IntentFilter(ACTION_REWIND_DEBUG);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            registerReceiver(rewindDebugReceiver, rewindFilter, Context.RECEIVER_EXPORTED);
-        } else {
-            registerReceiver(rewindDebugReceiver, rewindFilter);
-        }
-
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "RadioDroid2 Player", NotificationManager.IMPORTANCE_LOW);
@@ -525,7 +512,6 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
         radioPlayer.destroy();
 
         unregisterReceiver(headsetConnectionReceiver);
-        unregisterReceiver(rewindDebugReceiver); // PROTOTYPE (rewind feature)
     }
 
     @Override

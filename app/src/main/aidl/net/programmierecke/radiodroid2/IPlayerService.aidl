@@ -17,6 +17,8 @@ void Resume();
 void Stop();
 void SkipToNext();
 void SkipToPrevious();
+void SeekBackward(long ms);
+boolean canSeekBackward();
 void addTimer(int secondsAdd);
 void clearTimer();
 long getTimerSeconds();

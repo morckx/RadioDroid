@@ -181,6 +181,17 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
         // State changed will be called when audio session id is available.
     }
 
+    // Rewind feature: how many ms of audio are currently retained and rewindable, or 0 if
+    // there is no ring buffer (HLS / disabled) or not enough buffered yet.
+    public long getRewindableMs() {
+        RingBufferDataSource ringBuffer =
+                (radioDataSourceFactory != null) ? radioDataSourceFactory.getRingBuffer() : null;
+        if (ringBuffer == null) {
+            return 0;
+        }
+        return ringBuffer.getRewindableMs();
+    }
+
     // Rewind feature: fully tear down the time-shift ring buffer (background reader +
     // live connection). close() is reused by media3 for seeks, so teardown is explicit.
     private void releaseRingBuffer() {
