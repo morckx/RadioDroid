@@ -59,10 +59,15 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
 
     final private String TAG = "ExoPlayerWrapper";
 
-    // PROTOTYPE (rewind feature): how much already-played audio ExoPlayer should retain
-    // so we can seek backwards into it. Will become configurable (15-120s) if the
-    // prototype proves out.
+    // Rewind feature: how much already-played audio to retain for backward seeking.
+    // The ExoPlayer LoadControl back-buffer keeps decoded samples around so the seek is
+    // accepted; the RingBufferDataSource retains the corresponding raw stream bytes so the
+    // rewound read has real data to serve. Will become configurable (15-120s).
     private static final int REWIND_BACK_BUFFER_MS = 120_000;
+
+    // Raw byte capacity of the time-shift ring buffer. Sized for REWIND_BACK_BUFFER_MS at a
+    // generous ~192 kbps (24 KB/s) so typical talk/news streams fit comfortably.
+    private static final int REWIND_RING_BUFFER_BYTES = (REWIND_BACK_BUFFER_MS / 1000) * 24 * 1024;
 
     private ExoPlayer player;
     private PlayListener stateListener;
@@ -83,6 +88,7 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
 
     private Context context;
     private MediaSource audioSource;
+    private RadioDataSourceFactory radioDataSourceFactory;
 
     private Runnable fullStopTask;
 
@@ -148,7 +154,11 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
         final int retryTimeout = prefs.getInt("settings_retry_timeout", 10);
         final int retryDelay = prefs.getInt("settings_retry_delay", 100);
 
-        DataSource.Factory dataSourceFactory = new RadioDataSourceFactory(httpClient, new DefaultBandwidthMeter.Builder(context).build(), this, retryTimeout, retryDelay);
+        // Enable the time-shift ring buffer for progressive (ICY) streams only; HLS has its
+        // own live window and a different seek path.
+        final int rewindBufferBytes = isHls ? 0 : REWIND_RING_BUFFER_BYTES;
+        radioDataSourceFactory = new RadioDataSourceFactory(httpClient, new DefaultBandwidthMeter.Builder(context).build(), this, retryTimeout, retryDelay, rewindBufferBytes);
+        DataSource.Factory dataSourceFactory = radioDataSourceFactory;
         // Produces Extractor instances for parsing the media data.
         if (!isHls) {
             audioSource = new ProgressiveMediaSource.Factory(dataSourceFactory)
@@ -171,6 +181,17 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
         // State changed will be called when audio session id is available.
     }
 
+    // Rewind feature: fully tear down the time-shift ring buffer (background reader +
+    // live connection). close() is reused by media3 for seeks, so teardown is explicit.
+    private void releaseRingBuffer() {
+        if (radioDataSourceFactory != null) {
+            RingBufferDataSource ringBuffer = radioDataSourceFactory.getRingBuffer();
+            if (ringBuffer != null) {
+                ringBuffer.release();
+            }
+        }
+    }
+
     @Override
     public void pause() {
         Log.i(TAG, "Pause. Stopping exoplayer.");
@@ -182,6 +203,7 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
             player.stop();
             player.release();
             player = null;
+            releaseRingBuffer();
         }
     }
 
@@ -196,6 +218,7 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
             player.stop();
             player.release();
             player = null;
+            releaseRingBuffer();
         }
 
         stopRecording();
