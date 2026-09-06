@@ -127,9 +127,9 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
         }
 
         if (player == null) {
-            // PROTOTYPE (rewind feature): ask ExoPlayer to retain already-played audio so we
-            // can seek backwards into it on live streams. 120s back-buffer, retained from the
-            // last keyframe so seeks land on a decodable position.
+            // Rewind feature: ask ExoPlayer to retain already-played audio so seeks are
+            // accepted, retained from the last keyframe so they land on a decodable position.
+            // The RingBufferDataSource holds the corresponding raw bytes for the actual rewind.
             LoadControl loadControl = new DefaultLoadControl.Builder()
                     .setBackBuffer(REWIND_BACK_BUFFER_MS, /* retainBackBufferFromKeyframe= */ true)
                     .build();
@@ -272,7 +272,7 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
             player.seekTo(0);
             player.setPlayWhenReady(true);
         }
-        Log.i(TAG, "seekBackward: requested=" + ms + " movedMs=" + movedMs);
+        Log.d(TAG, "seekBackward: requested=" + ms + " movedMs=" + movedMs);
         return movedMs;
     }
 
@@ -291,7 +291,7 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
             player.seekTo(0);
             player.setPlayWhenReady(true);
         }
-        Log.i(TAG, "seekToLive: movedMs=" + movedMs);
+        Log.d(TAG, "seekToLive: movedMs=" + movedMs);
         return movedMs;
     }
 

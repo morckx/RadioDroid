@@ -113,8 +113,6 @@ public class RingBufferDataSource implements DataSource {
     @Override
     public long open(DataSpec dataSpec) throws IOException {
         final long requestedPos = dataSpec.position;
-        Log.i(TAG, "open() requestedPos=" + requestedPos + " live=" + liveBytePos
-                + " oldest=" + oldestRetainedBytePos + " started=" + started);
 
         if (!started) {
             // First open: connect the live stream and start the background reader.
@@ -140,8 +138,6 @@ public class RingBufferDataSource implements DataSource {
                         + " (window " + oldestRetainedBytePos + ".." + liveBytePos + ")");
             }
             readBytePos = clamped;
-            Log.i(TAG, "open(): read cursor set to " + clamped
-                    + " (" + (liveBytePos - clamped) + " bytes behind live)");
         }
         return C.LENGTH_UNSET;
     }
@@ -263,9 +259,7 @@ public class RingBufferDataSource implements DataSource {
             pendingReadPos = target;
             rewound = true;
             long movedMs = movedBytes * 1000 / bytesPerSecond;
-            Log.i(TAG, "rewindBy: requested " + ms + "ms (" + rewindBytes + " bytes @ "
-                    + bytesPerSecond + " B/s), moved " + movedMs + "ms to pos " + target
-                    + " (snapped, metaint=" + metaint + ")");
+            Log.d(TAG, "rewindBy: requested " + ms + "ms, moved " + movedMs + "ms");
             return movedMs;
         }
     }
@@ -292,7 +286,7 @@ public class RingBufferDataSource implements DataSource {
             }
             pendingReadPos = target;
             long movedMs = (bytesPerSecond > 0) ? movedBytes * 1000 / bytesPerSecond : 0;
-            Log.i(TAG, "seekToLive: moved " + movedMs + "ms forward to pos " + target);
+            Log.d(TAG, "seekToLive: moved " + movedMs + "ms forward");
             return movedMs;
         }
     }
@@ -458,7 +452,6 @@ public class RingBufferDataSource implements DataSource {
         // NOT stop the background reader or the live connection here, otherwise a rewind
         // would kill live playback. The next open() simply repositions the read cursor.
         // Full teardown happens in release(), called by the player when playback ends.
-        Log.i(TAG, "close() (seek/load boundary) - reader kept alive");
     }
 
     /**
