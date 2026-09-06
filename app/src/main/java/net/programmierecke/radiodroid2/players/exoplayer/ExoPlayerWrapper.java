@@ -246,25 +246,24 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
         if (player == null) {
             return 0;
         }
-        long current = player.getCurrentPosition();
-        // PROTOTYPE #2: log everything media3 tells us about seekability, so we can see
-        // WHY a backward seek is refused (typically the extractor SeekMap is unseekable
-        // for a live MP3 stream, so isCurrentMediaItemSeekable() is false).
-        long duration = player.getDuration();
-        long bufferedPos = player.getBufferedPosition();
-        boolean seekable = player.isCurrentMediaItemSeekable();
-        boolean isLive = player.isCurrentMediaItemLive();
-        Log.i(TAG, "seekBackward PROBE: current=" + current + " duration=" + duration
-                + " bufferedPos=" + bufferedPos + " seekable=" + seekable
-                + " isLive=" + isLive + " requested=" + ms);
+        RingBufferDataSource ringBuffer =
+                (radioDataSourceFactory != null) ? radioDataSourceFactory.getRingBuffer() : null;
+        if (ringBuffer == null) {
+            Log.w(TAG, "seekBackward: no ring buffer (HLS or disabled), cannot rewind");
+            return 0;
+        }
 
-        long target = Math.max(0, current - ms);
-        long moved = current - target;
-        Log.i(TAG, "seekBackward: current=" + current + " target=" + target
-                + " moved=" + moved + " (requested " + ms + ")");
-        player.seekTo(target);
-        Log.i(TAG, "seekBackward: after seekTo, position=" + player.getCurrentPosition());
-        return moved;
+        // The live stream is unseekable (SeekMap), so we cannot use a positioned seekTo.
+        // Instead: tell the ring buffer to move its read cursor back, then force ExoPlayer
+        // to restart reading (seekTo(0) triggers a re-open, which our open() honours via the
+        // pending rewind position).
+        long movedMs = ringBuffer.rewindBy(ms);
+        if (movedMs > 0) {
+            player.seekTo(0);
+            player.setPlayWhenReady(true);
+        }
+        Log.i(TAG, "seekBackward: requested=" + ms + " movedMs=" + movedMs);
+        return movedMs;
     }
 
     @Override

@@ -51,6 +51,16 @@ public class RingBufferDataSource implements DataSource {
     /** ExoPlayer's current read position within the exposed window. Guarded by lock. */
     private long readBytePos = 0;
 
+    /**
+     * When >= 0, the position the next open() should read from instead of the DataSpec's
+     * position. Set by {@link #rewindBy} so a player restart resumes from the rewound point
+     * even though the (unseekable) stream makes ExoPlayer re-open at position 0. Guarded by lock.
+     */
+    private long pendingReadPos = -1;
+
+    // Byte-rate measurement, for mapping a rewind duration to a byte offset. Guarded by lock.
+    private long firstByteWallClockMs = 0;
+
     private volatile boolean started = false;
     private volatile boolean closed = false;
     private volatile IOException readerError = null;
@@ -81,14 +91,19 @@ public class RingBufferDataSource implements DataSource {
             return result;
         }
 
-        // Subsequent open (a seek): just move our read cursor within the retained window.
+        // Subsequent open. The stream is unseekable, so on a rewind ExoPlayer restarts and
+        // re-opens at position 0; we override that with the pending rewind position when set.
         synchronized (lock) {
-            long clamped = Math.max(oldestRetainedBytePos, Math.min(requestedPos, liveBytePos));
-            if (clamped != requestedPos) {
-                Log.w(TAG, "open(): requested " + requestedPos + " clamped to " + clamped
+            long desired = (pendingReadPos >= 0) ? pendingReadPos : requestedPos;
+            pendingReadPos = -1;
+            long clamped = Math.max(oldestRetainedBytePos, Math.min(desired, liveBytePos));
+            if (clamped != desired) {
+                Log.w(TAG, "open(): desired " + desired + " clamped to " + clamped
                         + " (window " + oldestRetainedBytePos + ".." + liveBytePos + ")");
             }
             readBytePos = clamped;
+            Log.i(TAG, "open(): read cursor set to " + clamped
+                    + " (" + (liveBytePos - clamped) + " bytes behind live)");
         }
         return C.LENGTH_UNSET;
     }
@@ -167,8 +182,47 @@ public class RingBufferDataSource implements DataSource {
         }
     }
 
+    /**
+     * Rewind the read cursor by {@code ms} of audio and return how many ms we actually moved
+     * back (bounded by what is retained). The read position is applied on the player's next
+     * open() via {@link #pendingReadPos}. Uses the measured byte-rate to map ms to bytes.
+     */
+    public long rewindBy(long ms) {
+        synchronized (lock) {
+            long bytesPerSecond = measuredBytesPerSecond();
+            if (bytesPerSecond <= 0) {
+                Log.w(TAG, "rewindBy: no byte-rate yet, cannot rewind");
+                return 0;
+            }
+            long rewindBytes = bytesPerSecond * ms / 1000;
+            long target = Math.max(oldestRetainedBytePos, readBytePos - rewindBytes);
+            long movedBytes = readBytePos - target;
+            pendingReadPos = target;
+            long movedMs = movedBytes * 1000 / bytesPerSecond;
+            Log.i(TAG, "rewindBy: requested " + ms + "ms (" + rewindBytes + " bytes @ "
+                    + bytesPerSecond + " B/s), moved " + movedMs + "ms to pos " + target);
+            return movedMs;
+        }
+    }
+
+    /** Estimated average bytes/second since the stream started. Caller holds lock. */
+    private long measuredBytesPerSecond() {
+        if (firstByteWallClockMs == 0) {
+            return 0;
+        }
+        long elapsedMs = System.currentTimeMillis() - firstByteWallClockMs;
+        if (elapsedMs < 1000) {
+            return 0; // not enough data yet for a stable estimate
+        }
+        // liveBytePos counts total bytes received (initial position is 0 for a live stream).
+        return liveBytePos * 1000 / elapsedMs;
+    }
+
     /** Append live bytes to the ring, advancing the live edge. Caller holds lock. */
     private void appendToRing(byte[] buffer, int offset, int length) {
+        if (firstByteWallClockMs == 0) {
+            firstByteWallClockMs = System.currentTimeMillis();
+        }
         if (length >= capacityBytes) {
             System.arraycopy(buffer, offset + length - capacityBytes, ring, 0, capacityBytes);
             liveBytePos += length;
