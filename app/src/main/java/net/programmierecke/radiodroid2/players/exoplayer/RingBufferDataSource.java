@@ -61,6 +61,21 @@ public class RingBufferDataSource implements DataSource {
     // Byte-rate measurement, for mapping a rewind duration to a byte offset. Guarded by lock.
     private long firstByteWallClockMs = 0;
 
+    // --- ICY metadata frame alignment ---
+    // The raw bytes we retain include ICY metadata frames every `metaint` audio bytes:
+    //   [metaint audio bytes][1 length byte L][L*16 metadata bytes] repeating.
+    // After a rewind we restart ExoPlayer's IcyExtractor via seekTo(0); it then expects the
+    // replayed bytes to begin exactly at an audio-segment start (right after a metadata
+    // frame). If we start mid-segment, its frame boundaries land in audio -> garbage/clicks.
+    // So we parse the frame structure as bytes arrive and record each audio-segment-start
+    // offset, then snap any rewind target back to the nearest such boundary.
+    private int metaint = 0;               // 0 => unknown / no ICY metadata
+    private long nextSegmentBoundaryPos = 0; // absolute pos of the next audio-segment start
+    private int metaParseState = 0;        // 0=in audio, 1=expect length byte, 2=in metadata
+    private int metaBytesRemaining = 0;    // audio or metadata bytes left in current phase
+    // Sorted-by-construction list of recent audio-segment-start offsets (absolute positions).
+    private final java.util.ArrayDeque<Long> segmentBoundaries = new java.util.ArrayDeque<>();
+
     private volatile boolean started = false;
     private volatile boolean closed = false;
     private volatile IOException readerError = null;
@@ -70,6 +85,25 @@ public class RingBufferDataSource implements DataSource {
         this.delegate = delegate;
         this.capacityBytes = capacityBytes;
         this.ring = new byte[capacityBytes];
+    }
+
+    /**
+     * Provide the ICY metadata interval (bytes of audio between metadata frames) so the ring
+     * can track frame boundaries for rewind alignment. Called once metadata size is known.
+     * 0 disables alignment (no ICY metadata in the stream).
+     */
+    public void setMetaint(int metaint) {
+        synchronized (lock) {
+            this.metaint = metaint;
+            if (metaint > 0) {
+                // The stream begins with an audio segment.
+                metaParseState = 0;
+                metaBytesRemaining = metaint;
+                nextSegmentBoundaryPos = liveBytePos;
+                segmentBoundaries.clear();
+                segmentBoundaries.addLast(liveBytePos);
+            }
+        }
     }
 
     @Override
@@ -196,11 +230,27 @@ public class RingBufferDataSource implements DataSource {
             }
             long rewindBytes = bytesPerSecond * ms / 1000;
             long target = Math.max(oldestRetainedBytePos, readBytePos - rewindBytes);
+
+            // Snap the target to an ICY audio-segment boundary so ExoPlayer's IcyExtractor
+            // stays aligned after the restart (otherwise metadata frames land in audio ->
+            // clicks/garbage). If no boundary info (non-ICY stream), use the raw target.
+            if (metaint > 0) {
+                long snapped = snapToSegmentBoundary(target);
+                if (snapped >= 0) {
+                    target = snapped;
+                } else {
+                    Log.w(TAG, "rewindBy: no segment boundary <= target, using oldest retained");
+                    target = segmentBoundaries.isEmpty() ? oldestRetainedBytePos
+                            : segmentBoundaries.peekFirst();
+                }
+            }
+
             long movedBytes = readBytePos - target;
             pendingReadPos = target;
             long movedMs = movedBytes * 1000 / bytesPerSecond;
             Log.i(TAG, "rewindBy: requested " + ms + "ms (" + rewindBytes + " bytes @ "
-                    + bytesPerSecond + " B/s), moved " + movedMs + "ms to pos " + target);
+                    + bytesPerSecond + " B/s), moved " + movedMs + "ms to pos " + target
+                    + " (snapped, metaint=" + metaint + ")");
             return movedMs;
         }
     }
@@ -218,11 +268,72 @@ public class RingBufferDataSource implements DataSource {
         return liveBytePos * 1000 / elapsedMs;
     }
 
+    /**
+     * Walk newly-arrived raw bytes through the ICY metaint state machine, recording the
+     * absolute position of each audio-segment start (a valid rewind restart point).
+     * Caller holds lock. {@code startPos} is the absolute position of buffer[offset].
+     */
+    private void trackFrameBoundaries(byte[] buffer, int offset, int length, long startPos) {
+        if (metaint <= 0) {
+            return;
+        }
+        for (int i = 0; i < length; i++) {
+            long pos = startPos + i;
+            switch (metaParseState) {
+                case 0: // audio phase
+                    if (--metaBytesRemaining == 0) {
+                        metaParseState = 1; // next byte is the metadata length
+                    }
+                    break;
+                case 1: // length byte
+                    int lenByte = buffer[offset + i] & 0xFF;
+                    if (lenByte == 0) {
+                        // Empty metadata frame: next audio segment starts at pos+1.
+                        recordSegmentStart(pos + 1);
+                        metaParseState = 0;
+                        metaBytesRemaining = metaint;
+                    } else {
+                        metaParseState = 2;
+                        metaBytesRemaining = lenByte * 16;
+                    }
+                    break;
+                case 2: // metadata bytes
+                    if (--metaBytesRemaining == 0) {
+                        // Metadata frame ended; the next byte starts an audio segment.
+                        recordSegmentStart(pos + 1);
+                        metaParseState = 0;
+                        metaBytesRemaining = metaint;
+                    }
+                    break;
+            }
+        }
+    }
+
+    private void recordSegmentStart(long pos) {
+        segmentBoundaries.addLast(pos);
+        // Drop boundaries that have fallen out of the retained window.
+        while (!segmentBoundaries.isEmpty() && segmentBoundaries.peekFirst() < oldestRetainedBytePos) {
+            segmentBoundaries.pollFirst();
+        }
+    }
+
+    /** Largest recorded segment-start boundary <= desired, or -1 if none. Caller holds lock. */
+    private long snapToSegmentBoundary(long desired) {
+        long best = -1;
+        for (long b : segmentBoundaries) {
+            if (b <= desired && b > best) {
+                best = b;
+            }
+        }
+        return best;
+    }
+
     /** Append live bytes to the ring, advancing the live edge. Caller holds lock. */
     private void appendToRing(byte[] buffer, int offset, int length) {
         if (firstByteWallClockMs == 0) {
             firstByteWallClockMs = System.currentTimeMillis();
         }
+        trackFrameBoundaries(buffer, offset, length, liveBytePos);
         if (length >= capacityBytes) {
             System.arraycopy(buffer, offset + length - capacityBytes, ring, 0, capacityBytes);
             liveBytePos += length;

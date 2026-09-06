@@ -379,6 +379,15 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
     @Override
     public void onDataSourceShoutcastInfo(@Nullable ShoutcastInfo shoutcastInfo) {
         stateListener.onDataSourceShoutcastInfo(shoutcastInfo, false);
+
+        // Rewind feature: give the ring buffer the ICY metadata interval so it can align
+        // rewind targets to audio-segment boundaries (avoids clicks/garbage after rewind).
+        if (radioDataSourceFactory != null) {
+            RingBufferDataSource ringBuffer = radioDataSourceFactory.getRingBuffer();
+            if (ringBuffer != null && shoutcastInfo != null) {
+                ringBuffer.setMetaint(shoutcastInfo.metadataOffset);
+            }
+        }
     }
 
     @Override
