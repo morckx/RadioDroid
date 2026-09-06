@@ -156,6 +156,23 @@ public class RadioPlayer implements PlayerWrapper.PlayListener, Recordable {
         return false;
     }
 
+    // Rewind feature: jump forward to the live edge (undo a rewind).
+    public final void seekToLive() {
+        playerThreadHandler.post(() -> {
+            if (currentPlayer instanceof ExoPlayerWrapper) {
+                ((ExoPlayerWrapper) currentPlayer).seekToLive();
+            }
+        });
+    }
+
+    // Rewind feature: whether playback is currently behind the live edge (rewound).
+    public final boolean isBehindLive() {
+        if (currentPlayer instanceof ExoPlayerWrapper) {
+            return ((ExoPlayerWrapper) currentPlayer).isBehindLive();
+        }
+        return false;
+    }
+
     public final void pause() {
         cancelStationLinkRetrieval();
 

@@ -135,6 +135,7 @@ public class FragmentPlayerFull extends Fragment {
     private ImageButton btnPrev;
     private ImageButton btnNext;
     private ImageButton btnRewind;
+    private ImageButton btnGoLive;
 
     // Rewind feature: how far back one tap jumps. Will become configurable (15-120s).
     private static final long REWIND_STEP_MS = 15000;
@@ -245,6 +246,7 @@ public class FragmentPlayerFull extends Fragment {
         btnPrev = view.findViewById(R.id.buttonPrev);
         btnNext = view.findViewById(R.id.buttonNext);
         btnRewind = view.findViewById(R.id.buttonRewind);
+        btnGoLive = view.findViewById(R.id.buttonGoLive);
         btnRecord = view.findViewById(R.id.buttonRecord);
         btnFavourite = view.findViewById(R.id.buttonFavorite);
 
@@ -364,7 +366,17 @@ public class FragmentPlayerFull extends Fragment {
             // Force UI update after station change
             new Handler().postDelayed(this::fullUpdate, 100);
         });
-        btnRewind.setOnClickListener(view -> PlayerServiceUtil.seekBackward(REWIND_STEP_MS));
+        btnRewind.setOnClickListener(view -> {
+            PlayerServiceUtil.seekBackward(REWIND_STEP_MS);
+            // Reflect the rewound state promptly (show the go-live button).
+            new Handler().postDelayed(() ->
+                    updatePlaybackButtons(PlayerServiceUtil.isPlaying(), PlayerServiceUtil.isRecording()), 200);
+        });
+        btnGoLive.setOnClickListener(view -> {
+            PlayerServiceUtil.seekToLive();
+            new Handler().postDelayed(() ->
+                    updatePlaybackButtons(PlayerServiceUtil.isPlaying(), PlayerServiceUtil.isRecording()), 200);
+        });
 
         btnRecord.setOnClickListener(view -> {
             if (PlayerServiceUtil.isPlaying()) {
@@ -581,12 +593,21 @@ public class FragmentPlayerFull extends Fragment {
         updateRewindButton(playing);
     }
 
-    // Rewind feature: phone-only, and only when there is buffered audio to rewind into.
+    // Rewind feature: phone-only. Shows the -15s button at the live edge, or the go-live
+    // button when playback is currently rewound (the -15s / live toggle). Both occupy the
+    // same slot so exactly one is visible.
     private void updateRewindButton(boolean playing) {
-        boolean available = playing
+        boolean feature = playing
                 && !Utils.isRunningOnTV(requireContext())
                 && PlayerServiceUtil.canSeekBackward();
-        btnRewind.setVisibility(available ? View.VISIBLE : View.GONE);
+        if (!feature) {
+            btnRewind.setVisibility(View.GONE);
+            btnGoLive.setVisibility(View.GONE);
+            return;
+        }
+        boolean behindLive = PlayerServiceUtil.isBehindLive();
+        btnRewind.setVisibility(behindLive ? View.GONE : View.VISIBLE);
+        btnGoLive.setVisibility(behindLive ? View.VISIBLE : View.GONE);
     }
 
     private void updatePlayButton(boolean playing) {

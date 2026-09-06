@@ -106,8 +106,9 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
     private final String ACTION_REWIND = "rewind";
     // Rewind feature: notification rewind step. Matches the in-app button default.
     private static final long NOTIFICATION_REWIND_STEP_MS = 15000;
-    // MediaSession custom action id for the -15s rewind button (Android 13+ media UI).
+    // MediaSession custom action ids for the -15s rewind / go-live buttons (Android 13+ media UI).
     public static final String CUSTOM_ACTION_REWIND = "net.programmierecke.radiodroid2.CUSTOM_REWIND";
+    public static final String CUSTOM_ACTION_GO_LIVE = "net.programmierecke.radiodroid2.CUSTOM_GO_LIVE";
     private final String ACTION_STOP = "stop";
 
     private static final float FULL_VOLUME = 100f;
@@ -188,11 +189,23 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
         public void SeekBackward(long ms) throws RemoteException {
             if (radioPlayer != null) {
                 radioPlayer.seekBackward(ms);
+                refreshRewindControlsSoon();
             }
         }
 
         public boolean canSeekBackward() throws RemoteException {
             return radioPlayer != null && radioPlayer.canSeekBackward();
+        }
+
+        public void SeekToLive() throws RemoteException {
+            if (radioPlayer != null) {
+                radioPlayer.seekToLive();
+                refreshRewindControlsSoon();
+            }
+        }
+
+        public boolean isBehindLive() throws RemoteException {
+            return radioPlayer != null && radioPlayer.isBehindLive();
         }
 
         public void Play(boolean isAlarm) throws RemoteException {
@@ -799,7 +812,8 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
 
         // Rewind feature: on Android 13+ the system media notification renders explicit
         // buttons from MediaSession *custom actions* (the standard ACTION_REWIND transport
-        // bit is not shown as a button). Add a custom -15s action for non-HLS streams.
+        // bit is not shown as a button). For non-HLS streams add a -15s action, plus a
+        // go-live action when playback is currently rewound.
         if (!isHls && (state == PlaybackStateCompat.STATE_PLAYING
                 || state == PlaybackStateCompat.STATE_BUFFERING)) {
             playbackStateBuilder.addCustomAction(
@@ -807,6 +821,13 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
                             CUSTOM_ACTION_REWIND,
                             getString(R.string.description_btn_rewind),
                             R.drawable.ic_replay_15_white_24dp).build());
+            if (radioPlayer != null && radioPlayer.isBehindLive()) {
+                playbackStateBuilder.addCustomAction(
+                        new PlaybackStateCompat.CustomAction.Builder(
+                                CUSTOM_ACTION_GO_LIVE,
+                                getString(R.string.description_btn_go_live),
+                                R.drawable.ic_skip_to_live_white_24dp).build());
+            }
         }
 
         if (state == PlaybackStateCompat.STATE_ERROR) {
@@ -1035,6 +1056,20 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
 
     private void updateNotification() {
         updateNotification(radioPlayer.getPlayState());
+    }
+
+    // Rewind feature: after a rewind/go-live (which take effect on the player thread), refresh
+    // the media session state + notification so the -15s / go-live buttons reflect the new
+    // behind-live state.
+    private void refreshRewindControlsSoon() {
+        handler.postDelayed(() -> {
+            if (radioPlayer != null && radioPlayer.isPlaying()) {
+                setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING);
+                if (notificationIsActive) {
+                    updateNotification();
+                }
+            }
+        }, 300);
     }
 
     private void updateNotification(PlayState playState) {

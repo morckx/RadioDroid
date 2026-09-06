@@ -19,6 +19,8 @@ void SkipToNext();
 void SkipToPrevious();
 void SeekBackward(long ms);
 boolean canSeekBackward();
+void SeekToLive();
+boolean isBehindLive();
 void addTimer(int secondsAdd);
 void clearTimer();
 long getTimerSeconds();

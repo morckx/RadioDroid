@@ -109,12 +109,14 @@ public class MediaSessionCallback extends MediaSessionCompat.Callback {
     public void onCustomAction(String action, Bundle extras) {
         // Rewind feature: Android 13+ renders the notification's -15s button as a custom
         // action, which arrives here.
-        if (PlayerService.CUSTOM_ACTION_REWIND.equals(action)) {
-            try {
+        try {
+            if (PlayerService.CUSTOM_ACTION_REWIND.equals(action)) {
                 playerService.SeekBackward(15000);
-            } catch (RemoteException e) {
-                e.printStackTrace();
+            } else if (PlayerService.CUSTOM_ACTION_GO_LIVE.equals(action)) {
+                playerService.SeekToLive();
             }
+        } catch (RemoteException e) {
+            e.printStackTrace();
         }
     }
 

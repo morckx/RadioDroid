@@ -326,6 +326,7 @@
     <string name="description_btn_skip_to_next">Skip to next</string>
     <string name="description_btn_skip_to_previous">Skip to previous</string>
     <string name="description_btn_rewind">Rewind 15 seconds</string>
+    <string name="description_btn_go_live">Go to live</string>
 
     <string name="description_btn_setup_alarm">Set alarm</string>
 

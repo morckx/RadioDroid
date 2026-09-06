@@ -267,6 +267,23 @@
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_replay_15_circle" />
 
+        <!-- Occupies the same slot as buttonRewind; the two toggle so exactly one shows:
+             rewind when at the live edge, go-live when rewound (the -15s / live toggle). -->
+        <ImageButton
+            android:id="@+id/buttonGoLive"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/description_btn_go_live"
+            android:scaleType="fitXY"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/buttonPlay"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/buttonPrev"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_skip_to_live_circle" />
+
         <ImageButton
             android:id="@+id/buttonPlay"
             android:layout_width="64dp"

@@ -265,6 +265,40 @@ public class RingBufferDataSource implements DataSource {
         }
     }
 
+    /**
+     * Jump the read cursor forward to the live edge (undo a rewind). Snaps to the newest
+     * audio-segment boundary at/before live so ExoPlayer's IcyExtractor stays aligned.
+     * Returns how many ms forward we moved (0 if already at live).
+     */
+    public long seekToLive() {
+        synchronized (lock) {
+            long bytesPerSecond = measuredBytesPerSecond();
+            long target = liveBytePos;
+            if (metaint > 0) {
+                long snapped = snapToSegmentBoundary(target);
+                if (snapped >= 0) {
+                    target = snapped;
+                }
+            }
+            long movedBytes = target - readBytePos;
+            if (movedBytes <= 0) {
+                return 0; // already at (or past) the snapped live edge
+            }
+            pendingReadPos = target;
+            long movedMs = (bytesPerSecond > 0) ? movedBytes * 1000 / bytesPerSecond : 0;
+            Log.i(TAG, "seekToLive: moved " + movedMs + "ms forward to pos " + target);
+            return movedMs;
+        }
+    }
+
+    /** Whether the read cursor is currently behind the live edge (i.e. rewound). */
+    public boolean isBehindLive() {
+        synchronized (lock) {
+            // A small tolerance so we don't flicker right at the edge.
+            return (liveBytePos - readBytePos) > 4096;
+        }
+    }
+
     /** Estimated average bytes/second since the stream started. Caller holds lock. */
     private long measuredBytesPerSecond() {
         if (firstByteWallClockMs == 0) {

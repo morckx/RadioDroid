@@ -207,6 +207,27 @@ public class PlayerServiceUtil {
         return false;
     }
 
+    public static void seekToLive() {
+        if (itsPlayerService != null) {
+            try {
+                itsPlayerService.SeekToLive();
+            } catch (RemoteException e) {
+                Log.e("", "" + e);
+            }
+        }
+    }
+
+    public static boolean isBehindLive() {
+        if (itsPlayerService != null) {
+            try {
+                return itsPlayerService.isBehindLive();
+            } catch (RemoteException e) {
+                Log.e("", "" + e);
+            }
+        }
+        return false;
+    }
+
     public static void pause(PauseReason pauseReason) {
         if (itsPlayerService != null) {
             try {

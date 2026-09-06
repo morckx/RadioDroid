@@ -249,8 +249,7 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
         return 0;
     }
 
-    // PROTOTYPE (rewind feature): jump back by the given amount within the retained
-    // back-buffer, clamped so we never seek before the earliest retained position.
+    // Rewind feature: jump back by the given amount within the retained time-shift buffer.
     // Returns how many ms we actually moved back (0 if nothing was available).
     @Override
     public long seekBackward(long ms) {
@@ -275,6 +274,32 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
         }
         Log.i(TAG, "seekBackward: requested=" + ms + " movedMs=" + movedMs);
         return movedMs;
+    }
+
+    // Rewind feature: jump forward to the live edge, undoing a rewind.
+    public long seekToLive() {
+        if (player == null) {
+            return 0;
+        }
+        RingBufferDataSource ringBuffer =
+                (radioDataSourceFactory != null) ? radioDataSourceFactory.getRingBuffer() : null;
+        if (ringBuffer == null) {
+            return 0;
+        }
+        long movedMs = ringBuffer.seekToLive();
+        if (movedMs > 0) {
+            player.seekTo(0);
+            player.setPlayWhenReady(true);
+        }
+        Log.i(TAG, "seekToLive: movedMs=" + movedMs);
+        return movedMs;
+    }
+
+    // Rewind feature: whether playback is currently behind the live edge (rewound).
+    public boolean isBehindLive() {
+        RingBufferDataSource ringBuffer =
+                (radioDataSourceFactory != null) ? radioDataSourceFactory.getRingBuffer() : null;
+        return ringBuffer != null && ringBuffer.isBehindLive();
     }
 
     @Override
