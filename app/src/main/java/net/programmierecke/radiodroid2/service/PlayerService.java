@@ -106,6 +106,8 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
     private final String ACTION_REWIND = "rewind";
     // Rewind feature: notification rewind step. Matches the in-app button default.
     private static final long NOTIFICATION_REWIND_STEP_MS = 15000;
+    // MediaSession custom action id for the -15s rewind button (Android 13+ media UI).
+    public static final String CUSTOM_ACTION_REWIND = "net.programmierecke.radiodroid2.CUSTOM_REWIND";
     private final String ACTION_STOP = "stop";
 
     private static final float FULL_VOLUME = 100f;
@@ -792,17 +794,20 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
             actions |= PlaybackStateCompat.ACTION_PLAY;
         }
 
-        // Rewind feature: expose ACTION_REWIND on the MediaSession for non-HLS streams.
-        // Android 13+ renders the media notification from these PlaybackState actions
-        // (not from Notification.addAction), so this is what makes the -15s button appear
-        // in the system media notification / lock screen.
-        if (!isHls && (state == PlaybackStateCompat.STATE_PLAYING
-                || state == PlaybackStateCompat.STATE_BUFFERING)) {
-            actions |= PlaybackStateCompat.ACTION_REWIND;
-        }
-
         PlaybackStateCompat.Builder playbackStateBuilder = new PlaybackStateCompat.Builder();
         playbackStateBuilder.setActions(actions);
+
+        // Rewind feature: on Android 13+ the system media notification renders explicit
+        // buttons from MediaSession *custom actions* (the standard ACTION_REWIND transport
+        // bit is not shown as a button). Add a custom -15s action for non-HLS streams.
+        if (!isHls && (state == PlaybackStateCompat.STATE_PLAYING
+                || state == PlaybackStateCompat.STATE_BUFFERING)) {
+            playbackStateBuilder.addCustomAction(
+                    new PlaybackStateCompat.CustomAction.Builder(
+                            CUSTOM_ACTION_REWIND,
+                            getString(R.string.description_btn_rewind),
+                            R.drawable.ic_replay_15_white_24dp).build());
+        }
 
         if (state == PlaybackStateCompat.STATE_ERROR) {
             String error = "";

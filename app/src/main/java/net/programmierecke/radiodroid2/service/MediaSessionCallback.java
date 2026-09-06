@@ -106,6 +106,19 @@ public class MediaSessionCallback extends MediaSessionCompat.Callback {
     }
 
     @Override
+    public void onCustomAction(String action, Bundle extras) {
+        // Rewind feature: Android 13+ renders the notification's -15s button as a custom
+        // action, which arrives here.
+        if (PlayerService.CUSTOM_ACTION_REWIND.equals(action)) {
+            try {
+                playerService.SeekBackward(15000);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
     public void onPlayFromMediaId(String mediaId, Bundle extras) {
         final String stationId = RadioDroidBrowser.stationIdFromMediaId(mediaId);
 
