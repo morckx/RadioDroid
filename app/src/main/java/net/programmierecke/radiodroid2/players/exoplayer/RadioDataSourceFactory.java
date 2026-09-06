@@ -31,6 +31,10 @@ public class RadioDataSourceFactory implements DataSource.Factory {
 
     @Override
     public DataSource createDataSource() {
-        return new IcyDataSource(httpClient, transferListener, dataSourceListener);
+        // PROTOTYPE #2 (rewind feature): wrap in a probe that logs whether media3 ever
+        // re-opens at a rewound position when we seekTo() backward. Remove once the
+        // seekable-window question is answered.
+        return new RewindProbeDataSource(
+                new IcyDataSource(httpClient, transferListener, dataSourceListener));
     }
 }

@@ -224,13 +224,23 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
             return 0;
         }
         long current = player.getCurrentPosition();
-        // For a live progressive stream the timeline window starts at 0; the earliest
-        // *available* position is bounded by the back-buffer we asked ExoPlayer to keep.
+        // PROTOTYPE #2: log everything media3 tells us about seekability, so we can see
+        // WHY a backward seek is refused (typically the extractor SeekMap is unseekable
+        // for a live MP3 stream, so isCurrentMediaItemSeekable() is false).
+        long duration = player.getDuration();
+        long bufferedPos = player.getBufferedPosition();
+        boolean seekable = player.isCurrentMediaItemSeekable();
+        boolean isLive = player.isCurrentMediaItemLive();
+        Log.i(TAG, "seekBackward PROBE: current=" + current + " duration=" + duration
+                + " bufferedPos=" + bufferedPos + " seekable=" + seekable
+                + " isLive=" + isLive + " requested=" + ms);
+
         long target = Math.max(0, current - ms);
         long moved = current - target;
         Log.i(TAG, "seekBackward: current=" + current + " target=" + target
                 + " moved=" + moved + " (requested " + ms + ")");
         player.seekTo(target);
+        Log.i(TAG, "seekBackward: after seekTo, position=" + player.getCurrentPosition());
         return moved;
     }
 
