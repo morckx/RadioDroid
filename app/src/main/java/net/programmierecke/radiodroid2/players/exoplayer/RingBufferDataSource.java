@@ -145,28 +145,38 @@ public class RingBufferDataSource implements DataSource {
     private void startReaderThread() {
         readerThread = new Thread(() -> {
             byte[] tmp = new byte[16 * 1024];
-            while (!closed) {
-                int n;
+            try {
+                while (!closed) {
+                    int n;
+                    try {
+                        n = delegate.read(tmp, 0, tmp.length);
+                    } catch (IOException e) {
+                        if (!closed) {
+                            readerError = e;
+                        }
+                        break;
+                    }
+                    if (n == C.RESULT_END_OF_INPUT || n < 0) {
+                        break;
+                    }
+                    if (n > 0) {
+                        synchronized (lock) {
+                            appendToRing(tmp, 0, n);
+                            lock.notifyAll();
+                        }
+                    }
+                }
+            } finally {
+                // This thread owns the delegate connection; close it here (off the main
+                // thread) so the SSL socket close's network I/O never runs on the caller's
+                // thread (avoids NetworkOnMainThreadException from release()).
                 try {
-                    n = delegate.read(tmp, 0, tmp.length);
+                    delegate.close();
                 } catch (IOException e) {
-                    readerError = e;
-                    synchronized (lock) {
-                        lock.notifyAll();
-                    }
-                    return;
+                    Log.w(TAG, "Error closing delegate in reader thread", e);
                 }
-                if (n == C.RESULT_END_OF_INPUT || n < 0) {
-                    synchronized (lock) {
-                        lock.notifyAll();
-                    }
-                    return;
-                }
-                if (n > 0) {
-                    synchronized (lock) {
-                        appendToRing(tmp, 0, n);
-                        lock.notifyAll();
-                    }
+                synchronized (lock) {
+                    lock.notifyAll();
                 }
             }
         }, "RadioRingBufferReader");
@@ -396,6 +406,11 @@ public class RingBufferDataSource implements DataSource {
      * Fully tear down: stop the background reader and close the live connection. Called by
      * {@link ExoPlayerWrapper} when it stops/pauses/releases the player, since a plain
      * DataSource has no separate release hook and close() is reused for seeks.
+     *
+     * <p>The delegate is closed by the reader thread as it exits (never on the caller's
+     * thread), because delegate.close() closes the SSL socket and does network I/O — doing
+     * that on the main thread (release() is called from the player/main thread) would throw
+     * NetworkOnMainThreadException.
      */
     public void release() {
         closed = true;
@@ -405,10 +420,6 @@ public class RingBufferDataSource implements DataSource {
         if (readerThread != null) {
             readerThread.interrupt();
         }
-        try {
-            delegate.close();
-        } catch (IOException e) {
-            Log.w(TAG, "Error closing delegate on release", e);
-        }
+        // delegate.close() happens in the reader thread's finally block.
     }
 }
