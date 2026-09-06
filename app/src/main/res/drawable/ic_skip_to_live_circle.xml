@@ -4,13 +4,15 @@
     android:viewportWidth="24"
     android:viewportHeight="24"
     android:tint="?attr/colorControlNormal">
-    <!-- "Go to live": a play arrow inside a circle outline. Distinct from skip-to-next
-         (a bare triangle + bar). Glyph is inset (~4..20) to match the other transport
-         icons' padded footprint. -->
-    <path
-        android:fillColor="@android:color/white"
-        android:pathData="M12,4c-4.42,0 -8,3.58 -8,8s3.58,8 8,8 8,-3.58 8,-8 -3.58,-8 -8,-8zM12,18.5c-3.58,0 -6.5,-2.92 -6.5,-6.5S8.42,5.5 12,5.5s6.5,2.92 6.5,6.5 -2.92,6.5 -6.5,6.5z" />
-    <path
-        android:fillColor="@android:color/white"
-        android:pathData="M10,8.5l5,3.5l-5,3.5z" />
+    <!-- "Go to live": the forward (mirrored) counterpart of the -15s replay arrow, without
+         the number. Same glyph geometry as ic_replay_15_circle so it matches its footprint
+         and padding; the arrowhead points forward instead of back. -->
+    <group
+        android:pivotX="12"
+        android:pivotY="12"
+        android:scaleX="-1">
+        <path
+            android:fillColor="@android:color/white"
+            android:pathData="M12,5V1L7,6l5,5V7c3.31,0 6,2.69 6,6s-2.69,6 -6,6 -6,-2.69 -6,-6H4c0,4.42 3.58,8 8,8s8,-3.58 8,-8 -3.58,-8 -8,-8z" />
+    </group>
 </vector>
