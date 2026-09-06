@@ -593,21 +593,16 @@ public class FragmentPlayerFull extends Fragment {
         updateRewindButton(playing);
     }
 
-    // Rewind feature: phone-only. Shows the -15s button at the live edge, or the go-live
-    // button when playback is currently rewound (the -15s / live toggle). Both occupy the
-    // same slot so exactly one is visible.
+    // Rewind feature: phone-only. The -15s rewind button shows whenever there is buffered
+    // audio (so you can keep rewinding further). The go-live button (far right) appears only
+    // when playback is currently rewound, to jump back to the live edge.
     private void updateRewindButton(boolean playing) {
         boolean feature = playing
                 && !Utils.isRunningOnTV(requireContext())
                 && PlayerServiceUtil.canSeekBackward();
-        if (!feature) {
-            btnRewind.setVisibility(View.GONE);
-            btnGoLive.setVisibility(View.GONE);
-            return;
-        }
-        boolean behindLive = PlayerServiceUtil.isBehindLive();
-        btnRewind.setVisibility(behindLive ? View.GONE : View.VISIBLE);
-        btnGoLive.setVisibility(behindLive ? View.VISIBLE : View.GONE);
+        btnRewind.setVisibility(feature ? View.VISIBLE : View.GONE);
+        btnGoLive.setVisibility(feature && PlayerServiceUtil.isBehindLive()
+                ? View.VISIBLE : View.GONE);
     }
 
     private void updatePlayButton(boolean playing) {
