@@ -812,21 +812,23 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
 
         // Rewind feature: on Android 13+ the system media notification renders explicit
         // buttons from MediaSession *custom actions* (the standard ACTION_REWIND transport
-        // bit is not shown as a button). For non-HLS streams add a -15s action, plus a
-        // go-live action when playback is currently rewound.
+        // bit is not shown as a button). Mirror the in-app single-toggle behaviour with one
+        // action that swaps: -15s at the live edge, go-live when rewound.
         if (!isHls && (state == PlaybackStateCompat.STATE_PLAYING
                 || state == PlaybackStateCompat.STATE_BUFFERING)) {
-            playbackStateBuilder.addCustomAction(
-                    new PlaybackStateCompat.CustomAction.Builder(
-                            CUSTOM_ACTION_REWIND,
-                            getString(R.string.description_btn_rewind),
-                            R.drawable.ic_replay_15_white_24dp).build());
-            if (radioPlayer != null && radioPlayer.isBehindLive()) {
+            boolean behindLive = radioPlayer != null && radioPlayer.isBehindLive();
+            if (behindLive) {
                 playbackStateBuilder.addCustomAction(
                         new PlaybackStateCompat.CustomAction.Builder(
                                 CUSTOM_ACTION_GO_LIVE,
                                 getString(R.string.description_btn_go_live),
                                 R.drawable.ic_skip_to_live_white_24dp).build());
+            } else {
+                playbackStateBuilder.addCustomAction(
+                        new PlaybackStateCompat.CustomAction.Builder(
+                                CUSTOM_ACTION_REWIND,
+                                getString(R.string.description_btn_rewind),
+                                R.drawable.ic_replay_15_white_24dp).build());
             }
         }
 
