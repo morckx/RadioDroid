@@ -148,10 +148,11 @@ public class RadioPlayer implements PlayerWrapper.PlayListener, Recordable {
         playerThreadHandler.post(() -> currentPlayer.seekBackward(ms));
     }
 
-    // Rewind feature: whether there is currently rewindable buffered audio.
+    // Rewind feature: whether rewind is possible for the current stream. True from playback
+    // start (does not wait for audio to buffer), so the rewind button appears immediately.
     public final boolean canSeekBackward() {
         if (currentPlayer instanceof ExoPlayerWrapper) {
-            return ((ExoPlayerWrapper) currentPlayer).getRewindableMs() > 0;
+            return ((ExoPlayerWrapper) currentPlayer).isRewindPossible();
         }
         return false;
     }

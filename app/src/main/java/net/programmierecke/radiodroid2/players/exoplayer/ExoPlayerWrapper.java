@@ -201,6 +201,14 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
         return ringBuffer.getRewindableMs();
     }
 
+    // Rewind feature: whether rewind is possible for the current stream (enabled, non-HLS,
+    // ring buffer present). True from the moment playback starts, before any audio is
+    // buffered, so the UI can show the rewind button immediately (a rewind simply no-ops
+    // until a little audio has accumulated).
+    public boolean isRewindPossible() {
+        return radioDataSourceFactory != null && radioDataSourceFactory.getRingBuffer() != null;
+    }
+
     // Rewind feature: fully tear down the time-shift ring buffer (background reader +
     // live connection). close() is reused by media3 for seeks, so teardown is explicit.
     private void releaseRingBuffer() {
