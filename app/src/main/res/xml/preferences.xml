@@ -164,6 +164,13 @@
             android:summaryOn="@string/settings_auto_resume_on_bluetooth_a2dp_connected_on"
             android:title="@string/settings_auto_resume_on_bluetooth_a2dp_connected" />
 
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="show_rewind_in_mini_player"
+            android:summaryOff="@string/settings_rewind_in_mini_player_off"
+            android:summaryOn="@string/settings_rewind_in_mini_player_on"
+            android:title="@string/settings_rewind_in_mini_player" />
+
         <Preference
             android:key="equalizer"
             android:title="@string/settings_equalizer" />
