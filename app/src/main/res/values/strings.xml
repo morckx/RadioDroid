@@ -186,6 +186,9 @@
     <string name="settings_milliseconds_format">%d milliseconds</string>
 
     <string name="settings_pause_when_noisy">Pause on headset disconnect</string>
+    <string name="settings_enable_rewind">Enable rewind</string>
+    <string name="settings_enable_rewind_on">A −15 s rewind / back-to-live button is available while listening to live radio (uses a small audio buffer)</string>
+    <string name="settings_enable_rewind_off">No rewind buffer is kept; saves a little memory</string>
     <string name="settings_rewind_in_mini_player">Rewind button in mini player</string>
     <string name="settings_rewind_in_mini_player_on">The rewind / back-to-live button is shown in the collapsed mini player</string>
     <string name="settings_rewind_in_mini_player_off">The rewind / back-to-live button is only shown in the full player</string>

@@ -814,9 +814,11 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
         // buttons from MediaSession *custom actions* (the standard ACTION_REWIND transport
         // bit is not shown as a button). Mirror the in-app single-toggle behaviour with one
         // action that swaps: -15s at the live edge, go-live when rewound.
-        if (!isHls && (state == PlaybackStateCompat.STATE_PLAYING
+        boolean rewindAvailable = radioPlayer != null
+                && (radioPlayer.canSeekBackward() || radioPlayer.isBehindLive());
+        if (rewindAvailable && (state == PlaybackStateCompat.STATE_PLAYING
                 || state == PlaybackStateCompat.STATE_BUFFERING)) {
-            boolean behindLive = radioPlayer != null && radioPlayer.isBehindLive();
+            boolean behindLive = radioPlayer.isBehindLive();
             if (behindLive) {
                 playbackStateBuilder.addCustomAction(
                         new PlaybackStateCompat.CustomAction.Builder(
