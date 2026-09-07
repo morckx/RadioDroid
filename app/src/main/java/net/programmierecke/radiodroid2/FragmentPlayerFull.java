@@ -135,7 +135,6 @@ public class FragmentPlayerFull extends Fragment {
     private ImageButton btnPrev;
     private ImageButton btnNext;
     private ImageButton btnRewind;
-    private ImageButton btnGoLive;
 
     // Rewind feature: how far back one tap jumps. Will become configurable (15-120s).
     private static final long REWIND_STEP_MS = 15000;
@@ -246,7 +245,6 @@ public class FragmentPlayerFull extends Fragment {
         btnPrev = view.findViewById(R.id.buttonPrev);
         btnNext = view.findViewById(R.id.buttonNext);
         btnRewind = view.findViewById(R.id.buttonRewind);
-        btnGoLive = view.findViewById(R.id.buttonGoLive);
         btnRecord = view.findViewById(R.id.buttonRecord);
         btnFavourite = view.findViewById(R.id.buttonFavorite);
 
@@ -366,14 +364,15 @@ public class FragmentPlayerFull extends Fragment {
             // Force UI update after station change
             new Handler().postDelayed(this::fullUpdate, 100);
         });
+        // Rewind / back-to-live toggle: at the live edge, tap rewinds -15s (and the button
+        // becomes "selected"/inverted); when rewound, tap jumps back to live.
         btnRewind.setOnClickListener(view -> {
-            PlayerServiceUtil.seekBackward(REWIND_STEP_MS);
-            // Reflect the rewound state promptly (show the go-live button).
-            new Handler().postDelayed(() ->
-                    updatePlaybackButtons(PlayerServiceUtil.isPlaying(), PlayerServiceUtil.isRecording()), 200);
-        });
-        btnGoLive.setOnClickListener(view -> {
-            PlayerServiceUtil.seekToLive();
+            if (PlayerServiceUtil.isBehindLive()) {
+                PlayerServiceUtil.seekToLive();
+            } else {
+                PlayerServiceUtil.seekBackward(REWIND_STEP_MS);
+            }
+            // Reflect the new rewound/live state promptly.
             new Handler().postDelayed(() ->
                     updatePlaybackButtons(PlayerServiceUtil.isPlaying(), PlayerServiceUtil.isRecording()), 200);
         });
@@ -593,16 +592,21 @@ public class FragmentPlayerFull extends Fragment {
         updateRewindButton(playing);
     }
 
-    // Rewind feature: phone-only. The -15s rewind button shows whenever there is buffered
-    // audio (so you can keep rewinding further). The go-live button (far right) appears only
-    // when playback is currently rewound, to jump back to the live edge.
+    // Rewind feature: phone-only single toggle button. Visible whenever there is buffered
+    // audio; shows -15s normally and an inverted "selected" look when rewound (tap = live).
     private void updateRewindButton(boolean playing) {
         boolean feature = playing
                 && !Utils.isRunningOnTV(requireContext())
                 && PlayerServiceUtil.canSeekBackward();
         btnRewind.setVisibility(feature ? View.VISIBLE : View.GONE);
-        btnGoLive.setVisibility(feature && PlayerServiceUtil.isBehindLive()
-                ? View.VISIBLE : View.GONE);
+        if (feature) {
+            boolean behindLive = PlayerServiceUtil.isBehindLive();
+            btnRewind.setSelected(behindLive);
+            btnRewind.setContentDescription(getString(behindLive
+                    ? R.string.description_btn_go_live : R.string.description_btn_rewind));
+        } else {
+            btnRewind.setSelected(false);
+        }
     }
 
     private void updatePlayButton(boolean playing) {

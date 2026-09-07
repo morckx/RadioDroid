@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Rewind/back-to-live toggle background: a filled accent circle when selected (rewound),
+     transparent otherwise. Combined with the tint selector this gives the inverted
+     "selected" look that signals playback is behind live. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_selected="true">
+        <shape android:shape="oval">
+            <solid android:color="@color/colorAccent" />
+        </shape>
+    </item>
+    <item android:drawable="@android:color/transparent" />
+</selector>

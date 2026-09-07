@@ -271,6 +271,9 @@ public class RingBufferDataSource implements DataSource {
      */
     public long seekToLive() {
         synchronized (lock) {
+            if (!rewound) {
+                return 0;
+            }
             long bytesPerSecond = measuredBytesPerSecond();
             long target = liveBytePos;
             if (metaint > 0) {
@@ -279,15 +282,19 @@ public class RingBufferDataSource implements DataSource {
                     target = snapped;
                 }
             }
-            long movedBytes = target - readBytePos;
+            // NOTE: readBytePos has already raced ahead toward live (ExoPlayer reads ahead to
+            // fill its decode buffer), so target - readBytePos is ~0 and cannot be used to
+            // decide "did we move". What matters for the *listener* is that ExoPlayer's queued
+            // buffered audio (~the rewind amount) gets discarded and playback resumes at the
+            // live edge. We unconditionally reposition to live; ExoPlayer's seekTo(0) restart
+            // (in ExoPlayerWrapper) flushes the buffer and re-reads from here.
             rewound = false;
-            if (movedBytes <= 0) {
-                return 0; // already at (or past) the snapped live edge
-            }
             pendingReadPos = target;
-            long movedMs = (bytesPerSecond > 0) ? movedBytes * 1000 / bytesPerSecond : 0;
-            Log.d(TAG, "seekToLive: moved " + movedMs + "ms forward");
-            return movedMs;
+            Log.d(TAG, "seekToLive: repositioning to live edge " + target);
+            // Report the buffered-ahead amount we're discarding, for the caller's log.
+            long discardMs = (bytesPerSecond > 0)
+                    ? (liveBytePos - target) * 1000 / bytesPerSecond : 1;
+            return Math.max(1, discardMs);
         }
     }
 
