@@ -3,6 +3,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## Development snapshot [0.86.905-morckx] - 2026-09-06
+
+### Added
+
+- Rewind live radio: a time-shift buffer lets you jump back (−15 s) while listening, e.g. to re-hear something in a talk/news programme, and a "go to live" button to jump back to the live edge
+  - Available on phones for progressive (non-HLS) streams, both as buttons in the full player and as actions in the media notification / lock screen
+  - Retains up to ~120 s of audio; rewind is aligned to ICY metadata boundaries so playback stays clean
+
 ## Development snapshot [0.86.904-morckx] - 2026-09-05
 
 ### Fixed

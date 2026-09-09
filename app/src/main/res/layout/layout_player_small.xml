@@ -97,7 +97,25 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="start"
-        app:constraint_referenced_ids="buttonPlay,buttonMore" />
+        app:constraint_referenced_ids="buttonRewind,buttonPlay,buttonMore" />
+
+    <!-- Rewind / back-to-live toggle in the collapsed player. Opt-in via settings; sits to
+         the left of play. Same selected/inverted behaviour as the full player. -->
+    <ImageButton
+        android:id="@+id/buttonRewind"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_centerVertical="true"
+        android:background="@drawable/rewind_toggle_background"
+        android:contentDescription="@string/description_btn_rewind"
+        android:padding="3dp"
+        android:scaleType="fitCenter"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/buttonPlay"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_replay_15_circle"
+        app:tint="@color/rewind_toggle_tint" />
 
     <ImageButton
         android:id="@+id/buttonPlay"

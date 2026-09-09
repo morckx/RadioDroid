@@ -49,7 +49,7 @@ def buildDate = { ->
     new Date().format('yyyy-MM-dd HH:mm:ss')
 }
 
-def appVersionName = "0.86.904-morckx"
+def appVersionName = "0.86.905-morckx"
 
 android {
     flavorDimensions "one"
@@ -72,7 +72,7 @@ android {
         minSdk 23
         targetSdk 37
 
-        versionCode 100
+        versionCode 101
         versionName appVersionName
 
         multiDexEnabled true

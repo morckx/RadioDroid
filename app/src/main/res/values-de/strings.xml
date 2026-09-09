@@ -165,7 +165,7 @@
     <string name="action_mpd_ok">MPD verbunden</string>
     <string name="action_mpd_connected">Verbunden mit Server: %1$s</string>
 
-    <string name="settings_other">Anderes</string>
+    <string name="settings_other">Sonstiges</string>
     <string-array name="weekdays">
         <item>S</item>
         <item>M</item>

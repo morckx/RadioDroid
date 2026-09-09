@@ -143,6 +143,37 @@ public class RadioPlayer implements PlayerWrapper.PlayListener, Recordable {
         }
     }
 
+    // Rewind feature: jump back within the retained time-shift buffer.
+    public final void seekBackward(long ms) {
+        playerThreadHandler.post(() -> currentPlayer.seekBackward(ms));
+    }
+
+    // Rewind feature: whether rewind is possible for the current stream. True from playback
+    // start (does not wait for audio to buffer), so the rewind button appears immediately.
+    public final boolean canSeekBackward() {
+        if (currentPlayer instanceof ExoPlayerWrapper) {
+            return ((ExoPlayerWrapper) currentPlayer).isRewindPossible();
+        }
+        return false;
+    }
+
+    // Rewind feature: jump forward to the live edge (undo a rewind).
+    public final void seekToLive() {
+        playerThreadHandler.post(() -> {
+            if (currentPlayer instanceof ExoPlayerWrapper) {
+                ((ExoPlayerWrapper) currentPlayer).seekToLive();
+            }
+        });
+    }
+
+    // Rewind feature: whether playback is currently behind the live edge (rewound).
+    public final boolean isBehindLive() {
+        if (currentPlayer instanceof ExoPlayerWrapper) {
+            return ((ExoPlayerWrapper) currentPlayer).isBehindLive();
+        }
+        return false;
+    }
+
     public final void pause() {
         cancelStationLinkRetrieval();
 

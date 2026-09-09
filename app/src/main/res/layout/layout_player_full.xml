@@ -246,11 +246,30 @@
             android:contentDescription="@string/description_btn_skip_to_previous"
             android:scaleType="fitXY"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/buttonPlay"
+            app:layout_constraintEnd_toStartOf="@+id/buttonRewind"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/buttonRecord"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_skip_previous_circle" />
+
+        <!-- Rewind / back-to-live toggle: shows -15s at the live edge (tap = rewind), and an
+             inverted "selected" look when rewound (tap = back to live). One button, one slot. -->
+        <ImageButton
+            android:id="@+id/buttonRewind"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/rewind_toggle_background"
+            android:contentDescription="@string/description_btn_rewind"
+            android:padding="4dp"
+            android:scaleType="fitCenter"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/buttonPlay"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/buttonPrev"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_replay_15_circle"
+            app:tint="@color/rewind_toggle_tint" />
 
         <ImageButton
             android:id="@+id/buttonPlay"
@@ -262,7 +281,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/buttonNext"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/buttonPrev"
+            app:layout_constraintStart_toEndOf="@+id/buttonRewind"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_play_circle" />
 

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.*;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.*;
@@ -53,6 +54,9 @@ public class FragmentPlayerSmall extends Fragment {
 
     private ImageButton buttonPlay;
     private ImageButton buttonMore;
+    private ImageButton buttonRewind;
+
+    private static final long REWIND_STEP_MS = 15000;
 
     private boolean firstPlayAttempted = false;
 
@@ -94,6 +98,7 @@ public class FragmentPlayerSmall extends Fragment {
 
         buttonPlay = view.findViewById(R.id.buttonPlay);
         buttonMore = view.findViewById(R.id.buttonMore);
+        buttonRewind = view.findViewById(R.id.buttonRewind);
 
         return view;
     }
@@ -114,6 +119,17 @@ public class FragmentPlayerSmall extends Fragment {
             } else {
                 playLastFromHistory();
             }
+        });
+
+        // Rewind / back-to-live toggle (opt-in, mini player). Same behaviour as the full
+        // player: -15s at the live edge, back-to-live when rewound.
+        buttonRewind.setOnClickListener(v -> {
+            if (PlayerServiceUtil.isBehindLive()) {
+                PlayerServiceUtil.seekToLive();
+            } else {
+                PlayerServiceUtil.seekBackward(REWIND_STEP_MS);
+            }
+            new Handler().postDelayed(this::fullUpdate, 200);
         });
 
         buttonMore.setOnClickListener(view -> {
@@ -228,6 +244,26 @@ public class FragmentPlayerSmall extends Fragment {
         transparentCircle.setVisibility(useCircularIcons ? View.VISIBLE : View.GONE);
     }
 
+    // Rewind feature: opt-in mini-player toggle. Shown only when the preference is enabled,
+    // playing, not on TV, and there is buffered audio. Selected/inverted look when rewound.
+    private void updateRewindButton() {
+        boolean prefEnabled = PreferenceManager.getDefaultSharedPreferences(requireContext())
+                .getBoolean("show_rewind_in_mini_player", false);
+        boolean feature = prefEnabled
+                && PlayerServiceUtil.isPlaying()
+                && !Utils.isRunningOnTV(requireContext())
+                && PlayerServiceUtil.canSeekBackward();
+        buttonRewind.setVisibility(feature ? View.VISIBLE : View.GONE);
+        if (feature) {
+            boolean behindLive = PlayerServiceUtil.isBehindLive();
+            buttonRewind.setSelected(behindLive);
+            buttonRewind.setContentDescription(getString(behindLive
+                    ? R.string.description_btn_go_live : R.string.description_btn_rewind));
+        } else {
+            buttonRewind.setSelected(false);
+        }
+    }
+
     private void fullUpdate() {
         if (PlayerServiceUtil.isPlaying()) {
             buttonPlay.setImageResource(R.drawable.ic_pause_circle);
@@ -236,6 +272,8 @@ public class FragmentPlayerSmall extends Fragment {
             buttonPlay.setImageResource(R.drawable.ic_play_circle);
             buttonPlay.setContentDescription(getResources().getString(R.string.detail_play));
         }
+
+        updateRewindButton();
 
         DataRadioStation station = Utils.getCurrentOrLastStation(requireContext());
 

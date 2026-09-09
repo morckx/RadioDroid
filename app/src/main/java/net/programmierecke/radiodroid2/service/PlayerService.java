@@ -10,6 +10,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.bluetooth.BluetoothA2dp;
 import android.bluetooth.BluetoothHeadset;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -102,6 +103,12 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
     private final String ACTION_RESUME = "resume";
     private final String ACTION_SKIP_TO_NEXT = "next";
     private final String ACTION_SKIP_TO_PREVIOUS = "previous";
+    private final String ACTION_REWIND = "rewind";
+    // Rewind feature: notification rewind step. Matches the in-app button default.
+    private static final long NOTIFICATION_REWIND_STEP_MS = 15000;
+    // MediaSession custom action ids for the -15s rewind / go-live buttons (Android 13+ media UI).
+    public static final String CUSTOM_ACTION_REWIND = "net.programmierecke.radiodroid2.CUSTOM_REWIND";
+    public static final String CUSTOM_ACTION_GO_LIVE = "net.programmierecke.radiodroid2.CUSTOM_GO_LIVE";
     private final String ACTION_STOP = "stop";
 
     private static final float FULL_VOLUME = 100f;
@@ -133,6 +140,7 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
     private final BecomingNoisyReceiver becomingNoisyReceiver = new BecomingNoisyReceiver();
     private final HeadsetConnectionReceiver headsetConnectionReceiver = new HeadsetConnectionReceiver();
     private final ConnectivityChecker connectivityChecker = new ConnectivityChecker();
+
 
     private PauseReason pauseReason = PauseReason.NONE;
 
@@ -176,6 +184,28 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
 
         public void SkipToPrevious() throws RemoteException {
             PlayerService.this.previous();
+        }
+
+        public void SeekBackward(long ms) throws RemoteException {
+            if (radioPlayer != null) {
+                radioPlayer.seekBackward(ms);
+                refreshRewindControlsSoon();
+            }
+        }
+
+        public boolean canSeekBackward() throws RemoteException {
+            return radioPlayer != null && radioPlayer.canSeekBackward();
+        }
+
+        public void SeekToLive() throws RemoteException {
+            if (radioPlayer != null) {
+                radioPlayer.seekToLive();
+                refreshRewindControlsSoon();
+            }
+        }
+
+        public boolean isBehindLive() throws RemoteException {
+            return radioPlayer != null && radioPlayer.isBehindLive();
         }
 
         public void Play(boolean isAlarm) throws RemoteException {
@@ -541,6 +571,11 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
                     case ACTION_RESUME:
                         resume();
                         break;
+                    case ACTION_REWIND:
+                        if (radioPlayer != null) {
+                            radioPlayer.seekBackward(NOTIFICATION_REWIND_STEP_MS);
+                        }
+                        break;
                     case ACTION_MEDIA_BUTTON:
                         KeyEvent key = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
                         if (key.getAction() == KeyEvent.ACTION_UP) {
@@ -775,6 +810,30 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
         PlaybackStateCompat.Builder playbackStateBuilder = new PlaybackStateCompat.Builder();
         playbackStateBuilder.setActions(actions);
 
+        // Rewind feature: on Android 13+ the system media notification renders explicit
+        // buttons from MediaSession *custom actions* (the standard ACTION_REWIND transport
+        // bit is not shown as a button). Mirror the in-app single-toggle behaviour with one
+        // action that swaps: -15s at the live edge, go-live when rewound.
+        boolean rewindAvailable = radioPlayer != null
+                && (radioPlayer.canSeekBackward() || radioPlayer.isBehindLive());
+        if (rewindAvailable && (state == PlaybackStateCompat.STATE_PLAYING
+                || state == PlaybackStateCompat.STATE_BUFFERING)) {
+            boolean behindLive = radioPlayer.isBehindLive();
+            if (behindLive) {
+                playbackStateBuilder.addCustomAction(
+                        new PlaybackStateCompat.CustomAction.Builder(
+                                CUSTOM_ACTION_GO_LIVE,
+                                getString(R.string.description_btn_go_live),
+                                R.drawable.ic_skip_to_live_white_24dp).build());
+            } else {
+                playbackStateBuilder.addCustomAction(
+                        new PlaybackStateCompat.CustomAction.Builder(
+                                CUSTOM_ACTION_REWIND,
+                                getString(R.string.description_btn_rewind),
+                                R.drawable.ic_replay_15_white_24dp).build());
+            }
+        }
+
         if (state == PlaybackStateCompat.STATE_ERROR) {
             String error = "";
 
@@ -936,6 +995,24 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
                 .addAction(R.drawable.ic_stop_white_24dp, getString(R.string.action_stop), pendingIntentStop)
                 .addAction(R.drawable.ic_skip_previous_24dp, getString(R.string.action_skip_to_previous), pendingIntentPrevious);
 
+        // Action indices for the compact view. Actions so far: [0]stop, [1]previous.
+        // Rewind (if shown), then play/pause, then next follow.
+        int actionIndex = 2;
+
+        // Rewind feature: show a -15s action when playing a non-HLS (progressive) stream,
+        // which is where the time-shift buffer applies. We intentionally don't gate on the
+        // buffer being non-empty (which flickers and needs a rebuild) — the buffer fills
+        // within a second or two and seekBackward safely no-ops until then.
+        boolean rewindAvailable = (currentPlayerState == PlayState.Playing) && !isHls;
+        if (rewindAvailable) {
+            Intent rewindIntent = new Intent(itsContext, PlayerService.class);
+            rewindIntent.setAction(ACTION_REWIND);
+            PendingIntent pendingIntentRewind = PendingIntent.getService(itsContext, 0, rewindIntent, pendingIntentFlag);
+            notificationBuilder.addAction(R.drawable.ic_replay_15_white_24dp, getString(R.string.description_btn_rewind), pendingIntentRewind);
+            actionIndex++;
+        }
+
+        int playPauseIndex = actionIndex;
         if (currentPlayerState == PlayState.Playing || currentPlayerState == PlayState.PrePlaying) {
             Intent pauseIntent = new Intent(itsContext, PlayerService.class);
             pauseIntent.setAction(ACTION_PAUSE);
@@ -954,11 +1031,12 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
                     .setDeleteIntent(pendingIntentStop)
                     .setOngoing(false);
         }
+        int nextIndex = playPauseIndex + 1;
 
         notificationBuilder.addAction(R.drawable.ic_skip_next_24dp, getString(R.string.action_skip_to_next), pendingIntentNext)
                 .setStyle(new MediaStyle()
                         .setMediaSession(mediaSession.getSessionToken())
-                        .setShowActionsInCompactView(1, 2, 3 /* previous, play/pause, next */)
+                        .setShowActionsInCompactView(playPauseIndex - 1, playPauseIndex, nextIndex)
                         .setCancelButtonIntent(pendingIntentStop)
                         .setShowCancelButton(true));
         Notification notification = notificationBuilder.build();
@@ -982,6 +1060,20 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
 
     private void updateNotification() {
         updateNotification(radioPlayer.getPlayState());
+    }
+
+    // Rewind feature: after a rewind/go-live (which take effect on the player thread), refresh
+    // the media session state + notification so the -15s / go-live buttons reflect the new
+    // behind-live state.
+    private void refreshRewindControlsSoon() {
+        handler.postDelayed(() -> {
+            if (radioPlayer != null && radioPlayer.isPlaying()) {
+                setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING);
+                if (notificationIsActive) {
+                    updateNotification();
+                }
+            }
+        }, 300);
     }
 
     private void updateNotification(PlayState playState) {
@@ -1249,6 +1341,17 @@ public class PlayerService extends JobIntentService implements RadioPlayer.Playe
             }
         }
         sendBroadCast(PLAYER_SERVICE_META_UPDATE);
+
+        // Rewind feature: now that we know whether the stream is HLS, refresh the media
+        // session state (Android 13+ renders the notification's media buttons from the
+        // PlaybackState actions) and the notification, so the -15s button appears for
+        // non-HLS streams or stays hidden for HLS.
+        if (notificationIsActive) {
+            if (radioPlayer != null && radioPlayer.isPlaying()) {
+                setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING);
+            }
+            updateNotification();
+        }
     }
 
     @Override

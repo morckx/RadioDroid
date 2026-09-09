@@ -134,6 +134,10 @@ public class FragmentPlayerFull extends Fragment {
     private ImageButton btnPlay;
     private ImageButton btnPrev;
     private ImageButton btnNext;
+    private ImageButton btnRewind;
+
+    // Rewind feature: how far back one tap jumps. Will become configurable (15-120s).
+    private static final long REWIND_STEP_MS = 15000;
     private ImageButton btnRecord;
     private ImageButton btnFavourite;
 
@@ -240,6 +244,7 @@ public class FragmentPlayerFull extends Fragment {
         btnPlay = view.findViewById(R.id.buttonPlay);
         btnPrev = view.findViewById(R.id.buttonPrev);
         btnNext = view.findViewById(R.id.buttonNext);
+        btnRewind = view.findViewById(R.id.buttonRewind);
         btnRecord = view.findViewById(R.id.buttonRecord);
         btnFavourite = view.findViewById(R.id.buttonFavorite);
 
@@ -358,6 +363,18 @@ public class FragmentPlayerFull extends Fragment {
             PlayerServiceUtil.skipToNext();
             // Force UI update after station change
             new Handler().postDelayed(this::fullUpdate, 100);
+        });
+        // Rewind / back-to-live toggle: at the live edge, tap rewinds -15s (and the button
+        // becomes "selected"/inverted); when rewound, tap jumps back to live.
+        btnRewind.setOnClickListener(view -> {
+            if (PlayerServiceUtil.isBehindLive()) {
+                PlayerServiceUtil.seekToLive();
+            } else {
+                PlayerServiceUtil.seekBackward(REWIND_STEP_MS);
+            }
+            // Reflect the new rewound/live state promptly.
+            new Handler().postDelayed(() ->
+                    updatePlaybackButtons(PlayerServiceUtil.isPlaying(), PlayerServiceUtil.isRecording()), 200);
         });
 
         btnRecord.setOnClickListener(view -> {
@@ -572,6 +589,24 @@ public class FragmentPlayerFull extends Fragment {
     private void updatePlaybackButtons(boolean playing, boolean recording) {
         updatePlayButton(playing);
         updateRecordButton(playing, recording);
+        updateRewindButton(playing);
+    }
+
+    // Rewind feature: phone-only single toggle button. Visible whenever there is buffered
+    // audio; shows -15s normally and an inverted "selected" look when rewound (tap = live).
+    private void updateRewindButton(boolean playing) {
+        boolean feature = playing
+                && !Utils.isRunningOnTV(requireContext())
+                && PlayerServiceUtil.canSeekBackward();
+        btnRewind.setVisibility(feature ? View.VISIBLE : View.GONE);
+        if (feature) {
+            boolean behindLive = PlayerServiceUtil.isBehindLive();
+            btnRewind.setSelected(behindLive);
+            btnRewind.setContentDescription(getString(behindLive
+                    ? R.string.description_btn_go_live : R.string.description_btn_rewind));
+        } else {
+            btnRewind.setSelected(false);
+        }
     }
 
     private void updatePlayButton(boolean playing) {
